@@ -78,12 +78,24 @@ def read_int_ids(file):  #creates commands list for ML counts
 
 if __name__ == '__main__':
     
-    #print "Input street names file to upload:"
-    #filename = raw_input()
+    #===========Interactive Input=====================================
+    # print "Give full path for Street Names file:"
+    # filenamestreets = raw_input()
+    # print "\nGive full path for Intersection_Ids file:"
+    # filenameids = raw_input()
+    # print "\nDB to login?"
+    # db = raw_input()
+    # print "\nUser to login as?"
+    # user = raw_input()
+    #===========================================================================
+    
+    
+    #======Static Input======================================
     filenamestreets = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\Streets.xls"
     filenameids = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\IntIds.xls"
     db = "postgres"
     user = "postgres"
+    #===========================================================================
     
     
     street_names = read_street_names(filenamestreets)
@@ -93,5 +105,5 @@ if __name__ == '__main__':
     py2psql.int_ids(int_ids,db,user)
     
     
-    print "DONE!"
+    print "UPLOAD COMPLETED !"
     

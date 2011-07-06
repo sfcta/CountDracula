@@ -1,13 +1,14 @@
-'''
-Created on Jul 1, 2011
+#!/usr/bin/env python
 
-@author: varun
-'''
-#===============================================================================
-# THIS FILE DOES ALL THE INTERACTION WITH PSQL !!
-#===============================================================================
+""""THIS FILE DOES ALL THE INTERACTION WITH PSQL !!
+"""
 
 import psycopg2 #Imported library(external) to interact with psql
+
+__author__ = "Varun Kohli, San Francisco County Transportation Authority"
+__license__= "GPL"
+__email__  = "modeling@sfcta.org"
+__date__   = "Jul 1 2011" 
 
 def upload_mainline (commandslist,db,user):	    #uploads counts to mainline table
     

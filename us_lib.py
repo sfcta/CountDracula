@@ -1,16 +1,15 @@
-'''
-Created on Jun 30, 2011
+#!/usr/bin/env python
 
-@author: varun
-'''
-#===============================================================================
-# General file containing misc. functions
-#===============================================================================
+"""General file containing misc. functions
+"""
 
-import os   #library to move files in system
-#import xlrd #Imported library(external) to read xls files on any platform
-from datetime import time,timedelta,datetime #Inbuilt library used for timestamp datatype
+import os
+from datetime import time,timedelta,datetime 
 
+__author__ = "Varun Kohli, San Francisco County Transportation Authority"
+__license__= "GPL"
+__email__  = "modeling@sfcta.org"
+__date__   = "Jun 30, 2011" 
 
 def movefile (src, dst, filename):	 #moves filename from src to dst directory
     

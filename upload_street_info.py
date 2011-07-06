@@ -1,10 +1,12 @@
-'''
-Created on Jul 5, 2011
+#!/usr/bin/env python
 
-@author: varun
-'''
 import py2psql
 import xlrd
+
+__author__ = "Varun Kohli, San Francisco County Transportation Authority"
+__license__= "GPL"
+__email__  = "modeling@sfcta.org"
+__date__   = "Jul 5 2011" 
 
 def read_street_names(file):  #creates commands list for ML counts
 

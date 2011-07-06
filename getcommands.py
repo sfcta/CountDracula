@@ -1,17 +1,17 @@
-'''
-Created on Jul 1, 2011
+#!/usr/bin/env python
 
-@author: varun
-'''
-#===============================================================================
-# Returns appropriate list of command parameters to be used to either 
-# upload to server or create csv file
-#===============================================================================
+"""Returns appropriate list of command parameters to be used to either 
+   upload to server or create csv file
+"""
 
-import xlrd #Imported library(external) to read xls files on any platform
+from datetime import date
+import xlrd 
 import us_lib   #Custom built library that has random utility functions
-from datetime import date   #Inbuilt library used for timestamp datatype
 
+__author__ = "Varun Kohli, San Francisco County Transportation Authority"
+__license__= "GPL"
+__email__  = "modeling@sfcta.org"
+__date__   = "Jul 1 2011" 
 
 def mainline(filename,filepath):  #creates commands list for ML counts
 

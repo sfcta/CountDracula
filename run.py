@@ -1,16 +1,17 @@
-'''
-Created on Jul 1, 2011
+#!/usr/bin/env python
 
-@author: varun
-'''
-#===============================================================================
-# MAIN FILE THAT STARTS EVERYTHING
-#===============================================================================
+"""MAIN FILE THAT STARTS EVERYTHING
+"""
 
 import os   #library to move files in system
 import py2psql #custom built library to interact with postgres 
 import getcommands  #Custom built library functions that parse the excel file and create commands list
 import us_lib   #Custom built library that has random utility functions
+
+__author__ = "Varun Kohli, San Francisco County Transportation Authority"
+__license__= "GPL"
+__email__  = "modeling@sfcta.org"
+__date__   = "Jul 5 2011" 
 
 def decide_type_n_go (file, directory): #Decides count type (ML or turn) and uploads accordingly
     

@@ -15,22 +15,32 @@ __date__   = "Jul 5 2011"
 
 def decide_type_n_go (file, directory): #Decides count type (ML or turn) and uploads accordingly
     
+    #===========================================================================
+    # db = raw_input()
+    # user = raw_input()
+    #===========================================================================
+    
     db = "postgres"         #dbname to upload to
     user = "postgres"       #user to upload as
+    
+    filenamestreets = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\Streets.xls"
+    filenamealts = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\ALT_Streets.xls"
+    allowed_streets = us_lib.exact_street_names(filenamestreets)
+    alt_streets = us_lib.alt_street_names(filenamealts)
     
     streets = file.replace(".xls","")
     splits = "_."
     slist = ''.join([ s if s not in splits else ' ' for s in streets]).split()
     
     if len(slist) == 3:
-        commandslist = getcommands.mainline(file,directory) #get commands from excel file
+        commandslist = getcommands.mainline(file,directory,allowed_streets, alt_streets) #get commands from excel file
         py2psql.upload_mainline(commandslist,db,user)
-        us_lib.copyfile(directory,directory+'\\Donefiles',file)
+        us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Uploadable',file)
         
     else :
-        commandslist = getcommands.turns(file,directory) #get commands from excel file
+        commandslist = getcommands.turns(file,directory,allowed_streets, alt_streets) #get commands from excel file
         py2psql.upload_turns(commandslist,db,user)
-        us_lib.copyfile(directory,directory+'\\Donefiles',file)
+        us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Uploadable',file)
         
     
 
@@ -40,16 +50,18 @@ if __name__ == '__main__':
     print "Input directory path to process:"
     directory = raw_input()
     
+    
     for file in os.listdir(directory):
         if file[-4:] =='.xls':
-            #-------------------------------------------------------------- try:
+            try:
+                print "processing file : "+file
                 decide_type_n_go(file, directory) #Sent filename and directory to the file that does the main work !!
-                
-            #===================================================================
-            # except :
-            #    print file
-            #    us_lib.copyfile(directory,directory+'\\FailedFiles',file)
-            #===================================================================
+                print "Done file : "+file
+            except:
+                print "Error in file : "+file
+                us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Failed',file)
+            
+            
                  
     print "DONE !!"
     

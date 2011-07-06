@@ -13,8 +13,8 @@ __license__= "GPL"
 __email__  = "modeling@sfcta.org"
 __date__   = "Jul 1 2011" 
 
-def mainline(filename,filepath):  #creates commands list for ML counts
-
+def mainline(filename,filepath,allowed_streets, alt_streets):  #creates commands list for ML counts
+    
     #---------Variables used-----------------------------------
     commands = []
     #count = -1
@@ -47,7 +47,26 @@ def mainline(filename,filepath):  #creates commands list for ML counts
     #-------- Extract road names from filename----------------------
     streets = filename.replace(".xls","")
     splits = "_."
-    slist = ''.join([ s if s not in splits else ' ' for s in streets]).split()
+    slist = ''.join([ str.upper(s) if s not in splits else ' ' for s in streets]).split()
+    i=0;
+    
+    #----See if we need to add suffix----------------------------------- 
+    
+    for i in range(0,3):
+        if slist[i] in allowed_streets:
+            #print "street"+slist[i]+"founf"
+            pass
+        elif slist[i] in alt_streets:
+            if slist[i]+alt_streets[slist[i]] in allowed_streets:
+                slist[i] = slist[i]+alt_streets[slist[i]]
+                #print "street"+slist[i]+"founf"
+            else:
+                print "street"+slist[i]+"notfounf"
+                raise
+        else:
+            print "street"+slist[i]+"notfounf"
+            raise
+   
     #----------Assign ml street name, rest streets will be assigned based on column and direction------ 
     ml_onstreet = slist[0]
     
@@ -93,7 +112,7 @@ def mainline(filename,filepath):  #creates commands list for ML counts
                     
     return commands
        
-def turns(filename,filepath):  #creates commands list for turns counts
+def turns(filename,filepath, allowed_streets, alt_streets):  #creates commands list for turns counts
 
     #---------Variables used-----------------------------------
     commands = []
@@ -128,7 +147,27 @@ def turns(filename,filepath):  #creates commands list for turns counts
     #-------- Extract road names from filename----------------------
     streets = filename.replace(".xls","")
     splits = "_."
-    slist = ''.join([ s if s not in splits else ' ' for s in streets]).split()
+    slist = ''.join([ str.upper(s) if s not in splits else ' ' for s in streets]).split()
+    
+    #----See if we need to add suffix----------------------------------- 
+    
+    for i in range(0,2):
+        if slist[i] in allowed_streets:
+            #print "street"+slist[i]+"founf"
+            pass
+        elif slist[i] in alt_streets:
+            if slist[i]+alt_streets[slist[i]] in allowed_streets:
+                slist[i] = slist[i]+alt_streets[slist[i]]
+                #print "street"+slist[i]+"founf"
+            else:
+                print "street"+slist[i]+"notfounf"
+                raise
+        else:
+            print "street"+slist[i]+"notfounf"
+            raise
+    
+    
+    
     
     #----------Loop through counts and Create SQL Commandslist with parameters-------------    
      
@@ -202,10 +241,12 @@ def turns(filename,filepath):  #creates commands list for turns counts
 if __name__ == '__main__':
     
     
-    #print mainline("Clement_38thAve_36thAve.xls","C:\Documents and Settings\Varun\Eclipse\converter\Samples")
-    
-    t_fromdir = "NB"
-    
-    compass = ['N','W','S','E']
-    t_todir = compass[compass.index(t_fromdir[0])-1]
-    print t_todir
+    print mainline("4thAve_Irving.Parnassus.xls","C:\Documents and Settings\Varun\Desktop\Standardized")
+    #===========================================================================
+    # 
+    # t_fromdir = "NB"
+    # 
+    # compass = ['N','W','S','E']
+    # t_todir = compass[compass.index(t_fromdir[0])-1]
+    # print t_todir
+    #===========================================================================

@@ -78,7 +78,7 @@ def read_int_ids(file):  #creates commands list for ML counts
 
 if __name__ == '__main__':
     
-    print "Input street names file to upload:"
+    #print "Input street names file to upload:"
     #filename = raw_input()
     filenamestreets = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\Streets.xls"
     filenameids = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\IntIds.xls"

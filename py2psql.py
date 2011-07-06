@@ -60,6 +60,7 @@ def street_names (commandslist,db,user):    #uploads street names to  table
     cur2db = conn2db.cursor()
     
     #________________THIS IS ONLY FOR TESTING !!!
+    cur2db.execute("DELETE from intersection_ids;")
     cur2db.execute("DELETE from street_names;")
     
     for command in commandslist:
@@ -110,5 +111,5 @@ def retrieve_table (filepath,table,db,user):        #save a table as csv (used f
     conn2db.close()
 
 if __name__ == '__main__':
-    pass
-    retrieve_table("C:\\Documents and Settings\\Varun\\Desktop\\Docs\\Samples\\Samles","counts_turns","postgres", "postgres")
+    
+    retrieve_table("C:\\Documents and Settings\\Varun\\Desktop\\Docs\\Samples","counts_ml","postgres", "postgres")

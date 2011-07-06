@@ -85,8 +85,8 @@ def int_ids (commandslist,db,user):    #uploads intersection ids table
     
     for command in commandslist:
         #ONLY done if street-pair doesn't exist already 
-        cur2db.execute("INSERT INTO intersection_ids (street1, street2, int_id) SELECT %s, %s, %s WHERE NOT EXISTS (SELECT street1, street2 FROM intersection_ids WHERE street1 = %s AND street2 = %s);",
-                           (command[0],command[1],command[2],command[0],command[1]))
+        cur2db.execute("INSERT INTO intersection_ids (street1, street2, int_id, long_x, lat_y) SELECT %s, %s, %s,%s,%s  WHERE NOT EXISTS (SELECT street1, street2 FROM intersection_ids WHERE street1 = %s AND street2 = %s);",
+                           (command[0],command[1],command[2],command[3],command[4],command[0],command[1]))
     conn2db.commit()
     cur2db.close()
     conn2db.close()

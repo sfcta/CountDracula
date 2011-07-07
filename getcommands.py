@@ -13,13 +13,13 @@ __license__= "GPL"
 __email__  = "modeling@sfcta.org"
 __date__   = "Jul 1 2011" 
 
-def mainline(filename,filepath,allowed_streets, alt_streets):  #creates commands list for ML counts
+def mainline(filename,filepath,allowed_streets, alt_streets,vtype_i):  #creates commands list for ML counts
     
     #---------Variables used-----------------------------------
     commands = []
     #count = -1
     #vtype = raw_input()
-    vtype = 0
+    vtype = vtype_i
     #starttime       timestamp format
     #period            string "x minute" -> used by psql as an interval format
     sourcefile = ""     #Will be changed later if found
@@ -113,13 +113,13 @@ def mainline(filename,filepath,allowed_streets, alt_streets):  #creates commands
                     
     return commands
        
-def turns(filename,filepath, allowed_streets, alt_streets):  #creates commands list for turns counts
+def turns(filename,filepath, allowed_streets, alt_streets,vtype_i):  #creates commands list for turns counts
 
     #---------Variables used-----------------------------------
     commands = []
     #count = -1
     #vtype = raw_input() 
-    vtype = 0
+    vtype = vtype_i
     #starttime       timestamp format
     #period            string "x minute" -> used by psql as an interval format
     sourcefile = ""     #Will be changed later if found

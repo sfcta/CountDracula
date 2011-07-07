@@ -33,14 +33,31 @@ def copyfile (src, dst, filename):     #moves filename from src to dst directory
                     
 def createtimestamp (date_s,time_list_se):	#does the job of creating time in timestamp format from string
     
-        start = time(int(time_list_se[0][:2]), int(time_list_se[0][2:]))  #Find start time in time format
+        special_times = {'AMPKHOUR':[time(8,00,00,100801),time(9,00,00,100801)],'PMPKHOUR' : [time(17,00,00,101701),time(18,00,00,101701)],'ADT' : [time(0,00,00,102424),time(23,30,00,102424)]}
+        if  time_list_se[0] not in special_times: 
+            
+            start = time(int(time_list_se[0][:2]), int(time_list_se[0][2:]))  #Find start time in time format
+            
+            starttime = timedelta(hours = int(time_list_se[0][:2]), minutes =  int(time_list_se[0][2:])) #Find starttime and end times in timedelta format so they can be subtracted and period found !!
+            endtime = timedelta(hours = int(time_list_se[1][:2]), minutes = int(time_list_se[1][2:]))
+            
+            starttimestamp = datetime.combine(date_s,start)
+            period = '%i minute' % int((endtime - starttime).seconds/60)
+            
+        else:
+            start = special_times[time_list_se[0]][0]
+            
+            starttime = timedelta(hours = int(special_times[time_list_se[0]][0].hour), minutes =  int(special_times[time_list_se[0]][0].minute)) #Find starttime and end times in timedelta format so they can be subtracted and period found !!
+            endtime = timedelta(hours = int(special_times[time_list_se[0]][1].hour), minutes =  (int(special_times[time_list_se[0]][1].minute)+30))
+            
+            if int(start.microsecond) == 102424:
+                starttimestamp = datetime.combine(date_s,start)
+                period = '1 day'
+            else:
+                starttimestamp = datetime.combine(date_s,start)
+                period = '%i minute' % int((endtime - starttime).seconds/60)
         
-        starttime = timedelta(hours = int(time_list_se[0][:2]), minutes =  int(time_list_se[0][2:])) #Find starttime and end times in timedelta format so they can be subtracted and period found !!
-        endtime = timedelta(hours = int(time_list_se[1][:2]), minutes = int(time_list_se[1][2:]))
-        
-        starttimestamp = datetime.combine(date_s,start)               #Create timestamp
-        period = '%i minute' % int((endtime - starttime).seconds/60)            #Create period
-        
+               
         return [starttimestamp,period]
 
 
@@ -90,11 +107,11 @@ def alt_street_names (filepath):
 
 if __name__ == '__main__':
     
-    filenamestreets = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\Streets.xls"
-    filenamealts = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\ALT_Streets.xls"
-    us_lib.exact_street_names(filenamestreets)
-    print us_lib.allowed_streets
-    us_lib.alt_street_names(filenamealts)
-    print us_lib.alt_streets
+    time_list_se = ['AMPKHOUR']
     
+    special_times = {'AMPKHOUR':[time(8,00,00,100801),time(8,30,00,100801)],'PMPKHOUR' : [time(17,00,00,101701),time(17,30,00,101701)],'ADT' : [time(0,00,00,102424),time(23,30,00,102424)]}
+    if time_list_se[0] not in special_times:
+        print time_list_se
+    else:
+        print special_times[time_list_se[0]][1].second    
     

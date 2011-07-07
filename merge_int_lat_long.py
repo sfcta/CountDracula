@@ -1,11 +1,13 @@
-'''
-Created on Jul 6, 2011
+#!/usr/bin/env python
 
-@author: varun
-'''
-#===============================================================================
-# Utility file to merge intersection ids with lat/long file
-#===============================================================================
+"""Utility file to merge intersection ids with lat/long file
+"""
+
+
+__author__ = "Varun Kohli, San Francisco County Transportation Authority"
+__license__= "GPL"
+__email__  = "modeling@sfcta.org"
+__date__   = "Jul 6 2011" 
 
 
 import xlrd, csv

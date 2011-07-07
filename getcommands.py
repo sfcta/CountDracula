@@ -18,6 +18,7 @@ def mainline(filename,filepath,allowed_streets, alt_streets):  #creates commands
     #---------Variables used-----------------------------------
     commands = []
     #count = -1
+    #vtype = raw_input()
     vtype = 0
     #starttime       timestamp format
     #period            string "x minute" -> used by psql as an interval format
@@ -117,6 +118,7 @@ def turns(filename,filepath, allowed_streets, alt_streets):  #creates commands l
     #---------Variables used-----------------------------------
     commands = []
     #count = -1
+    #vtype = raw_input() 
     vtype = 0
     #starttime       timestamp format
     #period            string "x minute" -> used by psql as an interval format

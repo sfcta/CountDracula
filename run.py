@@ -58,8 +58,8 @@ if __name__ == '__main__':
                 decide_type_n_go(file, directory) #Sent filename and directory to the file that does the main work !!
                 print "Done file : "+file
             except:
-                print "Error in file : "+file
-                us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Failed',file)
+               print "Error in file : "+file
+               us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Failed',file)
             
             
                  

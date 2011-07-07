@@ -194,6 +194,9 @@ def turns(filename,filepath, allowed_streets, alt_streets,vtype_i):  #creates co
             #Determines directions
             if turntype == 'TH':
                 t_todir = t_fromdir
+            elif turntype == ' U-Turn':
+                compass = ['N','W','S','E']
+                t_todir = compass[compass.index(t_fromdir[0])-2] + 'B'
             elif turntype == 'RT':
                 compass = ['N','W','S','E']
                 t_todir = compass[compass.index(t_fromdir[0])-1] + 'B'
@@ -202,7 +205,7 @@ def turns(filename,filepath, allowed_streets, alt_streets,vtype_i):  #creates co
                 t_todir = compass[compass.index(t_fromdir[0])-1] + 'B'
             
             #Determines Street names and order
-            if turntype == 'TH':
+            if (turntype == 'TH' or turntype == ' U-Turn') :
                 if  t_fromdir == "NB" or t_fromdir == "SB":
                     t_fromstreet = slist[0]
                     t_tostreet = slist[0]

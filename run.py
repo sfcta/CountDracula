@@ -13,18 +13,14 @@ __license__= "GPL"
 __email__  = "modeling@sfcta.org"
 __date__   = "Jul 5 2011" 
 
-def decide_type_n_go (file, directory,vtype): #Decides count type (ML or turn) and uploads accordingly
+def decide_type_n_go (file, directory,vtype,db_i,user_i): #Decides count type (ML or turn) and uploads accordingly
     
-    #===========================================================================
-    # db = raw_input()
-    # user = raw_input()
-    #===========================================================================
+
+    db = db_i
+    user = db_i
     
-    db = "postgres"         #dbname to upload to
-    user = "postgres"       #user to upload as
-    
-    filenamestreets = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\Streets.xls"
-    filenamealts = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\ALT_Streets.xls"
+    filenamestreets = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\CountDracula_FINALS\\_EXCEL_CUBE_INPUTS\\Streets.xls"
+    filenamealts = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\CountDracula_FINALS\\_EXCEL_CUBE_INPUTS\\ALT_Streets.xls"
     allowed_streets = us_lib.exact_street_names(filenamestreets)
     alt_streets = us_lib.alt_street_names(filenamealts)
     
@@ -35,34 +31,48 @@ def decide_type_n_go (file, directory,vtype): #Decides count type (ML or turn) a
     if len(slist) == 3:
         commandslist = getcommands.mainline(file,directory,allowed_streets, alt_streets, vtype) #get commands from excel file
         py2psql.upload_mainline(commandslist,db,user)
-        us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Uploadable',file)
+        us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Uploadable\_vtype',file)
         
     else :
         commandslist = getcommands.turns(file,directory,allowed_streets, alt_streets, vtype) #get commands from excel file
         py2psql.upload_turns(commandslist,db,user)
-        us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Uploadable',file)
+        us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Uploadable\_vtype',file)
         
     
 
 
 if __name__ == '__main__':
     
+    
     print "Input directory path to process:"
     directory = raw_input()
-    
+
     print "Input vehicle type of files in directory:\n"
     print "'0:ALL'  |  '1:PEDESTRIAN'  |  '2:TRUCK'  |  '-1:UNKNOWN'"
     vtype = raw_input()
     
+    #===========================================================================
+    # 
+    # print "Input database to enter counts to:\n"
+    # db = raw_input()
+    # 
+    # print "Input username to login as:\n"
+    # user = raw_input()
+    # 
+    #===========================================================================
+    
+    db = "postgres"         #dbname to upload to
+    user = "postgres"       #user to upload as
+    
     for file in os.listdir(directory):
         if file[-4:] =='.xls':
-            try:
+         #   try:
                 print "processing file : "+file
-                decide_type_n_go(file, directory,vtype) #Sent filename and directory to the file that does the main work !!
+                decide_type_n_go(file, directory,vtype,db,user) #Sent filename and directory to the file that does the main work !!
                 print "Done file : "+file
-            except:
-               print "Error in file : "+file
-               us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Failed',file)
+       #     except:
+        #       print "Error in file : "+file
+        #       us_lib.movefile(directory,'C:\Documents and Settings\Varun\Desktop\Collections\Failed',file)
             
             
                  

@@ -48,7 +48,7 @@ def createtimestamp (date_s,time_list_se):	#does the job of creating time in tim
             start = special_times[time_list_se[0]][0]
             
             starttime = timedelta(hours = int(special_times[time_list_se[0]][0].hour), minutes =  int(special_times[time_list_se[0]][0].minute)) #Find starttime and end times in timedelta format so they can be subtracted and period found !!
-            endtime = timedelta(hours = int(special_times[time_list_se[0]][1].hour), minutes =  (int(special_times[time_list_se[0]][1].minute)+30))
+            endtime = timedelta(hours = int(special_times[time_list_se[0]][1].hour), minutes =  (int(special_times[time_list_se[0]][1].minute)))
             
             if int(start.microsecond) == 102424:
                 starttimestamp = datetime.combine(date_s,start)

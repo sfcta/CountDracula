@@ -108,4 +108,20 @@ def retrieve_table (filepath,table,db,user):        #save a table as csv (used f
 
 if __name__ == '__main__':
     
-    retrieve_table("C:\\Documents and Settings\\Varun\\Desktop\\Docs\\Samples","counts_ml","postgres", "postgres")
+    print 'Enter DB to login to:'
+    db = raw_input()
+    
+    print 'Enter username to login as:'
+    user = raw_input()
+    
+    print 'Enter Table to download:'
+    table = raw_input()
+    
+    print 'Enter filepath to save:'
+    filepath = raw_input()
+    
+    retrieve_table(filepath,table,db,user)
+    
+    print 'DONE'
+    
+    

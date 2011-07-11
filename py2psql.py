@@ -21,8 +21,12 @@ def upload_mainline (commandslist,db,user):	    #uploads counts to mainline tabl
     
     for command in commandslist:
         #send command to server
-        cur2db.execute("INSERT INTO counts_ml (count,starttime,period,vtype, onstreet,ondir,fromstreet,tostreet,refpos,sourcefile,project) Values (%s, %s, %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s )",
+        try:
+            cur2db.execute("INSERT INTO counts_ml (count,starttime,period,vtype, onstreet,ondir,fromstreet,tostreet,refpos,sourcefile,project) Values (%s, %s, %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s )",
                        tuple(command))
+        except:
+            print "Duplicate found and skipped"
+            break
         
     conn2db.commit()
     cur2db.close()
@@ -39,16 +43,21 @@ def upload_turns (commandslist,db,user):	#uploads counts to turns table
     
     for command in commandslist:
         #-----Check if intersection exists in DB-------------- 
+        intid = -1
         cur2db.execute("SELECT int_id from intersection_ids WHERE ((street1=%s AND street2=%s) OR (street1=%s AND street2=%s));",(command[4],command[8],command[8],command[4]))
-        intid = -1 
         intid = cur2db.fetchone()
         if intid == None:   #i.e. intersection not found !!
             print ('INTERSECTION with streets 1) '+command[4]+' 2) '+command[8]+' NOT IN DB')
             raise   #raise exception
         else:
             #send command to server
-            cur2db.execute("INSERT INTO counts_turns (count,starttime,period,vtype,fromstreet,fromdir,tostreet,todir,intstreet,intid,sourcefile,project) Values (%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s )",
-                            (command[0],command[1],command[2],command[3],command[4],command[5],command[6],command[7],command[8],intid,command[10],command[11],))
+            try:
+                cur2db.execute("INSERT INTO counts_turns (count,starttime,period,vtype,fromstreet,fromdir,tostreet,todir,intstreet,intid,sourcefile,project) Values (%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s )",
+                                (command[0],command[1],command[2],command[3],command[4],command[5],command[6],command[7],command[8],intid,command[10],command[11],))
+            except:
+                print "Duplicate found and skipped"
+                break
+                
     conn2db.commit()
     cur2db.close()
     conn2db.close()
@@ -95,6 +104,71 @@ def int_ids (commandslist,db,user):    #uploads intersection ids table
     cur2db.close()
     conn2db.close()
 
+def alt_names (commandslist,db,user):    #uploads alt_names to  DB
+    
+    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    cur2db = conn2db.cursor()
+    
+    #________________THIS IS ONLY FOR TESTING !!!
+    #OR Clear DB before uploading new street_names
+    #===========================================================================
+    # cur2db.execute("DELETE from counts_ml;")
+    # cur2db.execute("DELETE from counts_turns;")
+    # cur2db.execute("DELETE from intersection_ids;")
+    cur2db.execute("DELETE from alt_names;")
+    #===========================================================================
+    
+    for command in commandslist:
+        #send command to server
+        cur2db.execute("INSERT INTO alt_names VALUES (%s,%s)",
+                       (command[0],command[1]))
+    conn2db.commit()
+    cur2db.close()
+    conn2db.close()
+
+def street_in_streetnames(name,db,user):
+    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    cur2db = conn2db.cursor()
+    cur2db.execute("SELECT * from street_names where street_name = %s",[name]);
+    entries = cur2db.fetchone()
+    if entries == None:
+        return 0
+    else:
+        return 1
+    
+    cur2db.close()
+    conn2db.close()
+    
+def street_in_altnames(name,db,user):
+    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    cur2db = conn2db.cursor()
+    cur2db.execute("SELECT * from alt_names where street_name = %s",[name]);
+    entries = cur2db.fetchone()
+    if entries == None:
+        #print entries
+        return 0
+        
+    else:
+        #print entries
+        return 1
+    
+    cur2db.close()
+    conn2db.close()
+    
+def altname(name,db,user):
+    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    cur2db = conn2db.cursor()
+    cur2db.execute("SELECT * from alt_names where street_name = %s",[name]);
+    entries = cur2db.fetchone()
+    if entries == None:
+        #print entries
+        return ""
+    else:
+        #print entries
+        return (""+entries[0]+entries[1])
+    
+    cur2db.close()
+    conn2db.close()
 
            
 def retrieve_table (filepath,table,db,user):        #save a table as csv (used for testing primarily) 
@@ -112,19 +186,23 @@ def retrieve_table (filepath,table,db,user):        #save a table as csv (used f
 
 if __name__ == '__main__':
     
-    print 'Enter DB to login to:'
-    db = raw_input()
+    #===========================================================================
+    # print 'Enter DB to login to:'
+    # db = raw_input()
+    # 
+    # print 'Enter username to login as:'
+    # user = raw_input()
+    # 
+    # print 'Enter Table to download:'
+    # table = raw_input()
+    # 
+    # print 'Enter filepath to save:'
+    # filepath = raw_input()
+    # 
+    # retrieve_table(filepath,table,db,user)
+    #===========================================================================
+    street_in_altnames("GEARY","postgres","postgres")
     
-    print 'Enter username to login as:'
-    user = raw_input()
-    
-    print 'Enter Table to download:'
-    table = raw_input()
-    
-    print 'Enter filepath to save:'
-    filepath = raw_input()
-    
-    retrieve_table(filepath,table,db,user)
     
     print 'DONE'
     

@@ -78,6 +78,36 @@ def read_int_ids(file):  #creates commands list for ML counts
                 
     return commands
 
+def read_alt_streets(file):  #creates commands list for ML counts
+
+    #---------Variables used-----------------------------------
+    commands = []
+    street = ""
+    suffix = ""
+    #-------------------------- open the .xls file------------------------------
+    
+    book = xlrd.open_workbook(file)
+    
+    #----------Loop through counts and Create SQL Commandslist with parameters-------------    
+    sheetnames =  book.sheet_names() 
+    totalsheets_ids = range(len(sheetnames))  #create sheet id list
+    
+    for sheet in totalsheets_ids :
+       
+        activesheet = book.sheet_by_name(sheetnames[sheet])
+        row_ids = range(0,len(activesheet.col(0))) #find rows to process for column
+            
+        for row in row_ids:
+                
+            street = activesheet.cell_value(row,0)
+            suffix = activesheet.cell_value(row,1)
+            if (street != "" and suffix != ""): #if all inputs exist
+                #-------Create time in time format !!!----------------- 
+                commands.append([street,suffix])
+                
+    return commands
+
+
 
 
 if __name__ == '__main__':
@@ -87,6 +117,8 @@ if __name__ == '__main__':
     filenamestreets = raw_input()
     print "\nGive full path for Intersection_Ids file:"
     filenameids = raw_input()
+    print "Give full path for Alt Street Names file:"
+    filenamealtstreets = raw_input()
     print "\nDB to login?"
     db = raw_input()
     print "\nUser to login as?"
@@ -102,11 +134,18 @@ if __name__ == '__main__':
     #===========================================================================
     
     
-    street_names = read_street_names(filenamestreets)
-    py2psql.street_names(street_names,db,user)
+    #===========================================================================
+    # street_names = read_street_names(filenamestreets)
+    # py2psql.street_names(street_names,db,user)
+    # 
+    # int_ids = read_int_ids(filenameids)
+    # py2psql.int_ids(int_ids,db,user)
+    #===========================================================================
     
-    int_ids = read_int_ids(filenameids)
-    py2psql.int_ids(int_ids,db,user)
+    alt_names = read_alt_streets(filenamealtstreets)
+    py2psql.alt_names(alt_names,db,user)
+    
+    
     
     
     print "UPLOAD COMPLETED !"

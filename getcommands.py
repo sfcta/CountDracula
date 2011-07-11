@@ -6,6 +6,7 @@
 
 from datetime import date
 import xlrd 
+import py2psql
 import us_lib   #Custom built library that has random utility functions
 
 __author__ = "Varun Kohli, San Francisco County Transportation Authority"
@@ -13,7 +14,10 @@ __license__= "GPL"
 __email__  = "modeling@sfcta.org"
 __date__   = "Jul 1 2011" 
 
-def mainline(filename,filepath,allowed_streets, alt_streets,vtype_i):  #creates commands list for ML counts
+def mainline(filename,filepath,vtype_i,db,user):  
+    """
+    creates commands list for ML counts
+    """
     
     #---------Variables used-----------------------------------
     commands = []
@@ -54,12 +58,13 @@ def mainline(filename,filepath,allowed_streets, alt_streets,vtype_i):  #creates 
     #----See if we need to add suffix----------------------------------- 
     
     for i in range(0,3):
-        if slist[i] in allowed_streets:
-            #print "street"+slist[i]+"founf"
+        if (py2psql.street_in_streetnames(slist[i],db,user)==1):
+            #print "street"+slist[i]+"found"
             pass
-        elif slist[i] in alt_streets:
-            if slist[i]+alt_streets[slist[i]] in allowed_streets:
-                slist[i] = slist[i]+alt_streets[slist[i]]
+        elif (py2psql.street_in_altnames(slist[i],db,user)==1):
+            alt_name = py2psql.altname(slist[i],db,user)
+            if (py2psql.street_in_streetnames(alt_name,db,user)==1):
+                slist[i] = alt_name
                 #print "street"+slist[i]+"founf"
             else:
                 print "street"+slist[i]+"notfounf"
@@ -113,8 +118,10 @@ def mainline(filename,filepath,allowed_streets, alt_streets,vtype_i):  #creates 
                     
     return commands
        
-def turns(filename,filepath, allowed_streets, alt_streets,vtype_i):  #creates commands list for turns counts
-
+def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns counts
+    """
+    creates commands list for turn counts
+    """
     #---------Variables used-----------------------------------
     commands = []
     #count = -1
@@ -154,22 +161,20 @@ def turns(filename,filepath, allowed_streets, alt_streets,vtype_i):  #creates co
     #----See if we need to add suffix----------------------------------- 
     
     for i in range(0,2):
-        if slist[i] in allowed_streets:
-            #print "street"+slist[i]+"founf"
-            pass
-        elif slist[i] in alt_streets:
-            if slist[i]+alt_streets[slist[i]] in allowed_streets:
-                slist[i] = slist[i]+alt_streets[slist[i]]
-                #print "street"+slist[i]+"founf"
-            else:
-                print "street"+slist[i]+"notfounf"
-                raise
-        else:
-            print "street"+slist[i]+"notfounf"
-            raise
-    
-    
-    
+      if (py2psql.street_in_streetnames(slist[i],db,user)==1):
+          #print "street"+slist[i]+"found"
+          pass
+      elif (py2psql.street_in_altnames(slist[i],db,user)==1):
+          alt_name = py2psql.altname(slist[i],db,user)
+          if (py2psql.street_in_streetnames(alt_name,db,user)==1):
+              slist[i] = alt_name
+              #print "street"+slist[i]+"founf"
+          else:
+              print "street"+slist[i]+"notfounf"
+              raise
+      else:
+          print "street"+slist[i]+"notfounf"
+          raise
     
     #----------Loop through counts and Create SQL Commandslist with parameters-------------    
      
@@ -200,9 +205,12 @@ def turns(filename,filepath, allowed_streets, alt_streets,vtype_i):  #creates co
             elif turntype == 'RT':
                 compass = ['N','W','S','E']
                 t_todir = compass[compass.index(t_fromdir[0])-1] + 'B'
-            else:
+            elif turntype == 'LT':
                 compass = ['N','E','S','W']
                 t_todir = compass[compass.index(t_fromdir[0])-1] + 'B'
+            else:
+                print 'Invalid Movement'
+                raise
             
             #Determines Street names and order
             if (turntype == 'TH' or turntype == ' U-Turn') :

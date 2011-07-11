@@ -15,16 +15,20 @@ __email__  = "modeling@sfcta.org"
 __date__   = "Jun 30, 2011" 
 
 
-def movefile (src, dst, filename):	 #moves filename from src to dst directory
-    
+def movefile (src, dst, filename):
+    """
+    Moves filename from src to dst directory
+    """
     if not os.path.isdir(dst):
         os.mkdir(dst)
      
     os.system('move \"' + src + '\\' + filename + '\" \"'+ dst+'\"')
     
 
-def copyfile (src, dst, filename):     #moves filename from src to dst directory
-    
+def copyfile (src, dst, filename):     
+    """
+    Copies filename from src to dst directory
+    """
     if not os.path.isdir(dst):
         os.mkdir(dst)
      
@@ -32,6 +36,9 @@ def copyfile (src, dst, filename):     #moves filename from src to dst directory
     
                     
 def createtimestamp (date_s,time_list_se):	#does the job of creating time in timestamp format from string
+        """
+        Creates timestamp from string
+        """
     
         special_times = {'AMPKHOUR':[time(8,00,00,100801),time(9,00,00,100801)],'PMPKHOUR' : [time(17,00,00,101701),time(18,00,00,101701)],'ADT' : [time(0,00,00,102424),time(23,30,00,102424)]}
         if  time_list_se[0] not in special_times: 
@@ -62,7 +69,10 @@ def createtimestamp (date_s,time_list_se):	#does the job of creating time in tim
 
 
     
-def sourcefiles (sheetnames,book):  #extracts sourcefiles names from "book"
+def sourcefiles (sheetnames,book):
+    """
+    extracts sourcefiles names from "book"
+    """
     sourcefile = ""
     
     if "source" in sheetnames :

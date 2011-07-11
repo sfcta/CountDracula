@@ -51,7 +51,7 @@ def mainline(filename,filepath,vtype_i,db,user):
     
     #-------- Extract road names from filename----------------------
     streets = filename.replace(".xls","")
-    splits = "_."
+    splits = "_-."
     slist = ''.join([ str.upper(s) if s not in splits else ' ' for s in streets]).split()
     i=0;
     
@@ -155,7 +155,7 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
     
     #-------- Extract road names from filename----------------------
     streets = filename.replace(".xls","")
-    splits = "_."
+    splits = "_-."
     slist = ''.join([ str.upper(s) if s not in splits else ' ' for s in streets]).split()
     
     #----See if we need to add suffix----------------------------------- 
@@ -190,7 +190,7 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
         column_ids = range(1,len(activesheet.row(0))) #find list of columns to process
         
         for column in column_ids :
-            
+            vtype = vtype_i
             #For the column, set direction and to from streets
             movement = activesheet.cell_value(0,column)
             
@@ -208,12 +208,15 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
             elif turntype == 'LT':
                 compass = ['N','E','S','W']
                 t_todir = compass[compass.index(t_fromdir[0])-1] + 'B'
+            elif turntype == 'PD':
+                t_todir = t_fromdir
+                vtype = 1
             else:
                 print 'Invalid Movement'
                 raise
             
             #Determines Street names and order
-            if (turntype == 'TH' or turntype == ' U-Turn') :
+            if (turntype == 'TH' or turntype == ' U-Turn' or turntype == 'PD') :
                 if  t_fromdir == "NB" or t_fromdir == "SB":
                     t_fromstreet = slist[0]
                     t_tostreet = slist[0]

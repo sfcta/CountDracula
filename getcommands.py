@@ -8,6 +8,7 @@ from datetime import date
 import xlrd 
 import py2psql
 import us_lib   #Custom built library that has random utility functions
+from types import FloatType, IntType
 
 __author__ = "Varun Kohli, San Francisco County Transportation Authority"
 __license__= "GPL"
@@ -89,7 +90,20 @@ def mainline(filename,filepath,vtype_i,db,user):
         
         column_ids = range(1,len(activesheet.row(0))) #find list of columns to process
         
+        ref = activesheet.cell_value(1,0)
+        if type(ref) is FloatType:
+            ml_refpos = ref
+        else:
+            ml_refpos = 0
+        
+        
         for column in column_ids :
+            
+            vehicle = activesheet.cell_value(1,column)
+            if type(vehicle) is FloatType and vehicle in range(-1,16):
+                vtype = vehicle
+            else:
+                vtype = vtype_i
             
             #For the column, set direction and to from streets
             ml_ondir = activesheet.cell_value(0,column)
@@ -190,16 +204,20 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
         column_ids = range(1,len(activesheet.row(0))) #find list of columns to process
         
         for column in column_ids :
-            vtype = vtype_i
+            vehicle = activesheet.cell_value(1,column)
+            if type(vehicle) is FloatType and vehicle in range(-1,16):
+                vtype = vehicle
+            else:
+                vtype = vtype_i
             #For the column, set direction and to from streets
             movement = activesheet.cell_value(0,column)
             
             t_fromdir = movement[:2]
             turntype = movement[2:]
             #Determines directions
-            if turntype == 'TH':
+            if turntype == "TH":
                 t_todir = t_fromdir
-            elif turntype == ' U-Turn':
+            elif (turntype == ' U-Turn') or (turntype == 'UT'):
                 compass = ['N','W','S','E']
                 t_todir = compass[compass.index(t_fromdir[0])-2] + 'B'
             elif turntype == 'RT':
@@ -212,11 +230,12 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
                 t_todir = t_fromdir
                 vtype = 1
             else:
+                print turntype
                 print 'Invalid Movement'
                 raise
             
             #Determines Street names and order
-            if (turntype == 'TH' or turntype == ' U-Turn' or turntype == 'PD') :
+            if (turntype == 'TH' or turntype == ' U-Turn' or turntype == 'PD' or turntype == 'UT') :
                 if  t_fromdir == "NB" or t_fromdir == "SB":
                     t_fromstreet = slist[0]
                     t_tostreet = slist[0]

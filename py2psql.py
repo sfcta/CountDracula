@@ -25,8 +25,9 @@ def upload_mainline (commandslist,db,user):	    #uploads counts to mainline tabl
             cur2db.execute("INSERT INTO counts_ml (count,starttime,period,vtype, onstreet,ondir,fromstreet,tostreet,refpos,sourcefile,project) Values (%s, %s, %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s )",
                        tuple(command))
         except:
-            print "Duplicate found and skipped"
-            break
+            #print command
+            print "Error inserting in DB"
+            raise
         
     conn2db.commit()
     cur2db.close()
@@ -54,9 +55,10 @@ def upload_turns (commandslist,db,user):	#uploads counts to turns table
             try:
                 cur2db.execute("INSERT INTO counts_turns (count,starttime,period,vtype,fromstreet,fromdir,tostreet,todir,intstreet,intid,sourcefile,project) Values (%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s )",
                                 (command[0],command[1],command[2],command[3],command[4],command[5],command[6],command[7],command[8],intid,command[10],command[11],))
-            except:
-                print "Duplicate found and skipped"
-                break
+            except psycopg2.IntegrityError:
+                #print command
+                print "Error inserting in DB"
+                raise
                 
     conn2db.commit()
     cur2db.close()
@@ -187,21 +189,24 @@ def retrieve_table (filepath,table,db,user):        #save a table as csv (used f
 if __name__ == '__main__':
     
     #===========================================================================
-    # print 'Enter DB to login to:'
-    # db = raw_input()
+    print 'Enter DB to login to:'
+    #db = raw_input()
+    db = "postgres"
     # 
-    # print 'Enter username to login as:'
-    # user = raw_input()
+    print 'Enter username to login as:'
+    #user = raw_input()
+    user = "postgres"
     # 
-    # print 'Enter Table to download:'
-    # table = raw_input()
+    print 'Enter Table to download:'
+    #table = raw_input()
+    table = "counts_turns"
     # 
-    # print 'Enter filepath to save:'
-    # filepath = raw_input()
+    print 'Enter filepath to save:'
+    filepath = raw_input()
     # 
-    # retrieve_table(filepath,table,db,user)
+    retrieve_table(filepath,table,db,user)
     #===========================================================================
-    street_in_altnames("GEARY","postgres","postgres")
+    #street_in_altnames("GEARY","postgres","postgres")
     
     
     print 'DONE'

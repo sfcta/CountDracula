@@ -21,7 +21,7 @@ def decide_type_n_go (file, directory,vtype,db_i,user_i):
     user = user_i
     
     streets = file.replace(".xls","")
-    splits = "_."
+    splits = "_-."
     slist = ''.join([ s if s not in splits else ' ' for s in streets]).split()
     
     if len(slist) == 3:
@@ -65,8 +65,8 @@ if __name__ == '__main__':
                 decide_type_n_go(file, directory,vtype,db,user) #Sent filename and directory to the file that does the main work !!
                 print "Done file : "+file
             #except:
-            #   print "Error in file : "+file
-            #   us_lib.movefile(directory,directory+'\\Failed',file)
+             #  print "Error in file : "+file
+               #us_lib.movefile(directory,directory+'\\Failed',file)
             
             
                  

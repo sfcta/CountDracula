@@ -31,6 +31,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="#">CountDracula v0.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -42,11 +45,142 @@
             
   <div class="section" id="welcome-to-countdracula-s-documentation">
 <h1>Welcome to CountDracula&#8217;s documentation!<a class="headerlink" href="#welcome-to-countdracula-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
-<div class="toctree-wrapper compound">
-<ul class="simple">
-</ul>
 </div>
+<div class="section" id="module-upload_street_info">
+<span id="initialization-module-upload-street-info"></span><h1>Initialization Module -  upload_street_info<a class="headerlink" href="#module-upload_street_info" title="Permalink to this headline">¶</a></h1>
+<p>This is the file that initializes DB by uploading 
+street names, intersection ids, street suffixes</p>
+<dl class="function">
+<dt id="upload_street_info.read_alt_streets">
+<tt class="descclassname">upload_street_info.</tt><tt class="descname">read_alt_streets</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#upload_street_info.read_alt_streets" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates commands list for street suffixes to send to py2psql</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="upload_street_info.read_int_ids">
+<tt class="descclassname">upload_street_info.</tt><tt class="descname">read_int_ids</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#upload_street_info.read_int_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates commands list for intersection idsto send to py2psql</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="upload_street_info.read_street_names">
+<tt class="descclassname">upload_street_info.</tt><tt class="descname">read_street_names</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#upload_street_info.read_street_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates commands list for street names to send to py2psql</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-run">
+<span id="counts-upload-module-run"></span><h1>Counts Upload Module -  run<a class="headerlink" href="#module-run" title="Permalink to this headline">¶</a></h1>
+<p>MAIN FILE THAT STARTS EVERYTHING</p>
+<dl class="function">
+<dt id="run.decide_type_n_go">
+<tt class="descclassname">run.</tt><tt class="descname">decide_type_n_go</tt><big>(</big><em>file</em>, <em>directory</em>, <em>vtype</em>, <em>db_i</em>, <em>user_i</em><big>)</big><a class="headerlink" href="#run.decide_type_n_go" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decides count type (ML or turn) and uploads accordingly</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-getcommands">
+<span id="excel-reader-module-getcommands"></span><h1>Excel reader Module - getcommands<a class="headerlink" href="#module-getcommands" title="Permalink to this headline">¶</a></h1>
+<p>Returns appropriate list of command parameters to be used to either 
+upload to server or create csv file</p>
+<dl class="function">
+<dt id="getcommands.mainline">
+<tt class="descclassname">getcommands.</tt><tt class="descname">mainline</tt><big>(</big><em>filename</em>, <em>filepath</em>, <em>vtype_i</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#getcommands.mainline" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates commands list for ML counts</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="getcommands.turns">
+<tt class="descclassname">getcommands.</tt><tt class="descname">turns</tt><big>(</big><em>filename</em>, <em>filepath</em>, <em>vtype_i</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#getcommands.turns" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates commands list for turn counts</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-py2psql">
+<span id="psql-interacter-module-py2psql"></span><h1>PSQL interacter module - py2psql<a class="headerlink" href="#module-py2psql" title="Permalink to this headline">¶</a></h1>
+<p>THIS FILE DOES ALL THE INTERACTION WITH PSQL !!</p>
+<dl class="function">
+<dt id="py2psql.alt_names">
+<tt class="descclassname">py2psql.</tt><tt class="descname">alt_names</tt><big>(</big><em>commandslist</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#py2psql.alt_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads street suffixes to DB</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="py2psql.altname">
+<tt class="descclassname">py2psql.</tt><tt class="descname">altname</tt><big>(</big><em>name</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#py2psql.altname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns street_name with suffix added</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="py2psql.int_ids">
+<tt class="descclassname">py2psql.</tt><tt class="descname">int_ids</tt><big>(</big><em>commandslist</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#py2psql.int_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads intersection_ids to db</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="py2psql.retrieve_table">
+<tt class="descclassname">py2psql.</tt><tt class="descname">retrieve_table</tt><big>(</big><em>filepath</em>, <em>table</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#py2psql.retrieve_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a table to a csv file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="py2psql.street_in_altnames">
+<tt class="descclassname">py2psql.</tt><tt class="descname">street_in_altnames</tt><big>(</big><em>name</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#py2psql.street_in_altnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if street name is in alt_names table</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="py2psql.street_in_streetnames">
+<tt class="descclassname">py2psql.</tt><tt class="descname">street_in_streetnames</tt><big>(</big><em>name</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#py2psql.street_in_streetnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if street name is in street_names table</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="py2psql.street_names">
+<tt class="descclassname">py2psql.</tt><tt class="descname">street_names</tt><big>(</big><em>commandslist</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#py2psql.street_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads street_names to table street_names</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="py2psql.upload_mainline">
+<tt class="descclassname">py2psql.</tt><tt class="descname">upload_mainline</tt><big>(</big><em>commandslist</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#py2psql.upload_mainline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads counts to table counts_ml</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="py2psql.upload_turns">
+<tt class="descclassname">py2psql.</tt><tt class="descname">upload_turns</tt><big>(</big><em>commandslist</em>, <em>db</em>, <em>user</em><big>)</big><a class="headerlink" href="#py2psql.upload_turns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads counts to turns table</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-us_lib">
+<span id="utility-functions-module-us-lib"></span><h1>Utility functions module - us_lib<a class="headerlink" href="#module-us_lib" title="Permalink to this headline">¶</a></h1>
+<p>General file containing misc. functions</p>
+<dl class="function">
+<dt id="us_lib.copyfile">
+<tt class="descclassname">us_lib.</tt><tt class="descname">copyfile</tt><big>(</big><em>src</em>, <em>dst</em>, <em>filename</em><big>)</big><a class="headerlink" href="#us_lib.copyfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies filename from src to dst directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="us_lib.createtimestamp">
+<tt class="descclassname">us_lib.</tt><tt class="descname">createtimestamp</tt><big>(</big><em>date_s</em>, <em>time_list_se</em><big>)</big><a class="headerlink" href="#us_lib.createtimestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates timestamp from string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="us_lib.movefile">
+<tt class="descclassname">us_lib.</tt><tt class="descname">movefile</tt><big>(</big><em>src</em>, <em>dst</em>, <em>filename</em><big>)</big><a class="headerlink" href="#us_lib.movefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves filename from src to dst directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="us_lib.sourcefiles">
+<tt class="descclassname">us_lib.</tt><tt class="descname">sourcefiles</tt><big>(</big><em>sheetnames</em>, <em>book</em><big>)</big><a class="headerlink" href="#us_lib.sourcefiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>extracts sourcefiles names from &#8220;book&#8221;</p>
+</dd></dl>
+
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -65,9 +199,12 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to CountDracula&#8217;s documentation!</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#">Welcome to CountDracula&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#module-upload_street_info">Initialization Module -  upload_street_info</a></li>
+<li><a class="reference internal" href="#module-run">Counts Upload Module -  run</a></li>
+<li><a class="reference internal" href="#module-getcommands">Excel reader Module - getcommands</a></li>
+<li><a class="reference internal" href="#module-py2psql">PSQL interacter module - py2psql</a></li>
+<li><a class="reference internal" href="#module-us_lib">Utility functions module - us_lib</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
@@ -99,6 +236,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="#">CountDracula v0.2 documentation</a> &raquo;</li> 
       </ul>
     </div>

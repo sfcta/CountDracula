@@ -1,0 +1,6 @@
+py2psql
+=======
+
+.. currentmodule:: 
+
+.. autodata:: py2psql

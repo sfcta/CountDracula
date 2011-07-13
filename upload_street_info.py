@@ -3,12 +3,21 @@
 import py2psql
 import xlrd
 
+"""
+This is the file that initializes DB by uploading 
+street names, intersection ids, street suffixes
+"""
+
+
 __author__ = "Varun Kohli, San Francisco County Transportation Authority"
 __license__= "GPL"
 __email__  = "modeling@sfcta.org"
 __date__   = "Jul 5 2011" 
 
-def read_street_names(file):  #creates commands list for ML counts
+def read_street_names(file):  
+    """
+    creates commands list for street names to send to py2psql
+    """
 
     #---------Variables used-----------------------------------
     commands = []
@@ -39,7 +48,10 @@ def read_street_names(file):  #creates commands list for ML counts
                 
     return commands
 
-def read_int_ids(file):  #creates commands list for ML counts
+def read_int_ids(file):  
+    """
+    creates commands list for intersection idsto send to py2psql
+    """
 
     #---------Variables used-----------------------------------
     commands = []
@@ -78,7 +90,11 @@ def read_int_ids(file):  #creates commands list for ML counts
                 
     return commands
 
-def read_alt_streets(file):  #creates commands list for ML counts
+def read_alt_streets(file): 
+    """
+    creates commands list for street suffixes to send to py2psql
+    """
+
 
     #---------Variables used-----------------------------------
     commands = []

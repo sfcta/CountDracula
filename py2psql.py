@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""""THIS FILE DOES ALL THE INTERACTION WITH PSQL !!
+"""THIS FILE DOES ALL THE INTERACTION WITH PSQL !!
 """
 
 import psycopg2 #Imported library(external) to interact with psql
@@ -37,7 +37,11 @@ def upload_mainline (commandslist,db,user):	    #uploads counts to mainline tabl
     cur2db.close()
     conn2db.close()
 
-def upload_turns (commandslist,db,user):	#uploads counts to turns table
+def upload_turns (commandslist,db,user):	
+    """
+    Uploads counts to turns table
+    """
+    
     
     conn2db = psycopg2.connect("dbname="+db+" user="+user)
     cur2db = conn2db.cursor()
@@ -69,6 +73,10 @@ def upload_turns (commandslist,db,user):	#uploads counts to turns table
     conn2db.close()
 
 def street_names (commandslist,db,user):    #uploads street names to  DB
+    """
+    Uploads street_names to table street_names
+    """
+    
     
     conn2db = psycopg2.connect("dbname="+db+" user="+user)
     cur2db = conn2db.cursor()
@@ -89,6 +97,9 @@ def street_names (commandslist,db,user):    #uploads street names to  DB
     conn2db.close()
 
 def int_ids (commandslist,db,user):    #uploads intersection ids table
+    """
+    Uploads intersection_ids to db
+    """
     
     conn2db = psycopg2.connect("dbname="+db+" user="+user)
     cur2db = conn2db.cursor()
@@ -111,6 +122,9 @@ def int_ids (commandslist,db,user):    #uploads intersection ids table
     conn2db.close()
 
 def alt_names (commandslist,db,user):    #uploads alt_names to  DB
+    """
+    Uploads street suffixes to DB
+    """
     
     conn2db = psycopg2.connect("dbname="+db+" user="+user)
     cur2db = conn2db.cursor()
@@ -133,6 +147,10 @@ def alt_names (commandslist,db,user):    #uploads alt_names to  DB
     conn2db.close()
 
 def street_in_streetnames(name,db,user):
+    """
+    Checks if street name is in street_names table 
+    """
+    
     conn2db = psycopg2.connect("dbname="+db+" user="+user)
     cur2db = conn2db.cursor()
     cur2db.execute("SELECT * from street_names where street_name = %s",[name]);
@@ -146,6 +164,9 @@ def street_in_streetnames(name,db,user):
     conn2db.close()
     
 def street_in_altnames(name,db,user):
+    """
+    Checks if street name is in alt_names table 
+    """
     conn2db = psycopg2.connect("dbname="+db+" user="+user)
     cur2db = conn2db.cursor()
     cur2db.execute("SELECT * from alt_names where street_name = %s",[name]);
@@ -162,6 +183,10 @@ def street_in_altnames(name,db,user):
     conn2db.close()
     
 def altname(name,db,user):
+    """
+    Returns street_name with suffix added 
+    """
+    
     conn2db = psycopg2.connect("dbname="+db+" user="+user)
     cur2db = conn2db.cursor()
     cur2db.execute("SELECT * from alt_names where street_name = %s",[name]);
@@ -178,6 +203,10 @@ def altname(name,db,user):
 
            
 def retrieve_table (filepath,table,db,user):        #save a table as csv (used for testing primarily) 
+    """
+    Saves a table to a csv file
+    """
+    
     
     myfile = open(filepath + '\\' + db + '_' + table + '.csv', 'wb') #Create CSV filename
     

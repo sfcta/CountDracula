@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
-import py2psql
-import xlrd
-
 """This is the file that initializes DB by uploading 
 street names, intersection ids, street suffixes
 """
+
+import py2psql
+import xlrd
+
+
 
 
 __author__ = "Varun Kohli, San Francisco County Transportation Authority"

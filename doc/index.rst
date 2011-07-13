@@ -6,10 +6,35 @@
 Welcome to CountDracula's documentation!
 ========================================
 
-Contents:
+Initialization Module -  upload_street_info
+================================================================================
 
-.. toctree::
-   :maxdepth: 2
+.. automodule:: upload_street_info
+	:members:
+
+Counts Upload Module -  run
+================================================================================
+
+.. automodule:: run
+	:members:
+
+Excel reader Module - getcommands
+================================================================================
+
+.. automodule:: getcommands
+	:members:
+
+PSQL interacter module - py2psql
+================================================================================
+
+.. automodule:: py2psql
+	:members:
+
+Utility functions module - us_lib
+================================================================================
+
+.. automodule:: us_lib
+	:members:
 
 Indices and tables
 ==================

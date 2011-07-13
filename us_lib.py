@@ -72,6 +72,7 @@ def sourcefiles (sheetnames,book):
     """
     extracts sourcefiles names from "book"
     """
+    
     sourcefile = ""
     
     if "source" in sheetnames :
@@ -87,6 +88,9 @@ def sourcefiles (sheetnames,book):
     return sourcefile
 
 def exact_street_names (filepath):
+    
+    
+    
     allowed_streets = []
     
     book = xlrd.open_workbook(filepath)

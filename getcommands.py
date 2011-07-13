@@ -217,7 +217,7 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
             #Determines directions
             if turntype == "TH":
                 t_todir = t_fromdir
-            elif (turntype == ' U-Turn') or (turntype == 'UT'):
+            elif (turntype == ' U-Turn') or (turntype == 'UT') or (turntype == 'U-Turn'):
                 compass = ['N','W','S','E']
                 t_todir = compass[compass.index(t_fromdir[0])-2] + 'B'
             elif turntype == 'RT':
@@ -235,7 +235,7 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
                 raise
             
             #Determines Street names and order
-            if (turntype == 'TH' or turntype == ' U-Turn' or turntype == 'PD' or turntype == 'UT') :
+            if (turntype == 'TH' or turntype == ' U-Turn' or turntype == 'U-Turn' or turntype == 'PD' or turntype == 'UT') :
                 if  t_fromdir == "NB" or t_fromdir == "SB":
                     t_fromstreet = slist[0]
                     t_tostreet = slist[0]

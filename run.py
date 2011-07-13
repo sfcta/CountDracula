@@ -6,7 +6,7 @@
 import os   #library to move files in system
 import py2psql #custom built library to interact with postgres 
 import getcommands  #Custom built library functions that parse the excel file and create commands list
-#import us_lib   #Custom built library that has random utility functions
+import us_lib   #Custom built library that has random utility functions
 
 __author__ = "Varun Kohli, San Francisco County Transportation Authority"
 __license__= "GPL"
@@ -60,13 +60,13 @@ if __name__ == '__main__':
     #===========================================================================
     for file in os.listdir(directory):
         if file[-4:] =='.xls':
-            #try:
+            try:
                 print "processing file : "+file
                 decide_type_n_go(file, directory,vtype,db,user) #Sent filename and directory to the file that does the main work !!
                 print "Done file : "+file
-            #except:
-                #print "Error in file : "+file
-                #us_lib.movefile(directory,directory+'\\Failed',file)
+            except:
+                print "Error in file : "+file
+                us_lib.movefile(directory,directory+'\\Error',file)
             
             
                  

@@ -66,7 +66,7 @@ def upload_turns (commandslist,db,user):
                 #print command
             except psycopg2.IntegrityError:
                 #print command
-                print "Error inserting in DB"
+                print "Duplicate count!!"
                 raise
                 
     conn2db.commit()

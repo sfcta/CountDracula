@@ -3,8 +3,7 @@
 import py2psql
 import xlrd
 
-"""
-This is the file that initializes DB by uploading 
+"""This is the file that initializes DB by uploading 
 street names, intersection ids, street suffixes
 """
 

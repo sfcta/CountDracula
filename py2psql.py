@@ -11,6 +11,10 @@ __email__  = "modeling@sfcta.org"
 __date__   = "Jul 1 2011" 
 
 def upload_mainline (commandslist,db,user):	    #uploads counts to mainline table
+    """
+    Uploads counts to table counts_ml
+    """
+    
     
     conn2db = psycopg2.connect("dbname="+db+" user="+user)
     cur2db = conn2db.cursor()

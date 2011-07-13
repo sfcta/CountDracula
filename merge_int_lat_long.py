@@ -74,7 +74,7 @@ def merge_lat_long (int_file, lat_longfile,target_file):
             command.extend(latlongs[command[2]])
             merged_ints.append([command[0],command[1],command[2],command[3],command[4]])
      
-     #Write to csv
+            #Write to csv
      
     myfile = open(target_file, 'wb') #Create CSV filename
     

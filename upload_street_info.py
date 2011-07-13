@@ -135,11 +135,11 @@ if __name__ == '__main__':
     
     
     #===========================================================================
-    # street_names = read_street_names(filenamestreets)
-    # py2psql.street_names(street_names,db,user)
+    street_names = read_street_names(filenamestreets)
+    py2psql.street_names(street_names,db,user)
     # 
-    # int_ids = read_int_ids(filenameids)
-    # py2psql.int_ids(int_ids,db,user)
+    int_ids = read_int_ids(filenameids)
+    py2psql.int_ids(int_ids,db,user)
     #===========================================================================
     
     alt_names = read_alt_streets(filenamealtstreets)

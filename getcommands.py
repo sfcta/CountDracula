@@ -8,7 +8,7 @@ from datetime import date
 import xlrd 
 import py2psql
 import us_lib   #Custom built library that has random utility functions
-from types import FloatType, IntType
+from types import FloatType
 
 __author__ = "Varun Kohli, San Francisco County Transportation Authority"
 __license__= "GPL"
@@ -175,20 +175,20 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
     #----See if we need to add suffix----------------------------------- 
     
     for i in range(0,2):
-      if (py2psql.street_in_streetnames(slist[i],db,user)==1):
-          #print "street"+slist[i]+"found"
-          pass
-      elif (py2psql.street_in_altnames(slist[i],db,user)==1):
-          alt_name = py2psql.altname(slist[i],db,user)
-          if (py2psql.street_in_streetnames(alt_name,db,user)==1):
-              slist[i] = alt_name
-              #print "street"+slist[i]+"founf"
-          else:
-              print "street"+slist[i]+"notfounf"
-              raise
-      else:
-          print "street"+slist[i]+"notfounf"
-          raise
+        if (py2psql.street_in_streetnames(slist[i],db,user)==1):
+            #print "street"+slist[i]+"found"
+            pass
+        elif (py2psql.street_in_altnames(slist[i],db,user)==1):
+            alt_name = py2psql.altname(slist[i],db,user)
+            if (py2psql.street_in_streetnames(alt_name,db,user)==1):
+                slist[i] = alt_name
+                #print "street"+slist[i]+"founf"
+            else:
+                print "street"+slist[i]+"notfounf"
+                raise
+        else:
+            print "street"+slist[i]+"notfounf"
+            raise
     
     #----------Loop through counts and Create SQL Commandslist with parameters-------------    
      

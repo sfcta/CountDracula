@@ -131,11 +131,11 @@ if __name__ == '__main__':
     
     
     print "Give full path for Street Names file:"
-    filenamestreets = raw_input()
+    #filenamestreets = raw_input()
     print "\nGive full path for Intersection_Ids file:"
-    filenameids = raw_input()
+    #filenameids = raw_input()
     print "Give full path for Alt Street Names file:"
-    filenamealtstreets = raw_input()
+    #filenamealtstreets = raw_input()
     print "\nDB to login?"
     db = raw_input()
     print "\nUser to login as?"
@@ -144,8 +144,9 @@ if __name__ == '__main__':
     
     
     #======Static Input======================================
-    #filenamestreets = "C:\\Documents and Settings\\Varun\\Desktop\\Docs\\nodenumbering\\FINAL\\Streets.xls"
-    #filenameids = "C:\\Documents and Settings\Varun\\Desktop\\Docs\\CountDracula_FINALS\\_EXCEL_CUBE_INPUTS\\Intersections.xls"
+    filenamestreets = "Q:\\Model Development\\CountDracula\\1_CountDracula_Creation\\_EXCEL_CUBE_INPUTS\\Streets.xls"
+    filenameids = "Q:\\Model Development\\CountDracula\\1_CountDracula_Creation\\_EXCEL_CUBE_INPUTS\\Intersections.xls"
+    filenamealtstreets = "Q:\\Model Development\\CountDracula\\1_CountDracula_Creation\\_EXCEL_CUBE_INPUTS\\Alt_Streets.xls"
     #db = "postgres"
     #user = "postgres"
     #===========================================================================

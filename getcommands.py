@@ -106,7 +106,8 @@ def mainline(filename,filepath,vtype_i,db,user):
                 vtype = vtype_i
             
             #For the column, set direction and to from streets
-            ml_ondir = activesheet.cell_value(0,column)
+            ml_ondir_temp = activesheet.cell_value(0,column)
+            ml_ondir = ml_ondir_temp[:2] 
             direction = ml_ondir[0]
             
             if (direction == 'S' or direction == 'E'):

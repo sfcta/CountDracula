@@ -48,25 +48,25 @@ if __name__ == '__main__':
     vtype = raw_input()
     
     print "Input database to enter counts to:\n"
-    #db = raw_input()
+    db = raw_input()
     
     print "Input username to login as:\n"
-    #user = raw_input()
+    user = raw_input()
     #===========================================================================
     # 
-    db = "postgres"         #dbname to upload to
-    user = "postgres"       #user to upload as
+    #db = "postgres"         #dbname to upload to
+    #user = "postgres"       #user to upload as
     # 
     #===========================================================================
     for file in os.listdir(directory):
         if file[-4:] =='.xls':
-            try:
+            #try:
                 print "processing file : "+file
                 decide_type_n_go(file, directory,vtype,db,user) #Sent filename and directory to the file that does the main work !!
                 print "Done file : "+file
-            except:
-                print "Error in file : "+file
-                us_lib.movefile(directory,directory+'\\Error',file)
+            #except:
+                #print "\n*************Error in file : "+file+"*************"
+                #us_lib.movefile(directory,directory+'\\Error',file)
             
             
                  

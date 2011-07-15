@@ -108,6 +108,9 @@ def int_ids (commandslist,db,user):    #uploads intersection ids table
     #________________THIS IS ONLY FOR TESTING !!!
     #OR EMPTY EXISTING INTERSECTIONS BEFORE ENTERING NEW TABLE
     cur2db.execute("DELETE from intersection_ids;")
+    cur2db.execute("DELETE from nodes;")
+    cur2db.execute("ALTER TABLE intersection_ids DROP CONSTRAINT intersection_ids_int_id_fkey;")
+    
     
     
     for command in commandslist:

@@ -271,6 +271,153 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
                     
     return commands
 
+def command_upload_mainline (db, user):
+    """
+    Gets single count info and uploads it
+    """
+    
+    commands = []
+    #get date
+    print "Enter count date in YYYY.MM.DD format:"
+    tmp_date = raw_input().split('.')
+    date_yyyy_mm_dd = date(int(tmp_date[0]),int(tmp_date[1]),int(tmp_date[2]) )
+    
+    
+    #get period & starttime
+    print "Enter count time:"
+    print "1 : AMPKHOUR    |    2 : PMPKHOUR    |    3: ADT    {Single counts are not supported as of now}"
+    time_period = int(raw_input())
+    time = []
+    if  time_period == 1:
+        time.append('AMPKHOUR')
+    elif time_period == 2:
+        time.append('PMPKHOUR')
+    elif time_period == 3:
+        time.append('ADT')
+    else :
+        print "Wrong time period Entered!"
+        raise
+        
+    sp = us_lib.createtimestamp(date_yyyy_mm_dd,time)     
+    starttime = sp[0]
+    period = sp[1]
+    
+    #get vtype
+    print "Enter vehicle type:"
+    print "'0:ALL'  |  '1:PEDESTRIAN'  |  '2:TRUCK'  |  '3:Bike'  |  '-1:UNKNOWN'"
+    vtype = int(raw_input())
+    
+    #get ml_onstreet
+    print "Enter the street we are on:"
+    ml_onstreet = raw_input().upper()
+    
+    #get ml_ondir
+    print "Enter the direction of movement:"
+    ml_ondir = raw_input().upper()
+    
+    #get ml_fromstreet
+    print "Enter the fromstreet:"
+    ml_fromstreet = raw_input().upper()
+    
+    #get ml_tostreet
+    print "Enter the tostreet:"
+    ml_tostreet = raw_input().upper()
+    
+    #get ml_refpos
+    print "Enter count location from downstream end in feet:"
+    ml_refpos = float(raw_input())
+    
+    #get sourcefile
+    print "Do you have a sourcefile:"
+    sourcefile = raw_input()
+    project = ""
+    
+    #get count
+    print "Enter count now:"
+    count = int(raw_input())
+    
+    commands.append([count,starttime,period,vtype,ml_onstreet,ml_ondir,ml_fromstreet,ml_tostreet,ml_refpos,sourcefile,project])  
+
+    py2psql.upload_mainline(commands,db,user)
+
+
+def command_upload_turning (db, user): 
+    """
+    Gets single count info and uploads it
+    """
+    
+    commands = []
+    #get date
+    print "Enter count date in YYYY.MM.DD format:"
+    #tmp_date = raw_input().split('.')
+    tmp_date = ['2006','06','14']
+    date_yyyy_mm_dd = date(int(tmp_date[0]),int(tmp_date[1]),int(tmp_date[2]) )
+    
+    
+    #get period & starttime
+    print "Enter count time:"
+    print "1 : AMPKHOUR    |    2 : PMPKHOUR    |    3: ADT    {Single counts are not supported as of now}"
+    #time_period = int(raw_input())
+    time_period = 3
+    time = []
+    if  time_period == 1:
+        time.append('AMPKHOUR')
+    elif time_period == 2:
+        time.append('PMPKHOUR')
+    elif time_period == 3:
+        time.append('ADT')
+    else :
+        print "Wrong time period Entered!"
+        raise
+        
+    sp = us_lib.createtimestamp(date_yyyy_mm_dd,time)     
+    starttime = sp[0]
+    period = sp[1]
+    
+    #get vtype
+    print "Enter vehicle type:"
+    print "'0:ALL'  |  '1:PEDESTRIAN'  |  '2:TRUCK'  |  '3:Bike'  |  '-1:UNKNOWN'"
+    #vtype = int(raw_input())
+    vtype = 0
+    
+    #get ml_onstreet
+    print "Enter the street approach street:"
+    t_fromstreet = raw_input().upper()
+    
+    #get ml_ondir
+    print "Enter the direction of approach:"
+    t_fromdir = raw_input().upper()
+
+    #get t_tostreet
+    print "Enter the tostreet:"
+    t_tostreet = raw_input().upper()
+    
+    #get t_todirection
+    print "Enter the to direction:"
+    t_todir = raw_input().upper()
+    
+    #get intersecting street
+    if t_fromstreet == t_tostreet:
+        print "Enter intersecting street:"
+        t_intstreet = raw_input().upper()
+    else:
+        t_intstreet = t_tostreet
+    
+    t_intid = -1
+    #get sourcefile
+    print "Do you have a sourcefile:"
+    #sourcefile = raw_input()
+    sourcefile = "Q:\\Roadway Observed Data\\Counts\ProjectBased\\Japantown\\1746 Post Transportation Technical Data 6-2006.pdf"
+    project = ""
+    
+    #get count
+    print "Enter count now:"
+    count = int(raw_input())
+    
+    commands.append([count,starttime,period,vtype,t_fromstreet,t_fromdir,t_tostreet,t_todir,t_intstreet,t_intid, sourcefile,project])  
+
+    py2psql.upload_turns(commands,db,user)
+
 
 
 

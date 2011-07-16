@@ -4,7 +4,6 @@
 """
 
 import os   #library to move files in system
-from datetime import date
 import py2psql #custom built library to interact with postgres 
 import getcommands  #Custom built library functions that parse the excel file and create commands list
 import us_lib   #Custom built library that has random utility functions

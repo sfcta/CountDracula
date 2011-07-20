@@ -10,13 +10,15 @@ __license__= "GPL"
 __email__  = "modeling@sfcta.org"
 __date__   = "Jul 1 2011" 
 
-def upload_mainline (commandslist,db,user):	    #uploads counts to mainline table
+def upload_mainline (commandslist,host,db,user,pw):	    #uploads counts to mainline table
     """
     Uploads counts to table counts_ml
     """
     
+    UPLOAD = 0
+    Duplicates = 0
     
-    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
     cur2db = conn2db.cursor()
     
     #________________THIS IS ONLY FOR TESTING !!!
@@ -28,22 +30,38 @@ def upload_mainline (commandslist,db,user):	    #uploads counts to mainline tabl
         try:
             cur2db.execute("INSERT INTO counts_ml (count,starttime,period,vtype, onstreet,ondir,fromstreet,tostreet,refpos,sourcefile,project) Values (%s, %s, %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s )",
                        tuple(command))
-        except:
+            conn2db.commit()
+            UPLOAD+=1
+        except psycopg2.IntegrityError:
             #print command
-            print "Error inserting in DB"
-            raise
+            #print "Error inserting in DB"
+            Duplicates+=1
+            cur2db.close()
+            conn2db.close()
+            conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
+            cur2db = conn2db.cursor()
+            
         
     conn2db.commit()
     cur2db.close()
     conn2db.close()
+    
+    print UPLOAD,' count(s) uploaded'
+    if Duplicates !=0:
+        print Duplicates, ' duplicate or erroneous count(s) found and skipped!'
+    
 
-def upload_turns (commandslist,db,user):	
+
+def upload_turns (commandslist,host, db,user,pw ):	
     """
     Uploads counts to turns table
     """
     
+    UPLOAD = 0
+    Duplicates = 0
     
-    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    
+    conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
     cur2db = conn2db.cursor()
     
     #________________THIS IS ONLY FOR TESTING !!!
@@ -63,23 +81,36 @@ def upload_turns (commandslist,db,user):
             try:
                 cur2db.execute("INSERT INTO counts_turns (count,starttime,period,vtype,fromstreet,fromdir,tostreet,todir,intstreet,intid,sourcefile,project) Values (%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s )",
                                 (command[0],command[1],command[2],command[3],command[4],command[5],command[6],command[7],command[8],intid,command[10],command[11],))
+                conn2db.commit()
+                UPLOAD+=1
                 #print command
             except psycopg2.IntegrityError:
                 #print command
-                print "Duplicate count!!"
-                raise
+                #print "Duplicate count!!"
+                Duplicates +=1
+                cur2db.close()
+                conn2db.close()
+                conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
+                cur2db = conn2db.cursor()
+                
+                
                 
     conn2db.commit()
     cur2db.close()
     conn2db.close()
+    
+    print UPLOAD,' count(s) uploaded'
+    if Duplicates !=0:
+        print Duplicates, ' duplicate or erroneous count(s) found and skipped!'
+    
 
-def street_names (commandslist,db,user):    #uploads street names to  DB
+def street_names (commandslist,host,db,user,pw):    #uploads street names to  DB
     """
     Uploads street_names to table street_names
     """
     
     
-    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
     cur2db = conn2db.cursor()
     
     #________________THIS IS ONLY FOR TESTING !!!
@@ -97,12 +128,12 @@ def street_names (commandslist,db,user):    #uploads street names to  DB
     cur2db.close()
     conn2db.close()
 
-def int_ids (commandslist,db,user):    #uploads intersection ids table
+def int_ids (commandslist,host,db,user,pw):    #uploads intersection ids table
     """
     Uploads intersection_ids to db
     """
     
-    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
     cur2db = conn2db.cursor()
     
     #________________THIS IS ONLY FOR TESTING !!!
@@ -125,12 +156,12 @@ def int_ids (commandslist,db,user):    #uploads intersection ids table
     cur2db.close()
     conn2db.close()
 
-def alt_names (commandslist,db,user):    #uploads alt_names to  DB
+def alt_names (commandslist,host,db,user,pw):    #uploads alt_names to  DB
     """
     Uploads street suffixes to DB
     """
     
-    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
     cur2db = conn2db.cursor()
     
     #________________THIS IS ONLY FOR TESTING !!!
@@ -150,12 +181,12 @@ def alt_names (commandslist,db,user):    #uploads alt_names to  DB
     cur2db.close()
     conn2db.close()
 
-def street_in_streetnames(name,db,user):
+def street_in_streetnames(name,host,db,user,pw):
     """
     Checks if street name is in street_names table 
     """
     
-    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
     cur2db = conn2db.cursor()
     cur2db.execute("SELECT * from street_names where street_name = %s",[name]);
     entries = cur2db.fetchone()
@@ -167,11 +198,11 @@ def street_in_streetnames(name,db,user):
     cur2db.close()
     conn2db.close()
     
-def street_in_altnames(name,db,user):
+def street_in_altnames(name,host,db,user,pw):
     """
     Checks if street name is in alt_names table 
     """
-    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
     cur2db = conn2db.cursor()
     cur2db.execute("SELECT * from alt_names where street_name = %s",[name]);
     entries = cur2db.fetchone()
@@ -186,12 +217,12 @@ def street_in_altnames(name,db,user):
     cur2db.close()
     conn2db.close()
     
-def altname(name,db,user):
+def altname(name,host,db,user,pw):
     """
     Returns street_name with suffix added 
     """
     
-    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
     cur2db = conn2db.cursor()
     cur2db.execute("SELECT * from alt_names where street_name = %s",[name]);
     entries = cur2db.fetchone()
@@ -206,7 +237,7 @@ def altname(name,db,user):
     conn2db.close()
 
            
-def retrieve_table (filepath,table,db,user):        #save a table as csv (used for testing primarily) 
+def retrieve_table (filepath,table,host,db,user,pw):        #save a table as csv (used for testing primarily) 
     """
     Saves a table to a csv file
     """
@@ -214,7 +245,7 @@ def retrieve_table (filepath,table,db,user):        #save a table as csv (used f
     
     myfile = open(filepath + '\\' + db + '_' + table + '.csv', 'wb') #Create CSV filename
     
-    conn2db = psycopg2.connect("dbname="+db+" user="+user)
+    conn2db = psycopg2.connect("host="+host+" dbname="+db+" user="+user+" password="+pw)
     cur2db = conn2db.cursor()
     
     cur2db.copy_to(myfile, table, sep="|")

@@ -136,10 +136,17 @@ if __name__ == '__main__':
     #filenameids = raw_input()
     print "Give full path for Alt Street Names file:"
     #filenamealtstreets = raw_input()
+    
+    print "Enter host ip:"
+    host = raw_input()
+    
     print "\nDB to login?"
     db = raw_input()
     print "\nUser to login as?"
     user = raw_input()
+    
+    print "Enter password:"
+    pw = raw_input()
     
     
     
@@ -154,14 +161,14 @@ if __name__ == '__main__':
     
     #===========================================================================
     street_names = read_street_names(filenamestreets)
-    py2psql.street_names(street_names,db,user)
+    py2psql.street_names(street_names,host,db,user,pw)
     # 
     int_ids = read_int_ids(filenameids)
-    py2psql.int_ids(int_ids,db,user)
+    py2psql.int_ids(int_ids,host,db,user,pw)
     #===========================================================================
     
     alt_names = read_alt_streets(filenamealtstreets)
-    py2psql.alt_names(alt_names,db,user)
+    py2psql.alt_names(alt_names,host,db,user,pw)
     
     
     

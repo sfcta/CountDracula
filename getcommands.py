@@ -15,7 +15,7 @@ __license__= "GPL"
 __email__  = "modeling@sfcta.org"
 __date__   = "Jul 1 2011" 
 
-def mainline(filename,filepath,vtype_i,db,user):  
+def mainline(filename,filepath,vtype_i,host,db,user,pw):  
     """
     creates commands list for ML counts
     """
@@ -59,12 +59,12 @@ def mainline(filename,filepath,vtype_i,db,user):
     #----See if we need to add suffix----------------------------------- 
     
     for i in range(0,3):
-        if (py2psql.street_in_streetnames(slist[i],db,user)==1):
+        if (py2psql.street_in_streetnames(slist[i],host,db,user,pw)==1):
             #print "street"+slist[i]+"found"
             pass
-        elif (py2psql.street_in_altnames(slist[i],db,user)==1):
-            alt_name = py2psql.altname(slist[i],db,user)
-            if (py2psql.street_in_streetnames(alt_name,db,user)==1):
+        elif (py2psql.street_in_altnames(slist[i],host,db,user,pw)==1):
+            alt_name = py2psql.altname(slist[i],host,db,user,pw)
+            if (py2psql.street_in_streetnames(alt_name,host,db,user,pw)==1):
                 slist[i] = alt_name
                 #print "street"+slist[i]+"founf"
             else:
@@ -133,7 +133,7 @@ def mainline(filename,filepath,vtype_i,db,user):
                     
     return commands
        
-def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns counts
+def turns(filename,filepath, vtype_i,host,db,user,pw):  #creates commands list for turns counts
     """
     creates commands list for turn counts
     """
@@ -176,12 +176,12 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
     #----See if we need to add suffix----------------------------------- 
     
     for i in range(0,2):
-        if (py2psql.street_in_streetnames(slist[i],db,user)==1):
+        if (py2psql.street_in_streetnames(slist[i],host,db,user,pw)==1):
             #print "street"+slist[i]+"found"
             pass
-        elif (py2psql.street_in_altnames(slist[i],db,user)==1):
-            alt_name = py2psql.altname(slist[i],db,user)
-            if (py2psql.street_in_streetnames(alt_name,db,user)==1):
+        elif (py2psql.street_in_altnames(slist[i],host,db,user,pw)==1):
+            alt_name = py2psql.altname(slist[i],host,db,user,pw)
+            if (py2psql.street_in_streetnames(alt_name,host,db,user,pw)==1):
                 slist[i] = alt_name
                 #print "street"+slist[i]+"founf"
             else:
@@ -271,7 +271,7 @@ def turns(filename,filepath, vtype_i,db,user):  #creates commands list for turns
                     
     return commands
 
-def command_upload_mainline (db, user):
+def command_upload_mainline (host,db, user,pw):
     """
     Gets single count info and uploads it
     """
@@ -338,10 +338,10 @@ def command_upload_mainline (db, user):
     
     commands.append([count,starttime,period,vtype,ml_onstreet,ml_ondir,ml_fromstreet,ml_tostreet,ml_refpos,sourcefile,project])  
 
-    py2psql.upload_mainline(commands,db,user)
+    py2psql.upload_mainline(commands,host,db,user,pw)
 
 
-def command_upload_turning (db, user): 
+def command_upload_turning (host,db, user,pw): 
     """
     Gets single count info and uploads it
     """
@@ -416,20 +416,13 @@ def command_upload_turning (db, user):
     
     commands.append([count,starttime,period,vtype,t_fromstreet,t_fromdir,t_tostreet,t_todir,t_intstreet,t_intid, sourcefile,project])  
 
-    py2psql.upload_turns(commands,db,user)
+    py2psql.upload_turns(commands,host,db,user,pw)
 
 
 
 
 if __name__ == '__main__':
     
+    pass
+
     
-    print mainline("4thAve_Irving.Parnassus.xls","C:\Documents and Settings\Varun\Desktop\Standardized")
-    #===========================================================================
-    # 
-    # t_fromdir = "NB"
-    # 
-    # compass = ['N','W','S','E']
-    # t_todir = compass[compass.index(t_fromdir[0])-1]
-    # print t_todir
-    #===========================================================================

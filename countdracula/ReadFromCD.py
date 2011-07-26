@@ -130,3 +130,59 @@ class ReadFromCD(object):
         
         return counts
         
+    def retrieve_table (self,filepath,table):        #save a table as csv (used for testing primarily) 
+        """
+        Saves a table to a csv file
+        """
+        
+        
+        myfile = open(filepath + '\\' + self._db + '_' + table + '.csv', 'wb') #Create CSV filename
+        
+        conn2db = psycopg2.connect("host="+self._host+" dbname="+self._db+" user="+self._user+" password="+self._pw)
+        cur2db = conn2db.cursor()
+        
+        cur2db.copy_to(myfile, table, sep="|")
+        
+        conn2db.commit()
+        cur2db.close()
+        conn2db.close()
+
+    def street_in_streetnames(self,name):
+        """
+        Checks if street name is in street_names table 
+        """
+        
+        self._cur2db.execute("SELECT street_name from street_names where street_name = %s",[name]);
+        entries = self._cur2db.fetchone()
+        if entries == None:
+            return 0
+        else:
+            return 1
+    
+    def street_in_altnames(self, name):
+        """
+        Checks if street name is in alt_names table 
+        """
+        
+        self._cur2db.execute("SELECT street_name from street_names where short_name = %s",[name]);
+        entries = self._cur2db.fetchone()
+        if entries == None:
+            #print entries
+            return 0
+        else:
+            #print entries
+            return 1
+        
+    def altname(self, name):
+        """
+        Returns street_name with suffix added 
+        """
+        self._cur2db.execute("SELECT street_name from street_names where short_name = %s",[name]);
+        entries = self._cur2db.fetchone()
+        if entries == None:
+            #print entries
+            return ""
+        else:
+            #print entries
+            return (""+entries[0])
+        

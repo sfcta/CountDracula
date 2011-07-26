@@ -6,7 +6,7 @@ Created on Jul 25, 2011
 
 import psycopg2
 
-class MyClass(object):
+class WriteToCD(object):
     '''
     Class that does all the writing (uploading) to our Database
     '''
@@ -23,8 +23,8 @@ class MyClass(object):
         '''
         
         self._host = host
-        self._database = database
-        self._username = username
+        self._db = database
+        self._user = username
         self._pw = pw
         
         
@@ -142,4 +142,36 @@ class MyClass(object):
         conn2db.commit()
         cur2db.close()
         conn2db.close()            
+        
+        
+    def street_names(self, fullnames, alt_names):
             
+        """
+        Uploads street_names to table street_names
+        """
+        conn2db = psycopg2.connect("host="+self._host+" dbname="+self._db+" user="+self._user+" password="+self._pw)
+        cur2db = conn2db.cursor()
+        
+        #________________THIS IS ONLY FOR TESTING !!!
+        #OR Clear DB before uploading new street_names
+        cur2db.execute("DELETE from counts_ml;")
+        cur2db.execute("DELETE from counts_turns;")
+        cur2db.execute("DELETE from intersection_ids;")
+        cur2db.execute("DELETE from street_names;")
+        
+        for command in fullnames:
+            #send command to server
+            cur2db.execute("INSERT INTO street_names VALUES (%s)",
+                           [command])
+        
+        for command in alt_names:
+            #send command to server
+            street_name = command[0]+command[1]
+            cur2db.execute("UPDATE street_names SET short_name = %s, suffix = %s where street_name = %s",
+                           (command[0],command[1],street_name))
+        
+        
+        conn2db.commit()
+        cur2db.close()
+        conn2db.close()
+

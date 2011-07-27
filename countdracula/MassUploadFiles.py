@@ -10,18 +10,22 @@ from WriteToCD import WriteToCD
 
 class MassUploadFiles(object):
     '''
-    Reads, parses and uploads files to database
+    Reads, parses and uploads count files to database
     '''
 
 
     def __init__(self, directory,vtype, host, database, username, pw):
         '''
-        self._directory
+        directory = directory to process
+        vtype = default vehicle type (used if vtype not found in file)
+        host = host ip
+        database = database name Eg: countdracula
+        username = username to login as
+        pw = pw for self._username
         '''
         self._directory = directory
-        self._vtype = vtype
-        self._filename = ""
-        self._host = host
+        self._vtype = vtype     #default vehicle type
+        self._host = host       
         self._database = database
         self._username = username
         self._pw = pw
@@ -52,7 +56,7 @@ class MassUploadFiles(object):
                         commandsuploader.upload_turns(commandslist)
                     #    us_lib.movefile(directory,directory+'\\DONE',file)
                 except:
-                    print "\n*************Error in file : "+file+"*************"
+                    print "\n*************Error in file : "+file+"*************\n"
                     #us_lib.movefile(directory,directory+'\\Error',file)
                     
                     

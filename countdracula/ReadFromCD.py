@@ -66,7 +66,7 @@ class ReadFromCD(object):
         """
         
            
-        counts = []
+        counts = [-1]*number
         ## Find approach street by finding the street name that is common between the list of streets at the atNode and fromNode
         
         self._cur2db.execute("SELECT street1 from (    ((SELECT DISTINCT street1 from intersection_ids where int_id = %s) UNION (SELECT DISTINCT  street2 from intersection_ids where int_id = %s)) UNION ALL ((SELECT DISTINCT  street1 from intersection_ids where int_id = %s)UNION(SELECT DISTINCT  street2 from intersection_ids where int_id = %s))    ) Street GROUP BY street1 HAVING count(street1) > 1",
@@ -105,7 +105,7 @@ class ReadFromCD(object):
         intstreets = []
         
         if fromstreet != tostreet:
-            intstreets[0] = tostreet
+            intstreets.append(tostreet)
         else:
             #if approach and departing street are same (i.e. for a thru movement), we find the intersection street
             self._cur2db.execute("SELECT street1 from ((SELECT DISTINCT street1 from intersection_ids where int_id = %s) UNION (SELECT DISTINCT  street2 from intersection_ids where int_id = %s)) STREET where street1 <> %s",
@@ -124,7 +124,9 @@ class ReadFromCD(object):
             
                 count =  self._cur2db.fetchone()
                 if not count == None: 
-                    counts.extend(count)
+                    counts[i]=count
+                else: 
+                    intstreetid+=1
             
             counttime = (datetime.combine(date(2000,1,1),starttime) + period).time()
         
@@ -147,42 +149,71 @@ class ReadFromCD(object):
         cur2db.close()
         conn2db.close()
 
-    def street_in_streetnames(self,name):
-        """
-        Checks if street name is in street_names table 
-        """
+    #===========================================================================
+    # def street_in_streetname(self,name):
+    #    """
+    #    Checks if street name is in street_names table 
+    #    """
+    #    
+    #    self._cur2db.execute("SELECT street_name from street_names where street_name = %s",[name]);
+    #    entries = self._cur2db.fetchone()
+    #    if entries == None:
+    #        return 0
+    #    else:
+    #        return 1
+    # 
+    # def street_in_altnames(self, name):
+    #    """
+    #    Checks if street name is in alt_names table 
+    #    """
+    #    
+    #    self._cur2db.execute("SELECT street_name from street_names where short_name = %s",[name]);
+    #    entries = self._cur2db.fetchone()
+    #    if entries == None:
+    #        #print entries
+    #        return 0
+    #    else:
+    #        #print entries
+    #        return 1
+    #    
+    # def altname(self, name):
+    #    """
+    #    Returns street_name with suffix added 
+    #    """
+    #    self._cur2db.execute("SELECT street_name from street_names where short_name = %s",[name]);
+    #    entries = self._cur2db.fetchone()
+    #    if entries == None:
+    #        #print entries
+    #        return ""
+    #    else:
+    #        #print entries
+    #        return (""+entries[0])
+    #===========================================================================
+        
+        
+    def getPossibleStreetNames(self, name):
         
         self._cur2db.execute("SELECT street_name from street_names where street_name = %s",[name]);
-        entries = self._cur2db.fetchone()
-        if entries == None:
-            return 0
+        entries = self._cur2db.fetchall()
+        if not entries == []:
+            return entries
         else:
-            return 1
-    
-    def street_in_altnames(self, name):
-        """
-        Checks if street name is in alt_names table 
-        """
+            self._cur2db.execute("SELECT street_name from street_names where nospace_name = %s",[name]);
+            entries = self._cur2db.fetchall()
+            if not entries == []:
+                return entries
+            else:
+                self._cur2db.execute("SELECT street_name from street_names where short_name = %s",[name]);
+                entries = self._cur2db.fetchall()
+                return entries
         
-        self._cur2db.execute("SELECT street_name from street_names where short_name = %s",[name]);
-        entries = self._cur2db.fetchone()
-        if entries == None:
-            #print entries
-            return 0
+    def getIntersectionId(self,NSstreet,EWstreet):
+         
+        self._cur2db.execute("SELECT int_id from intersection_ids WHERE ((street1=%s AND street2=%s) OR (street1=%s AND street2=%s));",(NSstreet,EWstreet,EWstreet,NSstreet))
+        intid = self._cur2db.fetchone()
+        if intid == None:   #i.e. intersection not found !!
+            return (-1,)
         else:
-            #print entries
-            return 1
+            return intid
         
-    def altname(self, name):
-        """
-        Returns street_name with suffix added 
-        """
-        self._cur2db.execute("SELECT street_name from street_names where short_name = %s",[name]);
-        entries = self._cur2db.fetchone()
-        if entries == None:
-            #print entries
-            return ""
-        else:
-            #print entries
-            return (""+entries[0])
         

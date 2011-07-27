@@ -30,7 +30,7 @@ def initializeDB():
     #======Static Input======================================
     filenamestreets = "Q:\\Model Development\\CountDracula\\1_CountDracula_Creation\\_EXCEL_CUBE_INPUTS\\Streets.xls"
     filenameids = "Q:\\Model Development\\CountDracula\\1_CountDracula_Creation\\_EXCEL_CUBE_INPUTS\\Intersections.xls"
-    filenamealtstreets = "Q:\\Model Development\\CountDracula\\1_CountDracula_Creation\\_EXCEL_CUBE_INPUTS\\Alt_Streets.xls"
+    #filenamealtstreets = "Q:\\Model Development\\CountDracula\\1_CountDracula_Creation\\_EXCEL_CUBE_INPUTS\\Alt_Streets.xls"
     #db = "postgres"
     #user = "postgres"
     #===========================================================================
@@ -41,9 +41,9 @@ def initializeDB():
     uploader = countdracula.WriteToCD(host, db, user, pw)
     
     street_names = parser.read_street_names(filenamestreets)
-    alt_names = parser.read_alt_streets(filenamealtstreets)
+    #alt_names = parser.read_alt_streets(filenamealtstreets)
     
-    uploader.street_names(street_names, alt_names)
+    uploader.street_names(street_names)
      
     int_ids = parser.read_int_ids(filenameids)
     uploader.int_ids(int_ids)
@@ -59,12 +59,13 @@ def initializeDB():
 if __name__ == '__main__':
     
     
-#    initializeDB()
-#    exit(0)
+    #initializeDB()
+    #exit(0)
     
     print "Host to connect to"
     host = raw_input()
-    #host = "172.30.1.120"
+    #host = "localhost"
+    #print host
     
     print "Input database to enter counts to:\n"
     db = raw_input()
@@ -79,7 +80,9 @@ if __name__ == '__main__':
     
     print "Password?"
     pw = raw_input()
-
+    #pw = "Pine2Front"
+    #print pw
+    
     print "Input directory path to process:"
     directory = raw_input()
     

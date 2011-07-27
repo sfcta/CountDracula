@@ -94,12 +94,12 @@ class ParseXlsToCDCommandsList():
     def mainline(self ):  
         """
         creates commands list for ML counts
-        
+        retunrs a list of list of sql insert command parameters
         
         """
         
         #---------Variables used-----------------------------------
-        commands = []
+        parametersList = []
         #count = -1
         #vtype = raw_input()
         vtype = self._vtype
@@ -136,24 +136,58 @@ class ParseXlsToCDCommandsList():
         
         #----See if we need to add suffix----------------------------------- 
         
-        for i in range(0,3):
-            if (self._countDraculaReader.street_in_streetnames(slist[i])==1):
-                #print "street"+slist[i]+"found"
-                pass
-            elif (self._countDraculaReader.street_in_altnames(slist[i])==1):
-                alt_name = self._countDraculaReader.altname(slist[i])
-                if (self._countDraculaReader.street_in_streetnames(alt_name)==1):
-                    slist[i] = alt_name
-                    #print "street"+slist[i]+"founf"
-                else:
-                    print "street"+slist[i]+"notfounf"
-                    raise
-            else:
-                print "street"+slist[i]+"notfounf"
-                raise
-       
+        #----See if we need to add suffix----------------------------------- 
+        
+        ONstreetslist = self._countDraculaReader.getPossibleStreetNames(slist[0])
+        if ONstreetslist == []:
+            print "Street "+slist[0]+" not found. Please check and rename file !"
+            raise
+        
+        NWstreetslist = self._countDraculaReader.getPossibleStreetNames(slist[1])
+        if NWstreetslist == []:
+            print "Street "+slist[1]+" not found. Please check and rename file !"
+            raise
+        
+        SEstreetslist = self._countDraculaReader.getPossibleStreetNames(slist[2])
+        if SEstreetslist == []:
+            print "Street "+slist[2]+" not found. Please check and rename file !"
+            raise
+        
+        
+        possibleNWintersections = 0
+        possibleSEintersections = 0
+        final_ONstreet = ""
+        final_NWstreet = ""
+        final_SEstreet = ""
+        
+        for ONstreet in ONstreetslist:
+            for NWstreet in NWstreetslist:
+                temp_intid = self._countDraculaReader.getIntersectionId(ONstreet,NWstreet)
+                if not temp_intid[0] == -1:
+                    possibleNWintersections+=1
+                    if possibleNWintersections>1:
+                        print "Street "+slist[0]+" and Street "+slist[1]+" can have multiple intersections possible. Please check and rename file !"
+                        raise
+                    else:
+                        for SEstreet in SEstreetslist:
+                            temp_intid2 = self._countDraculaReader.getIntersectionId(ONstreet,SEstreet)
+                            if not temp_intid2[0] == -1:
+                                possibleSEintersections+=1
+                                if possibleSEintersections>1:
+                                    print "Street "+slist[0]+" and Street "+slist[2]+" can have multiple intersections possible. Please check and rename file !"
+                                    raise
+                                else:
+                                    final_ONstreet = ONstreet
+                                    final_NWstreet = NWstreet
+                                    final_SEstreet = SEstreet
+                        
+            
+        if possibleNWintersections ==0 or possibleSEintersections ==0:
+            print "Street "+slist[0]+", Street "+slist[1]+" and Street "+slist[2]+" don't have a possible mainline spot for count. Please check and rename file !" 
+            raise
+ 
         #----------Assign ml street name, rest streets will be assigned based on column and direction------ 
-        ml_onstreet = slist[0]
+        ml_onstreet = final_ONstreet
         
         #----------Loop through counts and Create SQL Commandslist with parameters-------------    
          
@@ -189,11 +223,11 @@ class ParseXlsToCDCommandsList():
                 direction = ml_ondir[0]
                 
                 if (direction == 'S' or direction == 'E'):
-                    ml_fromstreet = slist[1]       #Veh is going from NtoS or WtoE
-                    ml_tostreet = slist[2]
+                    ml_fromstreet = final_NWstreet       #Veh is going from NtoS or WtoE
+                    ml_tostreet = final_SEstreet
                 else:
-                    ml_fromstreet = slist[2]       #Veh is going from StoN or EtoW
-                    ml_tostreet = slist[1]
+                    ml_fromstreet = final_SEstreet       #Veh is going from StoN or EtoW
+                    ml_tostreet = final_NWstreet
                 #------------------------------------------------------------------------------
     
                 row_ids = range(2,len(activesheet.col(column))) #find rows to process for column
@@ -207,16 +241,17 @@ class ParseXlsToCDCommandsList():
                         starttime = sp[0]
                         period = sp[1]
                         
-                        commands.append([count,starttime,period,vtype,ml_onstreet,ml_ondir,ml_fromstreet,ml_tostreet,ml_refpos,sourcefile,project])
+                        parametersList.append([count,starttime,period,vtype,ml_onstreet,ml_ondir,ml_fromstreet,ml_tostreet,ml_refpos,sourcefile,project])
                         
-        return commands
+        return parametersList
     
     def turns(self):  #creates commands list for turns counts
         """
         creates commands list for turn counts
+        retunrs a list of list of sql insert command parameters
         """
         #---------Variables used-----------------------------------
-        commands = []
+        parametersList = []
         #count = -1
         #vtype = raw_input() 
         vtype = self._vtype
@@ -253,21 +288,35 @@ class ParseXlsToCDCommandsList():
         
         #----See if we need to add suffix----------------------------------- 
         
-        for i in range(0,2):
-            if (self._countDraculaReader.street_in_streetnames(slist[i])==1):
-                #print "street"+slist[i]+"found"
-                pass
-            elif (self._countDraculaReader.street_in_altnames(slist[i])==1):
-                alt_name = self._countDraculaReader.altname(slist[i])
-                if (self._countDraculaReader.street_in_streetnames(alt_name)==1):
-                    slist[i] = alt_name
-                    #print "street"+slist[i]+"founf"
-                else:
-                    print "street"+slist[i]+"notfounf"
-                    raise
-            else:
-                print "street"+slist[i]+"notfounf"
-                raise
+        NSstreetslist = self._countDraculaReader.getPossibleStreetNames(slist[0])
+        if NSstreetslist == []:
+            print "Street "+slist[0]+" not found. Please check and rename file !"
+            raise
+        
+        EWstreetslist = self._countDraculaReader.getPossibleStreetNames(slist[1])
+        if EWstreetslist == []:
+            print "Street "+slist[1]+" not found. Please check and rename file !"
+            raise
+        
+        possibleintersections = 0
+        final_NSstreet = ""
+        final_EWstreet = ""
+        for NSstreet in NSstreetslist:
+            for EWstreet in EWstreetslist:
+                temp_intid = self._countDraculaReader.getIntersectionId(NSstreet,EWstreet)
+                if not temp_intid[0] == -1:
+                    possibleintersections+=1
+                    if possibleintersections>1:
+                        print "Street "+slist[0]+" and Street "+slist[1]+" can have multiple intersections possible. Please check and rename file !"
+                        raise
+                    else:
+                        final_NSstreet = NSstreet
+                        final_EWstreet = EWstreet
+                        t_intid = temp_intid[0]
+            
+        if possibleintersections ==0:
+            print "Street "+slist[0]+" and Street "+slist[1]+" don't intersect. Please check and rename file !" 
+            raise
         
         #----------Loop through counts and Create SQL Commandslist with parameters-------------    
          
@@ -316,22 +365,22 @@ class ParseXlsToCDCommandsList():
                 #Determines Street names and order
                 if (turntype == 'TH' or turntype == ' U-Turn' or turntype == 'U-Turn' or turntype == 'PD' or turntype == 'UT') :
                     if  t_fromdir == "NB" or t_fromdir == "SB":
-                        t_fromstreet = slist[0]
-                        t_tostreet = slist[0]
-                        t_intstreet = slist[1]
+                        t_fromstreet = final_NSstreet
+                        t_tostreet = final_NSstreet
+                        t_intstreet = final_EWstreet
                     else:
-                        t_fromstreet = slist[1]
-                        t_tostreet = slist[1]
-                        t_intstreet = slist[0]
+                        t_fromstreet = final_EWstreet
+                        t_tostreet = final_EWstreet
+                        t_intstreet = final_NSstreet
                 else:   #turning movement and to and from streets are different
                     if  t_fromdir == "NB" or t_fromdir == "SB":
-                        t_fromstreet = slist[0]
-                        t_tostreet = slist[1]
-                        t_intstreet = slist[1]
+                        t_fromstreet = final_NSstreet
+                        t_tostreet = final_EWstreet
+                        t_intstreet = final_EWstreet
                     else:           #TODO added maybe by mistake !!!  (check it)
-                        t_fromstreet = slist[1]
-                        t_tostreet = slist[0]
-                        t_intstreet = slist[0]
+                        t_fromstreet = final_EWstreet
+                        t_tostreet = final_NSstreet
+                        t_intstreet = final_NSstreet
                 #------------------------------------------------------------------------------
     
                 row_ids = range(2,len(activesheet.col(column))) #find rows to process for column
@@ -345,9 +394,9 @@ class ParseXlsToCDCommandsList():
                         starttime = sp[0]
                         period = sp[1]
                         
-                        commands.append([count,starttime,period,vtype,t_fromstreet,t_fromdir,t_tostreet,t_todir,t_intstreet,t_intid, sourcefile,project])
+                        parametersList.append([count,starttime,period,vtype,t_fromstreet,t_fromdir,t_tostreet,t_todir,t_intstreet,t_intid, sourcefile,project])
                         
-        return commands
+        return parametersList
     
     def read_int_ids(self,file):  
         """
@@ -396,7 +445,7 @@ class ParseXlsToCDCommandsList():
     
     def read_street_names(self,file):  
         """
-        creates commands list for street names to send to py2psql
+        creates sql commands parameter list for inserting street names to send to py2psql
         """
     
         #---------Variables used-----------------------------------
@@ -420,47 +469,53 @@ class ParseXlsToCDCommandsList():
             row_ids = range(0,len(activesheet.col(0))) #find rows to process for column
                 
             for row in row_ids:
-                    
+                namesrow = [""]*4    
                 name = activesheet.cell_value(row,0) 
                 if name != "" : #If name exists!
-                    #-------Create time in time format !!!----------------- 
-                    commands.append(name)
+                    #-------Create time in time format !!!-----------------
+                    namesrow[0] = name
+                    namesrow[1] =  activesheet.cell_value(row,1)
+                    namesrow[2] = activesheet.cell_value(row,2)
+                    namesrow[3] = activesheet.cell_value(row,3)   
+                    commands.append(namesrow)
                     
         return commands
     
     
     
-    
-    def read_alt_streets(self,file): 
-        """
-        creates commands list for street suffixes to send to py2psql
-        """
-    
-    
-        #---------Variables used-----------------------------------
-        commands = []
-        street = ""
-        suffix = ""
-        #-------------------------- open the .xls file------------------------------
-        
-        book = xlrd.open_workbook(file)
-        
-        #----------Loop through counts and Create SQL Commandslist with parameters-------------    
-        sheetnames =  book.sheet_names() 
-        totalsheets_ids = range(len(sheetnames))  #create sheet id list
-        
-        for sheet in totalsheets_ids :
-           
-            activesheet = book.sheet_by_name(sheetnames[sheet])
-            row_ids = range(0,len(activesheet.col(0))) #find rows to process for column
-                
-            for row in row_ids:
-                    
-                street = activesheet.cell_value(row,0)
-                suffix = activesheet.cell_value(row,1)
-                if (street != "" and suffix != ""): #if all inputs exist
-                    #-------Create time in time format !!!----------------- 
-                    commands.append([street,suffix])
-                    
-        return commands
-    
+    #===========================================================================
+    # 
+    # def read_alt_streets(self,file): 
+    #    """
+    #    creates commands list for street suffixes to send to py2psql
+    #    """
+    # 
+    # 
+    #    #---------Variables used-----------------------------------
+    #    commands = []
+    #    street = ""
+    #    suffix = ""
+    #    #-------------------------- open the .xls file------------------------------
+    #    
+    #    book = xlrd.open_workbook(file)
+    #    
+    #    #----------Loop through counts and Create SQL Commandslist with parameters-------------    
+    #    sheetnames =  book.sheet_names() 
+    #    totalsheets_ids = range(len(sheetnames))  #create sheet id list
+    #    
+    #    for sheet in totalsheets_ids :
+    #       
+    #        activesheet = book.sheet_by_name(sheetnames[sheet])
+    #        row_ids = range(0,len(activesheet.col(0))) #find rows to process for column
+    #            
+    #        for row in row_ids:
+    #                
+    #            street = activesheet.cell_value(row,0)
+    #            suffix = activesheet.cell_value(row,1)
+    #            if (street != "" and suffix != ""): #if all inputs exist
+    #                #-------Create time in time format !!!----------------- 
+    #                commands.append([street,suffix])
+    #                
+    #    return commands
+    # 
+    #===========================================================================

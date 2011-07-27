@@ -66,7 +66,7 @@ class ReadFromCD(object):
         """
         
            
-        counts = [-1]*number
+        #counts = [-1]*number
         ## Find approach street by finding the street name that is common between the list of streets at the atNode and fromNode
         
         self._cur2db.execute("SELECT street1 from (    ((SELECT DISTINCT street1 from intersection_ids where int_id = %s) UNION (SELECT DISTINCT  street2 from intersection_ids where int_id = %s)) UNION ALL ((SELECT DISTINCT  street1 from intersection_ids where int_id = %s)UNION(SELECT DISTINCT  street2 from intersection_ids where int_id = %s))    ) Street GROUP BY street1 HAVING count(street1) > 1",
@@ -102,35 +102,38 @@ class ReadFromCD(object):
             todir = "EB"
         
         
-        intstreets = []
+        #intstreets = []
         
-        if fromstreet != tostreet:
-            intstreets.append(tostreet)
-        else:
+        #if fromstreet != tostreet:
+        #    intstreets.append(tostreet)
+        #else:
             #if approach and departing street are same (i.e. for a thru movement), we find the intersection street
-            self._cur2db.execute("SELECT street1 from ((SELECT DISTINCT street1 from intersection_ids where int_id = %s) UNION (SELECT DISTINCT  street2 from intersection_ids where int_id = %s)) STREET where street1 <> %s",
-                           (atNode,atNode,fromstreet))
-            intstreets =   self._cur2db.fetchall()
+        #   self._cur2db.execute("SELECT street1 from ((SELECT DISTINCT street1 from intersection_ids where int_id = %s) UNION (SELECT DISTINCT  street2 from intersection_ids where int_id = %s)) STREET where street1 <> %s",
+        #                (atNode,atNode,fromstreet))
+        #  intstreets =   self._cur2db.fetchall()
             
         counttime = starttime
+        counts = [-1]*number
+        found = 0
         for i in range(0,number):
             count = None
-            intstreetid = 0
             
             #Decide what to do if multiple names with multiple streets ?!!
-            while count == None and intstreetid < len(intstreets):
-                self._cur2db.execute("SELECT AVG(count) from counts_turns where fromstreet = %s AND fromdir = %s AND tostreet = %s  AND todir = %s AND intstreet = %s AND period = %s  GROUP BY starttime HAVING  starttime::time = %s",
-                           (fromstreet, fromdir, tostreet, todir, intstreets[intstreetid], period, counttime))
+            #while count == None and intstreetid < len(intstreets):
+            self._cur2db.execute("SELECT AVG(count) from counts_turns where fromstreet = %s AND fromdir = %s AND tostreet = %s  AND todir = %s AND intid = %s AND period = %s  GROUP BY starttime HAVING  starttime::time = %s",
+                           (fromstreet, fromdir, tostreet, todir, atNode, period, counttime))
             
-                count =  self._cur2db.fetchone()
-                if not count == None: 
-                    counts[i]=count
-                else: 
-                    intstreetid+=1
+            count =  self._cur2db.fetchone()
+            if not count == None:
+                found +=1 
+                counts[i]=count
+                
             
             counttime = (datetime.combine(date(2000,1,1),starttime) + period).time()
-        
-        return counts
+        if found>0:
+            return counts
+        else: 
+            return []
         
     def retrieve_table (self,filepath,table):        #save a table as csv (used for testing primarily) 
         """

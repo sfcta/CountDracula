@@ -125,12 +125,12 @@ class WriteToCD(object):
         
         for command in commandslist:
             #ONLY done if street-pair doesn't exist already 
-            cur2db.execute("Select street_name from street_names where nospace_name = %s",
-                           (command[0],))
+            cur2db.execute("Select street_name from street_names where nospace_name = %s or street_name = %s",
+                           (command[0],command[0]))
             street1 = cur2db.fetchone()
             
-            cur2db.execute("Select street_name from street_names where nospace_name = %s",
-                           (command[1],))
+            cur2db.execute("Select street_name from street_names where nospace_name = %s or street_name = %s",
+                           (command[1],command[1]))
             street2 = cur2db.fetchone()
             
             if not (street1 == None or street2 == None):

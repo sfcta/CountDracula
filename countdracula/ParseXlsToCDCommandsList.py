@@ -134,7 +134,6 @@ class ParseXlsToCDCommandsList():
         slist = ''.join([ str.upper(s) if s not in splits else ' ' for s in streets]).split()
         i=0;
         
-        #----See if we need to add suffix----------------------------------- 
         
         #----See if we need to add suffix----------------------------------- 
         

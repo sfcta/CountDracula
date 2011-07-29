@@ -4,6 +4,20 @@ Created on Jul 25, 2011
 @author: varun
 '''
 
+
+"""
+This Script is used to Initialize the database and 
+upload counts to it.
+
+Make sure countdracula package is accessible by python and run it.
+
+Give the inputs when asked
+
+Some directory/host inputs are hard coded
+
+
+"""
+
 import countdracula
 
 def initializeDB():

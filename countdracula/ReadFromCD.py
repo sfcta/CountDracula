@@ -136,16 +136,26 @@ class ReadFromCD(object):
             
             #Decide what to do if multiple names with multiple streets ?!!
             #while count == None and intstreetid < len(intstreets):
+            #===================================================================
             self._cur2db.execute("SELECT AVG(count) from counts_turns where fromstreet = %s AND fromdir = %s AND tostreet = %s  AND todir = %s AND intid = %s AND period = %s  GROUP BY starttime HAVING  starttime::time = %s",
                            (fromstreet, fromdir, tostreet, todir, atNode, period, counttime))
+            # 
+            #===================================================================
+            #self._cur2db.execute("SELECT AVG(count) from counts_turns where fromstreet = %s AND fromdir = %s AND tostreet = %s  AND todir = %s AND intid = %s AND period = %s",
+             #              (fromstreet, fromdir, tostreet, todir, atNode, period))
+            
+            if atNode == 51369:
+                pass
+            
+            
             
             count =  self._cur2db.fetchone()
             if not count == None:
                 found +=1 
-                counts[i]=count
+                counts[i]=count[0]
                 
             
-            counttime = (datetime.combine(date(2000,1,1),starttime) + period).time()
+            counttime = (datetime.combine(date(2000,1,1),counttime) + period).time()
         if found>0:
             return counts
         else: 

@@ -142,17 +142,12 @@ class ReadFromCD(object):
             # 
             #===================================================================
             #self._cur2db.execute("SELECT AVG(count) from counts_turns where fromstreet = %s AND fromdir = %s AND tostreet = %s  AND todir = %s AND intid = %s AND period = %s",
-             #              (fromstreet, fromdir, tostreet, todir, atNode, period))
-            
-            if atNode == 51369:
-                pass
-            
-            
+            #              (fromstreet, fromdir, tostreet, todir, atNode, period))
             
             count =  self._cur2db.fetchone()
             if not count == None:
                 found +=1 
-                counts[i]=count[0]
+                counts[i]=float(count[0])
                 
             
             counttime = (datetime.combine(date(2000,1,1),counttime) + period).time()

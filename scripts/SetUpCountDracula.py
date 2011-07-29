@@ -58,35 +58,38 @@ def initializeDB():
 
 if __name__ == '__main__':
     
+    print "Do you want to initialize the Database (input street names etc.)  [0 - No | 1 - Yes] ?"
+    init = raw_input()
+    if init == 1:
+        initializeDB()
+        exit(0)
     
-    #initializeDB()
-    #exit(0)
     
-    print "Host to connect to"
+    print "\nHost to connect to"
     host = raw_input()
     #host = "localhost"
     #print host
     
-    print "Input database to enter counts to:\n"
+    print "\nInput database to enter counts to:"
     db = raw_input()
     #db = "postgres"         #dbname to upload to
     #print db
     
     
-    print "Input username to login as:\n"
+    print "\nInput username to login as:"
     user = raw_input()
     #user = "postgres"       #user to upload as
     #print user
     
-    print "Password?"
+    print "\nPassword ?"
     pw = raw_input()
     #pw = "Pine2Front"
     #print pw
     
-    print "Input directory path to process:"
+    print "\nInput directory path to process:"
     directory = raw_input()
     
-    print "Input vehicle type of files in directory:\n"
+    print "\nInput vehicle type of files in directory:"
     print "'0:ALL'  |  '1:PEDESTRIAN'  |  '2:TRUCK'  |  '3:Bike'  |  '-1:UNKNOWN'"
     vtype = raw_input()
     

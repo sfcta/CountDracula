@@ -129,20 +129,31 @@ class ReadFromCD(object):
         #  intstreets =   self._cur2db.fetchall()
             
         counttime = starttime
+        #endtime = (datetime.combine(date(2000,1,1),counttime) + period*number).time()
+        
         counts = [-1]*number
         found = 0
         for i in range(0,number):
             count = None
             
-            #Decide what to do if multiple names with multiple streets ?!!
-            #while count == None and intstreetid < len(intstreets):
-            #===================================================================
+            #Get avg of counts for the given movement and timeperiod 
             self._cur2db.execute("SELECT AVG(count) from counts_turns where fromstreet = %s AND fromdir = %s AND tostreet = %s  AND todir = %s AND intid = %s AND period = %s  GROUP BY starttime HAVING  starttime::time = %s",
                            (fromstreet, fromdir, tostreet, todir, atNode, period, counttime))
-            # 
-            #===================================================================
-            #self._cur2db.execute("SELECT AVG(count) from counts_turns where fromstreet = %s AND fromdir = %s AND tostreet = %s  AND todir = %s AND intid = %s AND period = %s",
-            #              (fromstreet, fromdir, tostreet, todir, atNode, period))
+            
+    # !!! TODO !!!
+        #=======================================================================
+        #    The above command could be modified to process counts as 'flows'
+        #    Eg: say we want count for period 15:00:00 to 15:15:00, we do a query on all counts, period for the movement where
+        #    starttime::time is >= starttime and period <= period   
+        #    then we do average of (count/count.period) * period
+        #    
+        #    This can be done something like:
+        # Select AVG(count*%s/period) from counts_turns where starttime::time >= %s and period <=%s,
+        # period, starttime, period
+        # Might be tough as postgres doesn't support division of intervals as of now
+        #    which means period/period may not work
+        # 
+        #=======================================================================
             
             count =  self._cur2db.fetchone()
             if not count == None:

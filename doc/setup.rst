@@ -22,6 +22,12 @@ Installation Instructions
 * postgreSQL has a straightforward installer; it asks you to choose a password for the "database superuser" and "service account".
 * postGIS has an installer which asks you for the password (presumably from the previous step)
 
+Depending on how your setup is, you may want to adjust the 
+`client authentication settings <http://www.postgresql.org/docs/9.0/interactive/client-authentication.html>`_ 
+on your database.  For example, if your database is setup on a publicly accessible machine, you might want to
+restrict the hosts which can connect to the database to be only localhost, or only the machine from which you'll
+run theses scripts.
+
 Database Setup
 --------------
 During the postgreSQL installation, a user was likely created for you called `postgres`. 

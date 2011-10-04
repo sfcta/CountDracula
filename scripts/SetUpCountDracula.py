@@ -51,16 +51,16 @@ def initializeDB():
     
     
     #===========================================================================
-    parser = countdracula.ParseXlsToCDCommandsList("", "", 0, host, db, user, pw)
-    uploader = countdracula.WriteToCD(host, db, user, pw)
+    parser = countdracula.CountsWorkbookParser("", "", 0, host, db, user, pw)
+    uploader = countdracula.CountsDatabaseWriter(host, db, user, pw)
     
-    street_names = parser.read_street_names(filenamestreets)
+    street_names = parser.readStreetNames(filenamestreets)
     #alt_names = parser.read_alt_streets(filenamealtstreets)
     
     uploader.street_names(street_names)
      
-    int_ids = parser.read_int_ids(filenameids)
-    uploader.int_ids(int_ids)
+    int_ids = parser.readIntersectionIds(filenameids)
+    uploader.insertIntersectionIds(int_ids)
     #===========================================================================
     
     print "UPLOAD COMPLETED !"

@@ -12,14 +12,13 @@
 # serve to show the default.
 
 import sys, os, countdracula
-from countdracula import WriteToCD
+from countdracula import CountsDatabaseWriter
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0,"../countdracula")
-sys.path.insert(0,os.path.abspath("C:\Documents and Settings\Varun\git\CountDracula"))
 
 # -- General configuration -----------------------------------------------------
 
@@ -28,7 +27,7 @@ sys.path.insert(0,os.path.abspath("C:\Documents and Settings\Varun\git\CountDrac
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.ifconfig']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.ifconfig', 'sphinx.ext.autosummary']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -77,7 +76,7 @@ exclude_patterns = []
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-#add_module_names = True
+add_module_names = False
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
@@ -220,4 +219,9 @@ man_pages = [
 
 
 autodoc_default_flags = ['members', 'undoc_members', 'inherited-members', 'show-inheritance']
+
 autoclass_content = 'both'
+
+autosummary_generate = True
+
+todo_include_todos = True

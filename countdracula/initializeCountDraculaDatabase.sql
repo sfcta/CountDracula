@@ -2,7 +2,7 @@ CREATE DATABASE countdracula;
 
 CREATE USER cdadmin  WITH PASSWORD 'CDadmin';
 
-GRANT ALL PRIVILEGES ON DATABASE countdracula to CDadmin;
+GRANT ALL PRIVILEGES ON DATABASE countdracula to cdadmin;
 
 CREATE USER cdreader WITH PASSWORD 'ReadOnly';  --> R and O capitalized
 
@@ -121,10 +121,18 @@ ALTER TABLE counts_turns ADD UNIQUE (count,starttime,vtype,period,fromstreet,fro
 
 -----------------------------------------------------------
 
-GRANT SELECT ON counts_ml TO cdreader;
-GRANT SELECT ON counts_turns TO cdreader;
+GRANT SELECT ON counts_ml        TO cdreader;
+GRANT SELECT ON counts_turns     TO cdreader;
+GRANT SELECT ON directions       TO cdreader;
 GRANT SELECT ON intersection_ids TO cdreader;
-GRANT SELECT ON street_names TO cdreader;
-GRANT SELECT ON vtype TO cdreader;
-GRANT SELECT ON directions TO cdreader;
-GRANT SELECT ON nodes TO cdreader;
+GRANT SELECT ON nodes            TO cdreader;
+GRANT SELECT ON street_names     TO cdreader;
+GRANT SELECT ON vtype            TO cdreader;
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON counts_ml        TO cdadmin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON counts_turns     TO cdadmin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON directions       TO cdadmin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON intersection_ids TO cdadmin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON nodes            TO cdadmin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON street_names     TO cdadmin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON vtype            TO cdadmin;

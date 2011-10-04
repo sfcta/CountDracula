@@ -24,12 +24,12 @@ __license__     = """
     along with DTA.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .MassUploadFiles import MassUploadFiles
-from .ParseXlsToCDCommandsList import ParseXlsToCDCommandsList
-from .ReadFromCD import ReadFromCD
-from .WriteToCD import WriteToCD
+from .CountsDatabaseReader import CountsDatabaseReader
+from .CountsDatabaseWriter import CountsDatabaseWriter
+from .CountsWorkbookParser import CountsWorkbookParser
 
 
-__all__ = ['MassUploadFiles', 'ParseXlsToCommandsList', 'ReadFromCD',
-           'WriteToCD'
+__all__ = ['CountsDatabaseReader',
+           'CountsDatabaseWriter',
+           'CountsWorkbookParser'
 ]

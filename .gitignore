@@ -1,2 +1,4 @@
 *.pyc
 .settings/*
+doc/_build/*
+doc/_generated/*

@@ -1,0 +1,219 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>countdracula.CountsDatabaseReader &mdash; CountDracula v.7 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="CountDracula v.7 documentation" href="../index.html" />
+    <link rel="next" title="countdracula.CountsDatabaseWriter" href="countdracula.CountsDatabaseWriter.html" />
+    <link rel="prev" title="countdracula.CountsWorkbookParser" href="countdracula.CountsWorkbookParser.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="countdracula.CountsDatabaseWriter.html" title="countdracula.CountsDatabaseWriter"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="countdracula.CountsWorkbookParser.html" title="countdracula.CountsWorkbookParser"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">CountDracula v.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="countdracula-countsdatabasereader">
+<h1>countdracula.CountsDatabaseReader<a class="headerlink" href="#countdracula-countsdatabasereader" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="countdracula.CountsDatabaseReader">
+<em class="property">class </em><tt class="descname">CountsDatabaseReader</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027FA6E8&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Class to handle read operations to the Counts database</p>
+<p>Constructor; connects to the counts database with the given credentials.</p>
+<blockquote>
+<div><ul class="simple">
+<li><em>host</em> is the host where the counts database resides; e.g. &#8216;localhost&#8217; or an ip address, like &#8216;172.0.0.1&#8217;</li>
+<li><em>database</em> is the database name; <cite>countdracula</cite> is the standard</li>
+<li><em>username</em> is a database user with write permissions; <cite>cdadmin</cite> is the standard.</li>
+<li><em>password</em> is the password for that the user.</li>
+<li><em>logger</em> is a logging.Logger instance for errors and informational messages.</li>
+</ul>
+</div></blockquote>
+<p>TODO: optional port?</p>
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027FA6E8&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor; connects to the counts database with the given credentials.</p>
+<blockquote>
+<div><ul class="simple">
+<li><em>host</em> is the host where the counts database resides; e.g. &#8216;localhost&#8217; or an ip address, like &#8216;172.0.0.1&#8217;</li>
+<li><em>database</em> is the database name; <cite>countdracula</cite> is the standard</li>
+<li><em>username</em> is a database user with write permissions; <cite>cdadmin</cite> is the standard.</li>
+<li><em>password</em> is the password for that the user.</li>
+<li><em>logger</em> is a logging.Logger instance for errors and informational messages.</li>
+</ul>
+</div></blockquote>
+<p>TODO: optional port?</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.__init__" title="countdracula.CountsDatabaseReader.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a></td>
+<td>x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getIntersectionId" title="countdracula.CountsDatabaseReader.getIntersectionId"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getIntersectionId</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getPossibleStreetNames" title="countdracula.CountsDatabaseReader.getPossibleStreetNames"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getPossibleStreetNames</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getTurningCounts" title="countdracula.CountsDatabaseReader.getTurningCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getTurningCounts</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.mapNodeId" title="countdracula.CountsDatabaseReader.mapNodeId"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.mapNodeId</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.retrieve_table" title="countdracula.CountsDatabaseReader.retrieve_table"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.retrieve_table</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.getIntersectionId">
+<tt class="descname">getIntersectionId</tt><big>(</big><em>NSstreet</em>, <em>EWstreet</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getIntersectionId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a NS street and an EW street, looks for the intersection id of their intersection.</p>
+<p>Returns the intersection id or None, if none is found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.getPossibleStreetNames">
+<tt class="descname">getPossibleStreetNames</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getPossibleStreetNames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a street name string, looks up the name in the various columns of the <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>
+and returns a list of the possible street_names (first column).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.getTurningCounts">
+<tt class="descname">getTurningCounts</tt><big>(</big><em>at_node</em>, <em>from_node</em>, <em>to_node</em>, <em>from_angle</em>, <em>to_angle</em>, <em>starttime</em>, <em>period</em>, <em>num_intervals</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getTurningCounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the counts from the database for a specific movement</p>
+<ul class="simple">
+<li><em>at_node</em> is the intersection node</li>
+<li><em>to_node</em> is the destination node</li>
+<li><em>from_node</em> is the origin node</li>
+<li><em>from_angle</em> is approach angle with East direction in radians</li>
+<li><em>to_angle</em> is the departing angle from East with radians</li>
+<li><em>starttime</em> is starting time for counts to get</li>
+<li><em>period</em> is time interval for each count</li>
+<li><em>num_intervals</em> = number of intervals to retrieve</li>
+</ul>
+<p>Returns a list of counts.</p>
+<div class="admonition-todo admonition " id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">document error conditions.  Also, isn&#8217;t <em>from_angle</em> and <em>to_angle</em> something we can calculate here?</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.mapNodeId">
+<tt class="descname">mapNodeId</tt><big>(</big><em>node_x</em>, <em>node_y</em>, <em>tolerance</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.mapNodeId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that returns id for a node in CountDracula which lies within &#8216;tolerance&#8217; feet</p>
+<p>to the coordinates node_x,node_y</p>
+<p>Returns -1 if a match is not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.retrieve_table">
+<tt class="descname">retrieve_table</tt><big>(</big><em>filepath</em>, <em>table</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.retrieve_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves a table to a csv file</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="countdracula.CountsWorkbookParser.html"
+                        title="previous chapter">countdracula.CountsWorkbookParser</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="countdracula.CountsDatabaseWriter.html"
+                        title="next chapter">countdracula.CountsDatabaseWriter</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/_generated/countdracula.CountsDatabaseReader.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="countdracula.CountsDatabaseWriter.html" title="countdracula.CountsDatabaseWriter"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="countdracula.CountsWorkbookParser.html" title="countdracula.CountsWorkbookParser"
+             >previous</a> |</li>
+        <li><a href="../index.html">CountDracula v.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, SFCTA Modeling team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

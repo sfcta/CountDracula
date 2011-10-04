@@ -22,7 +22,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="CountDracula v.7 documentation" href="#" /> 
+    <link rel="top" title="CountDracula v.7 documentation" href="#" />
+    <link rel="next" title="CountDracula Setup" href="setup.html" /> 
   </head>
   <body>
     <div class="related">
@@ -31,6 +32,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="setup.html" title="CountDracula Setup"
+             accesskey="N">next</a> |</li>
         <li><a href="#">CountDracula v.7 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -42,174 +46,47 @@
             
   <div class="section" id="welcome-to-countdracula-s-documentation">
 <h1>Welcome to CountDracula&#8217;s documentation!<a class="headerlink" href="#welcome-to-countdracula-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>CountDracula is a counts database to store street traffic counts. The following are classes to setup the database</p>
+<p>CountDracula is a counts database framework for storing street traffic counts.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">CountDracula Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#installation-instructions">Installation Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#database-setup">Database Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tables.html">CountDracula Tables</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tables.html#vtype-table">vtype Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tables.html#directions-table">directions Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tables.html#street-names-table">street_names Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tables.html#intersection-ids-table">intersection_ids Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tables.html#nodes-table">nodes Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tables.html#counts-turns-table">counts_turns Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tables.html#counts-ml-table">counts_ml Table</a></li>
+</ul>
+</li>
+</ul>
 </div>
-<div class="section" id="file-upload-class-massuploadfiles">
-<h1>File Upload Class -  MassUploadFiles<a class="headerlink" href="#file-upload-class-massuploadfiles" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="countdracula.MassUploadFiles">
-<em class="property">class </em><tt class="descclassname">countdracula.</tt><tt class="descname">MassUploadFiles</tt><big>(</big><em>directory</em>, <em>vtype</em>, <em>host</em>, <em>database</em>, <em>username</em>, <em>pw</em><big>)</big><a class="headerlink" href="#countdracula.MassUploadFiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Reads, parses and uploads count files to database</p>
-<p>directory = directory to process</p>
-<p>vtype = default vehicle type (used if vtype not found in file)</p>
-<p>host = host ip</p>
-<p>database = database name Eg: countdracula</p>
-<p>username = username to login as</p>
-<p>pw = pw for self._username</p>
-<dl class="method">
-<dt id="countdracula.MassUploadFiles.UploadFiles">
-<tt class="descname">UploadFiles</tt><big>(</big><big>)</big><a class="headerlink" href="#countdracula.MassUploadFiles.UploadFiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uploads the files from the directory self._directory</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
-<div class="section" id="excel-reader-class-parsexlstocdcommandslist">
-<h1>Excel reader Class - ParseXlsToCDCommandsList<a class="headerlink" href="#excel-reader-class-parsexlstocdcommandslist" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="countdracula.ParseXlsToCDCommandsList">
-<em class="property">class </em><tt class="descclassname">countdracula.</tt><tt class="descname">ParseXlsToCDCommandsList</tt><big>(</big><em>filename</em>, <em>filepath</em>, <em>vtype</em>, <em>host</em>, <em>db</em>, <em>username</em>, <em>pw</em><big>)</big><a class="headerlink" href="#countdracula.ParseXlsToCDCommandsList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Takes in xls files and returns sql command parameters to be used by &#8216;WriteToCD&#8217; to upload to DB</p>
-<p>filename = filename (Eg: 3RDST_4THAVE.5THBLVD.xls)</p>
-<p>filepath = Eg: &#8220;C:path oile</p>
-<p>vtype = vehicle type</p>
-<p>countDraculaReader = countDracula reader to read street_names etc.</p>
-<dl class="method">
-<dt id="countdracula.ParseXlsToCDCommandsList.createtimestamp">
-<tt class="descname">createtimestamp</tt><big>(</big><em>date_s</em>, <em>time_list_se</em><big>)</big><a class="headerlink" href="#countdracula.ParseXlsToCDCommandsList.createtimestamp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates timestamp from string</p>
-<p>date_s = date from sheet name in date format</p>
-<p>time_list_se as a list of start and end times from cell value Eg: cel l600-1700 is passed as time_list_se = [[1600],[1700]]</p>
-<p>Returns list -&gt; [starttimestamp, period] which can be fed to postgres to input in starttime and period column</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.ParseXlsToCDCommandsList.mainline">
-<tt class="descname">mainline</tt><big>(</big><big>)</big><a class="headerlink" href="#countdracula.ParseXlsToCDCommandsList.mainline" title="Permalink to this definition">¶</a></dt>
-<dd><p>creates commands list for ML counts</p>
-<p>returns a list of list of sql insert command parameters</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.ParseXlsToCDCommandsList.read_int_ids">
-<tt class="descname">read_int_ids</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#countdracula.ParseXlsToCDCommandsList.read_int_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>creates commands list for intersection idsto send to py2psql</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.ParseXlsToCDCommandsList.read_street_names">
-<tt class="descname">read_street_names</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#countdracula.ParseXlsToCDCommandsList.read_street_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>creates sql commands parameter list for inserting street names to send to py2psql</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.ParseXlsToCDCommandsList.sourcefiles">
-<tt class="descname">sourcefiles</tt><big>(</big><em>sheetnames</em>, <em>book</em><big>)</big><a class="headerlink" href="#countdracula.ParseXlsToCDCommandsList.sourcefiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>extracts sourcefiles names from &#8220;book&#8221;</p>
-<p>takes book object and list of sheetnames as input and returns sourcefile as a string</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.ParseXlsToCDCommandsList.turns">
-<tt class="descname">turns</tt><big>(</big><big>)</big><a class="headerlink" href="#countdracula.ParseXlsToCDCommandsList.turns" title="Permalink to this definition">¶</a></dt>
-<dd><p>creates commands list for turn counts</p>
-<p>returns a list of list of sql insert command parameters</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="database-reader-class-readfromcd">
-<h1>Database Reader Class - ReadFromCD<a class="headerlink" href="#database-reader-class-readfromcd" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="countdracula.ReadFromCD">
-<em class="property">class </em><tt class="descclassname">countdracula.</tt><tt class="descname">ReadFromCD</tt><big>(</big><em>host</em>, <em>database</em>, <em>username</em>, <em>pw</em><big>)</big><a class="headerlink" href="#countdracula.ReadFromCD" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Class that does all the retrieval from our Database</p>
-<p>self._host = host address</p>
-<p>self._database = database name</p>
-<p>self._username = username</p>
-<p>self._pw = password</p>
-<p>self._conn2db = Connector to db</p>
-<p>self._cur2db = Cursor to DB</p>
-<dl class="method">
-<dt id="countdracula.ReadFromCD.getTurningCounts">
-<tt class="descname">getTurningCounts</tt><big>(</big><em>atNode</em>, <em>fromNode</em>, <em>toNode</em>, <em>fromangle</em>, <em>toangle</em>, <em>starttime</em>, <em>period</em>, <em>number</em><big>)</big><a class="headerlink" href="#countdracula.ReadFromCD.getTurningCounts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the counts from the database for a specific movement</p>
-<p>atNode = intersection node in CD</p>
-<p>toNode = Destination node in CD</p>
-<p>fromNode = Origin nodein CD</p>
-<p>fromangle = approach angle with East direction in radians</p>
-<p>toangle = departing angle from East with radians</p>
-<p>starttime = starting time for counts to get</p>
-<p>period = time interval for each count</p>
-<p>number = number of intervals to retrieve</p>
-<p>Returns a list of counts</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.ReadFromCD.mapNodeId">
-<tt class="descname">mapNodeId</tt><big>(</big><em>node_x</em>, <em>node_y</em>, <em>tolerance</em><big>)</big><a class="headerlink" href="#countdracula.ReadFromCD.mapNodeId" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that returns id for a node in CountDracula which lies within &#8216;tolerance&#8217; feet</p>
-<p>to the coordinates node_x,node_y</p>
-<p>Returns -1 if a match is not found</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.ReadFromCD.retrieve_table">
-<tt class="descname">retrieve_table</tt><big>(</big><em>filepath</em>, <em>table</em><big>)</big><a class="headerlink" href="#countdracula.ReadFromCD.retrieve_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves a table to a csv file</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="database-writer-class-writetocd">
-<h1>Database Writer Class - WriteToCD<a class="headerlink" href="#database-writer-class-writetocd" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="countdracula.WriteToCD">
-<em class="property">class </em><tt class="descclassname">countdracula.</tt><tt class="descname">WriteToCD</tt><big>(</big><em>host</em>, <em>database</em>, <em>username</em>, <em>pw</em><big>)</big><a class="headerlink" href="#countdracula.WriteToCD" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Class that does all the writing (uploading) to our Database</p>
-<p>self._host = host address</p>
-<p>self._database = database name</p>
-<p>self._username = username</p>
-<p>self._pw = password</p>
-<p>self._conn2db = Connector to db</p>
-<p>self._cur2db = Cursor to DB</p>
-<dl class="method">
-<dt id="countdracula.WriteToCD.int_ids">
-<tt class="descname">int_ids</tt><big>(</big><em>commandslist</em><big>)</big><a class="headerlink" href="#countdracula.WriteToCD.int_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uploads intersection_ids to db</p>
-<p>command list is a list of list of parameters for each query</p>
-<p>Each query requires node, lat, long, street1, street2</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.WriteToCD.street_names">
-<tt class="descname">street_names</tt><big>(</big><em>names</em><big>)</big><a class="headerlink" href="#countdracula.WriteToCD.street_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uploads street_names to table street_names</p>
-<p>command list is a list of list of parameters for each query</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.WriteToCD.upload_mainline">
-<tt class="descname">upload_mainline</tt><big>(</big><em>commandslist</em><big>)</big><a class="headerlink" href="#countdracula.WriteToCD.upload_mainline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uploads counts to table counts_ml</p>
-<p>commandslist = list of parameter lists for each sql insert commad Eg: [[count,starttime,period...],[...]]</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.WriteToCD.upload_turns">
-<tt class="descname">upload_turns</tt><big>(</big><em>commandslist</em><big>)</big><a class="headerlink" href="#countdracula.WriteToCD.upload_turns" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uploads counts to turns table</p>
-<p>commandslist = list of parameter lists for each sql insert commad Eg: [[count,starttime,period...],[...]]</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="countdracula-api">
+<h1>CountDracula API<a class="headerlink" href="#countdracula-api" title="Permalink to this headline">¶</a></h1>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr><td><a class="reference internal" href="_generated/countdracula.CountsDatabaseReader.html#countdracula.CountsDatabaseReader" title="countdracula.CountsDatabaseReader"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.CountsDatabaseReader</span></tt></a></td>
+<td>Class to handle read operations to the Counts database</td>
+</tr>
+<tr><td><a class="reference internal" href="_generated/countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter" title="countdracula.CountsDatabaseWriter"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.CountsDatabaseWriter</span></tt></a></td>
+<td>Class to handle write operations to the Counts database</td>
+</tr>
+<tr><td><a class="reference internal" href="_generated/countdracula.CountsWorkbookParser.html#countdracula.CountsWorkbookParser" title="countdracula.CountsWorkbookParser"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.CountsWorkbookParser</span></tt></a></td>
+<td>Reads in and parses in Excel workbooks in certain standardized formats, returning tuples to be used by</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -218,6 +95,44 @@
 <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
 </ul>
+</div>
+<div class="section" id="todo-list">
+<h1>TODO List<a class="headerlink" href="#todo-list" title="Permalink to this headline">¶</a></h1>
+<div class="admonition-todo admonition " id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">This table of streetnames is for ...?</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="tables.html#index-0"><em>original entry</em></a> is located in  tables.rst, line 57.)</p>
+<div class="admonition-todo admonition " id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">why are spaces not in the short_name field?</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="tables.html#index-1"><em>original entry</em></a> is located in  tables.rst, line 58.)</p>
+<div class="admonition-todo admonition " id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">is nospace_name = short_name + suffix with spaces removed?</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="tables.html#index-2"><em>original entry</em></a> is located in  tables.rst, line 59.)</p>
+<div class="admonition-todo admonition " id="index-3">
+<p class="first admonition-title">Todo</p>
+<p class="last">is street_name = short_name + &#8221; &#8221; + suffix?</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="tables.html#index-3"><em>original entry</em></a> is located in  tables.rst, line 60.)</p>
+<div class="admonition-todo admonition " id="index-4">
+<p class="first admonition-title">Todo</p>
+<p class="last">what about alternative names?</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="tables.html#index-4"><em>original entry</em></a> is located in  tables.rst, line 61.)</p>
+<div class="admonition-todo admonition " id="index-5">
+<p class="first admonition-title">Todo</p>
+<p class="last">duplicative of intersection_ids ?</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="tables.html#index-5"><em>original entry</em></a> is located in  tables.rst, line 101.)</p>
+<div class="admonition-todo admonition " id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">document error conditions.  Also, isn&#8217;t <em>from_angle</em> and <em>to_angle</em> something we can calculate here?</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="_generated/countdracula.CountsDatabaseReader.html#index-0"><em>original entry</em></a> is located in  _generated\countdracula.CountsDatabaseReader.rst, line 64.)</p>
 </div>
 
 
@@ -228,14 +143,19 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to CountDracula&#8217;s documentation!</a></li>
-<li><a class="reference internal" href="#file-upload-class-massuploadfiles">File Upload Class -  MassUploadFiles</a></li>
-<li><a class="reference internal" href="#excel-reader-class-parsexlstocdcommandslist">Excel reader Class - ParseXlsToCDCommandsList</a></li>
-<li><a class="reference internal" href="#database-reader-class-readfromcd">Database Reader Class - ReadFromCD</a></li>
-<li><a class="reference internal" href="#database-writer-class-writetocd">Database Writer Class - WriteToCD</a></li>
+<li><a class="reference internal" href="#">Welcome to CountDracula&#8217;s documentation!</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#countdracula-api">CountDracula API</a><ul>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#todo-list">TODO List</a></li>
 </ul>
 
+  <h4>Next topic</h4>
+  <p class="topless"><a href="setup.html"
+                        title="next chapter">CountDracula Setup</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -264,6 +184,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="setup.html" title="CountDracula Setup"
+             >next</a> |</li>
         <li><a href="#">CountDracula v.7 documentation</a> &raquo;</li> 
       </ul>
     </div>

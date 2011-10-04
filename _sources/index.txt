@@ -5,35 +5,23 @@
 
 Welcome to CountDracula's documentation!
 ========================================
+CountDracula is a counts database framework for storing street traffic counts.
 
-CountDracula is a counts database to store street traffic counts. The following are classes to setup the database
+.. toctree::
 
-File Upload Class -  MassUploadFiles
-================================================================================
+   setup
+   tables
 
-.. autoclass:: countdracula.MassUploadFiles
-	:members:
+CountDracula API
+================
 
-Excel reader Class - ParseXlsToCDCommandsList
-================================================================================
-
-.. autoclass:: countdracula.ParseXlsToCDCommandsList
-	:members:
-
-
-Database Reader Class - ReadFromCD
-================================================================================
-
-.. autoclass:: countdracula.ReadFromCD
-	:members:
-
-
-
-Database Writer Class - WriteToCD
-================================================================================
-
-.. autoclass:: countdracula.WriteToCD
-	:members:
+.. autosummary::
+   :nosignatures:
+   :toctree: _generated
+   
+   countdracula.CountsDatabaseReader   
+   countdracula.CountsDatabaseWriter
+   countdracula.CountsWorkbookParser
 
 
 Indices and tables
@@ -44,4 +32,6 @@ Indices and tables
 * :ref:`search`
 
 
-
+TODO List
+=========
+.. todolist::

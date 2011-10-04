@@ -1,0 +1,28 @@
+countdracula.CountsWorkbookParser
+=================================
+
+.. currentmodule:: countdracula
+
+.. autoclass:: CountsWorkbookParser
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CountsWorkbookParser.__init__
+      ~CountsWorkbookParser.createtimestamp
+      ~CountsWorkbookParser.readIntersectionIds
+      ~CountsWorkbookParser.readMainlineCounts
+      ~CountsWorkbookParser.readSourcefile
+      ~CountsWorkbookParser.readStreetNames
+      ~CountsWorkbookParser.readTurnCounts
+   
+   
+
+   
+   
+   

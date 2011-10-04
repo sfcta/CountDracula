@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CountDracula Setup &mdash; CountDracula v.7 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="CountDracula v.7 documentation" href="index.html" />
+    <link rel="next" title="CountDracula Tables" href="tables.html" />
+    <link rel="prev" title="Welcome to CountDracula’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tables.html" title="CountDracula Tables"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to CountDracula’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">CountDracula v.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="countdracula-setup">
+<h1>CountDracula Setup<a class="headerlink" href="#countdracula-setup" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>To setup a CountDracula database, you&#8217;ll need to install the following:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.postgresql.org">postgreSQL</a>, an open source object-relational database system.
+<em>Tested with postgreSQL 9.0.3 on windows and ? on Linux</em></li>
+<li><a class="reference external" href="http://postgis.refractions.net">postGIS</a>, an open source add-on that &#8220;spatially enables&#8221; postgreSQL
+with GIS functionality.  <em>Tested with postGIS 9.0.3 on windows</em></li>
+<li><a class="reference external" href="http://www.python.org/">python</a>, the programming language in which CountDracula is implemented.
+<em>Tested with python 2.6</em>  The following python modules are also used:<ul>
+<li><a class="reference external" href="http://www.initd.org/psycopg/">psycopg</a>, an PostgreSQL adapter for Python.  <em>Tested with psycopg 2.4.2</em></li>
+<li><a class="reference external" href="http://pypi.python.org/pypi/xlrd">xlrd</a>, a python library for reading Microsoft Excel files.
+<em>Tested with xlrd 0.7.1</em></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="installation-instructions">
+<h2>Installation Instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>postgreSQL has a straightforward installer; it asks you to choose a password for the &#8220;database superuser&#8221; and &#8220;service account&#8221;.</li>
+<li>postGIS has an installer which asks you for the password (presumably from the previous step)</li>
+</ul>
+<p>Depending on how your setup is, you may want to adjust the
+<a class="reference external" href="http://www.postgresql.org/docs/9.0/interactive/client-authentication.html">client authentication settings</a>
+on your database.  For example, if your database is setup on a publicly accessible machine, you might want to
+restrict the hosts which can connect to the database to be only localhost, or only the machine from which you&#8217;ll
+run theses scripts.</p>
+</div>
+<div class="section" id="database-setup">
+<h2>Database Setup<a class="headerlink" href="#database-setup" title="Permalink to this headline">¶</a></h2>
+<p>During the postgreSQL installation, a user was likely created for you called <cite>postgres</cite>.
+You can now create the CountDracula postgreSQL database, its users, and initialize its tables
+(noting that the location of the postgres executables should be in your path):</p>
+<div class="highlight-python"><pre>X:\lmz\util\CountDracula&gt;psql --username postgres --file=countdracula\initializeCountDraculaDatabase.sql</pre>
+</div>
+<p>You&#8217;ll get prompted for your postgreSQL password again, and you should see a bunch of output like the following:</p>
+<div class="highlight-python"><pre>CREATE DATABASE
+CREATE ROLE
+GRANT
+CREATE ROLE
+GRANT
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+You are now connected to database "countdracula".
+psql:countdracula/initializeCountDraculaDatabase.sql:22: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "vtype_pkey" for table "vtype"
+
+CREATE TABLE
+INSERT 0 17
+psql:countdracula/initializeCountDraculaDatabase.sql:50: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "directions_pkey" for table "directions"
+CREATE TABLE
+INSERT 0 4
+psql:countdracula/initializeCountDraculaDatabase.sql:62: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "street_names_pkey" for table "street_names"
+CREATE TABLE
+CREATE TABLE
+psql:countdracula/initializeCountDraculaDatabase.sql:74: NOTICE:  ALTER TABLE / ADD UNIQUE will create implicit index "intersection_ids_street1_street2_key" for table "intersection_ids"
+ALTER TABLE
+psql:countdracula/initializeCountDraculaDatabase.sql:80: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "nodes_pkey" for table "nodes"
+
+CREATE TABLE
+ALTER TABLE
+CREATE TABLE
+psql:countdracula/initializeCountDraculaDatabase.sql:100: NOTICE:  ALTER TABLE / ADD UNIQUE will create implicit index "counts_ml_count_starttime_vtype_period_onstreet_ondir_froms_key" for table "counts_ml"
+ALTER TABLE
+CREATE TABLE
+psql:countdracula/initializeCountDraculaDatabase.sql:120: NOTICE:  ALTER TABLE / ADD UNIQUE will create implicit index "counts_turns_count_starttime_vtype_period_fromstreet_fromdi_key" for table "counts_turns"
+ALTER TABLE
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CountDracula Setup</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installation-instructions">Installation Instructions</a></li>
+<li><a class="reference internal" href="#database-setup">Database Setup</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to CountDracula&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tables.html"
+                        title="next chapter">CountDracula Tables</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/setup.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tables.html" title="CountDracula Tables"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to CountDracula’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">CountDracula v.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, SFCTA Modeling team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

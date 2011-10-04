@@ -1,0 +1,517 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CountDracula Tables &mdash; CountDracula v.7 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="CountDracula v.7 documentation" href="index.html" />
+    <link rel="next" title="countdracula.CountsDatabaseReader" href="_generated/countdracula.CountsDatabaseReader.html" />
+    <link rel="prev" title="CountDracula Setup" href="setup.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="_generated/countdracula.CountsDatabaseReader.html" title="countdracula.CountsDatabaseReader"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="CountDracula Setup"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">CountDracula v.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="countdracula-tables">
+<h1>CountDracula Tables<a class="headerlink" href="#countdracula-tables" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="vtype-table">
+<span id="table-vtype"></span><h2>vtype Table<a class="headerlink" href="#vtype-table" title="Permalink to this headline">¶</a></h2>
+<p>Vehicle type table, mapping vehicle type codes to descriptions.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="12%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">column name</th>
+<th class="head">data type</th>
+<th class="head">notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>vtype</td>
+<td>integer</td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>vehicle</td>
+<td>text</td>
+<td>descriptor</td>
+</tr>
+</tbody>
+</table>
+<p>Initial values are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">vtype</th>
+<th class="head">vehicles</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>-1</td>
+<td><cite>Unknown</cite></td>
+</tr>
+<tr><td>0</td>
+<td><cite>All (Total)</cite></td>
+</tr>
+<tr><td>1</td>
+<td><cite>Pedestrian</cite></td>
+</tr>
+<tr><td>2</td>
+<td><cite>Truck</cite></td>
+</tr>
+<tr><td>3</td>
+<td><cite>Bike</cite></td>
+</tr>
+<tr><td>4</td>
+<td><cite>Bus</cite></td>
+</tr>
+<tr><td>5</td>
+<td><cite>Cars Only</cite></td>
+</tr>
+<tr><td>6</td>
+<td><cite>2 Axle Long</cite></td>
+</tr>
+<tr><td>7</td>
+<td><cite>2 Axle 6 Tire</cite></td>
+</tr>
+<tr><td>8</td>
+<td><cite>3 Axle Single</cite></td>
+</tr>
+<tr><td>9</td>
+<td><cite>4 Axle Single</cite></td>
+</tr>
+<tr><td>10</td>
+<td><cite>&lt;5 Axle Double</cite></td>
+</tr>
+<tr><td>11</td>
+<td><cite>5 Axle Double</cite></td>
+</tr>
+<tr><td>12</td>
+<td><cite>&gt;6 Axle Double</cite></td>
+</tr>
+<tr><td>13</td>
+<td><cite>&lt;6 Axle Multi</cite></td>
+</tr>
+<tr><td>14</td>
+<td><cite>6 Axle Multi</cite></td>
+</tr>
+<tr><td>15</td>
+<td><cite>&gt;6 Axle Multi</cite></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="directions-table">
+<span id="table-directions"></span><h2>directions Table<a class="headerlink" href="#directions-table" title="Permalink to this headline">¶</a></h2>
+<p>Directions disambiguate which direction a count is referring to.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="12%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">column name</th>
+<th class="head">data type</th>
+<th class="head">notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>direction</td>
+<td>text</td>
+<td>Initial values are <cite>NB</cite>, <cite>SB</cite>, <cite>EB</cite>, and <cite>WB</cite></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="street-names-table">
+<span id="table-street-names"></span><h2>street_names Table<a class="headerlink" href="#street-names-table" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition " id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">This table of streetnames is for ...?</p>
+</div>
+<div class="admonition-todo admonition " id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">why are spaces not in the short_name field?</p>
+</div>
+<div class="admonition-todo admonition " id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">is nospace_name = short_name + suffix with spaces removed?</p>
+</div>
+<div class="admonition-todo admonition " id="index-3">
+<p class="first admonition-title">Todo</p>
+<p class="last">is street_name = short_name + &#8221; &#8221; + suffix?</p>
+</div>
+<div class="admonition-todo admonition " id="index-4">
+<p class="first admonition-title">Todo</p>
+<p class="last">what about alternative names?</p>
+</div>
+<p>Can be updated with <a class="reference internal" href="_generated/countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter.insertStreetNames" title="countdracula.CountsDatabaseWriter.insertStreetNames"><tt class="xref py py-meth docutils literal"><span class="pre">countdracula.CountsDatabaseWriter.insertStreetNames()</span></tt></a></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="12%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">column name</th>
+<th class="head">data type</th>
+<th class="head">notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>street_name</td>
+<td>text</td>
+<td>primary key.  e.g. <em>CESARCHAVEZ ST</em></td>
+</tr>
+<tr><td>nospace_name</td>
+<td>text</td>
+<td>name without spaces. e.g. <em>CESARCHAVEZST</em></td>
+</tr>
+<tr><td>short_name</td>
+<td>text</td>
+<td>name without suffix. e.g. <em>CESARCHAVEZ</em></td>
+</tr>
+<tr><td>suffix</td>
+<td>text</td>
+<td><em>BLVD</em>, <em>AVE</em>, etc</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="intersection-ids-table">
+<span id="table-intersection-ids"></span><h2>intersection_ids Table<a class="headerlink" href="#intersection-ids-table" title="Permalink to this headline">¶</a></h2>
+<p>This table corresonds intersections with their named streets as well as
+their latitude/longitude coordinates.  The table has no primary key but
+it does have the constraint that (street1, street2) is unique.
+Can be updated with <a class="reference internal" href="_generated/countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter.insertIntersectionIds" title="countdracula.CountsDatabaseWriter.insertIntersectionIds"><tt class="xref py py-meth docutils literal"><span class="pre">countdracula.CountsDatabaseWriter.insertIntersectionIds()</span></tt></a></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="12%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">column name</th>
+<th class="head">data type</th>
+<th class="head">notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>street1</td>
+<td>text</td>
+<td>corresponds to <em>street_name</em> in
+<a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
+</tr>
+<tr><td>street2</td>
+<td>text</td>
+<td>corresponds to <em>street_name</em> in
+<a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
+</tr>
+<tr><td>int_id</td>
+<td>integer</td>
+<td>corresponds to <em>int_id</em> in <a class="reference internal" href="#table-nodes"><em>nodes Table</em></a></td>
+</tr>
+<tr><td>long_x</td>
+<td>double</td>
+<td>longitude of the intersection</td>
+</tr>
+<tr><td>lat_y</td>
+<td>double</td>
+<td>latitude of the intersection</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="nodes-table">
+<span id="table-nodes"></span><h2>nodes Table<a class="headerlink" href="#nodes-table" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition " id="index-5">
+<p class="first admonition-title">Todo</p>
+<p class="last">duplicative of intersection_ids ?</p>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="12%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">column name</th>
+<th class="head">data type</th>
+<th class="head">notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>int_id</td>
+<td>integer</td>
+<td>primary key</td>
+</tr>
+<tr><td>long_x</td>
+<td>double</td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>lat_y</td>
+<td>double</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="counts-turns-table">
+<span id="table-counts-turns"></span><h2>counts_turns Table<a class="headerlink" href="#counts-turns-table" title="Permalink to this headline">¶</a></h2>
+<p>This table stores turn counts for intersections.  Can be updated with
+<a class="reference internal" href="_generated/countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter.insertTurnCounts" title="countdracula.CountsDatabaseWriter.insertTurnCounts"><tt class="xref py py-meth docutils literal"><span class="pre">countdracula.CountsDatabaseWriter.insertTurnCounts()</span></tt></a></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="12%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">column name</th>
+<th class="head">data type</th>
+<th class="head">notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>count</td>
+<td>integer</td>
+<td>turn count</td>
+</tr>
+<tr><td>starttime</td>
+<td>timestamp</td>
+<td>start time for the count (e.g. 2007-06-19 16:30:00)</td>
+</tr>
+<tr><td>period</td>
+<td>interval</td>
+<td>interval for the count (e.g. 00:15:00)</td>
+</tr>
+<tr><td>vtype</td>
+<td>integer</td>
+<td>vehicle type code, corresponds to <em>vtype</em> in
+<a class="reference internal" href="#table-vtype"><em>vtype Table</em></a></td>
+</tr>
+<tr><td>fromstreet</td>
+<td>text</td>
+<td>turn origin, corresponds to <em>street_name</em> in
+<a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
+</tr>
+<tr><td>fromdir</td>
+<td>text</td>
+<td>direction going into turn, corresponds to <em>direction</em>
+in <a class="reference internal" href="#table-directions"><em>directions Table</em></a></td>
+</tr>
+<tr><td>tostreet</td>
+<td>text</td>
+<td>turn destination, corresponds to <em>street_name</em> in
+<a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
+</tr>
+<tr><td>todir</td>
+<td>text</td>
+<td>direction coming out of turn, corresponds to
+<em>direction</em> in <a class="reference internal" href="#table-directions"><em>directions Table</em></a></td>
+</tr>
+<tr><td>intstreet</td>
+<td>text</td>
+<td>for through or u-turn counts, this is the cross street.
+for turns, this is the same as <em>tostreet</em></td>
+</tr>
+<tr><td>intid</td>
+<td>integer</td>
+<td>corresponds to <em>int_id</em> in
+<a class="reference internal" href="#table-intersection-ids"><em>intersection_ids Table</em></a></td>
+</tr>
+<tr><td>sourcefile</td>
+<td>text</td>
+<td>labeling string to keep track of where this came from</td>
+</tr>
+<tr><td>project</td>
+<td>text</td>
+<td>another labeling string for tracking, meant to be used
+when the counts were gathered for a specific project</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="counts-ml-table">
+<span id="table-counts-ml"></span><h2>counts_ml Table<a class="headerlink" href="#counts-ml-table" title="Permalink to this headline">¶</a></h2>
+<p>This table stores mainline counts for a given primary street between two cross streets.
+Can be updated with <a class="reference internal" href="_generated/countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter.insertMainlineCounts" title="countdracula.CountsDatabaseWriter.insertMainlineCounts"><tt class="xref py py-meth docutils literal"><span class="pre">countdracula.CountsDatabaseWriter.insertMainlineCounts()</span></tt></a></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="12%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">column name</th>
+<th class="head">data type</th>
+<th class="head">notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>count</td>
+<td>integer</td>
+<td>mainline count</td>
+</tr>
+<tr><td>starttime</td>
+<td>timestamp</td>
+<td>start time for the count (e.g. 2007-06-19 16:30:00)</td>
+</tr>
+<tr><td>period</td>
+<td>interval</td>
+<td>interval for the count (e.g. 00:15:00)</td>
+</tr>
+<tr><td>vtype</td>
+<td>integer</td>
+<td>vehicle type code, corresponds to <em>vtype</em> in
+<a class="reference internal" href="#table-vtype"><em>vtype Table</em></a></td>
+</tr>
+<tr><td>onstreet</td>
+<td>text</td>
+<td>the street with the count, corresponds to <em>street_name</em>
+in <a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
+</tr>
+<tr><td>ondir</td>
+<td>text</td>
+<td>direction of count, corresponds to
+<em>direction</em> in <a class="reference internal" href="#table-directions"><em>directions Table</em></a></td>
+</tr>
+<tr><td>fromstreet</td>
+<td>text</td>
+<td>cross street before count, corresponds to <em>street_name</em>
+in <a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
+</tr>
+<tr><td>tostreet</td>
+<td>text</td>
+<td>cross street before count, corresponds to <em>street_name</em>
+in <a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
+</tr>
+<tr><td>refpos</td>
+<td>float</td>
+<td>???</td>
+</tr>
+<tr><td>sourcefile</td>
+<td>text</td>
+<td>labeling string to keep track of where this came from</td>
+</tr>
+<tr><td>project</td>
+<td>text</td>
+<td>another labeling string for tracking, meant to be used
+when the counts were gathered for a specific project</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CountDracula Tables</a><ul>
+<li><a class="reference internal" href="#vtype-table">vtype Table</a></li>
+<li><a class="reference internal" href="#directions-table">directions Table</a></li>
+<li><a class="reference internal" href="#street-names-table">street_names Table</a></li>
+<li><a class="reference internal" href="#intersection-ids-table">intersection_ids Table</a></li>
+<li><a class="reference internal" href="#nodes-table">nodes Table</a></li>
+<li><a class="reference internal" href="#counts-turns-table">counts_turns Table</a></li>
+<li><a class="reference internal" href="#counts-ml-table">counts_ml Table</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="setup.html"
+                        title="previous chapter">CountDracula Setup</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="_generated/countdracula.CountsDatabaseReader.html"
+                        title="next chapter">countdracula.CountsDatabaseReader</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tables.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="_generated/countdracula.CountsDatabaseReader.html" title="countdracula.CountsDatabaseReader"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="CountDracula Setup"
+             >previous</a> |</li>
+        <li><a href="index.html">CountDracula v.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, SFCTA Modeling team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

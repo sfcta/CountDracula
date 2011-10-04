@@ -1,0 +1,26 @@
+countdracula.CountsDatabaseWriter
+=================================
+
+.. currentmodule:: countdracula
+
+.. autoclass:: CountsDatabaseWriter
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CountsDatabaseWriter.__init__
+      ~CountsDatabaseWriter.insertIntersectionIds
+      ~CountsDatabaseWriter.insertMainlineCounts
+      ~CountsDatabaseWriter.insertStreetNames
+      ~CountsDatabaseWriter.insertTurnCounts
+   
+   
+
+   
+   
+   

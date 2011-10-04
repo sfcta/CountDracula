@@ -1,0 +1,27 @@
+countdracula.CountsDatabaseReader
+=================================
+
+.. currentmodule:: countdracula
+
+.. autoclass:: CountsDatabaseReader
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CountsDatabaseReader.__init__
+      ~CountsDatabaseReader.getIntersectionId
+      ~CountsDatabaseReader.getPossibleStreetNames
+      ~CountsDatabaseReader.getTurningCounts
+      ~CountsDatabaseReader.mapNodeId
+      ~CountsDatabaseReader.retrieve_table
+   
+   
+
+   
+   
+   

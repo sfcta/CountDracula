@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>countdracula.CountsDatabaseWriter &mdash; CountDracula v.7 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="CountDracula v.7 documentation" href="../index.html" />
+    <link rel="next" title="countdracula.CountsWorkbookParser" href="countdracula.CountsWorkbookParser.html" />
+    <link rel="prev" title="countdracula.CountsDatabaseReader" href="countdracula.CountsDatabaseReader.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="countdracula.CountsWorkbookParser.html" title="countdracula.CountsWorkbookParser"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="countdracula.CountsDatabaseReader.html" title="countdracula.CountsDatabaseReader"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">CountDracula v.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="countdracula-countsdatabasewriter">
+<h1>countdracula.CountsDatabaseWriter<a class="headerlink" href="#countdracula-countsdatabasewriter" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="countdracula.CountsDatabaseWriter">
+<em class="property">class </em><tt class="descname">CountsDatabaseWriter</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdadmin'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027E00A8&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Class to handle write operations to the Counts database</p>
+<p>Constructor; connects to the counts database with the given credentials.</p>
+<blockquote>
+<div><ul class="simple">
+<li><em>host</em> is the host where the counts database resides; e.g. &#8216;localhost&#8217; or an ip address, like &#8216;172.0.0.1&#8217;</li>
+<li><em>database</em> is the database name; <cite>countdracula</cite> is the standard</li>
+<li><em>username</em> is a database user with write permissions; <cite>cdadmin</cite> is the standard.</li>
+<li><em>password</em> is the password for that the user.</li>
+<li><em>logger</em> is a logging.Logger instance for errors and informational messages.</li>
+</ul>
+</div></blockquote>
+<p>TODO: optional port?</p>
+<dl class="method">
+<dt id="countdracula.CountsDatabaseWriter.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdadmin'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027E00A8&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor; connects to the counts database with the given credentials.</p>
+<blockquote>
+<div><ul class="simple">
+<li><em>host</em> is the host where the counts database resides; e.g. &#8216;localhost&#8217; or an ip address, like &#8216;172.0.0.1&#8217;</li>
+<li><em>database</em> is the database name; <cite>countdracula</cite> is the standard</li>
+<li><em>username</em> is a database user with write permissions; <cite>cdadmin</cite> is the standard.</li>
+<li><em>password</em> is the password for that the user.</li>
+<li><em>logger</em> is a logging.Logger instance for errors and informational messages.</li>
+</ul>
+</div></blockquote>
+<p>TODO: optional port?</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.__init__" title="countdracula.CountsDatabaseWriter.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a></td>
+<td>x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertIntersectionIds" title="countdracula.CountsDatabaseWriter.insertIntersectionIds"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertIntersectionIds</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertMainlineCounts" title="countdracula.CountsDatabaseWriter.insertMainlineCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertMainlineCounts</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertStreetNames" title="countdracula.CountsDatabaseWriter.insertStreetNames"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertStreetNames</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertTurnCounts" title="countdracula.CountsDatabaseWriter.insertTurnCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertTurnCounts</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="countdracula.CountsDatabaseWriter.insertIntersectionIds">
+<tt class="descname">insertIntersectionIds</tt><big>(</big><em>intersectionList</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.insertIntersectionIds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts the given list of intersections into the <a class="reference internal" href="../tables.html#table-intersection-ids"><em>intersection_ids Table</em></a>.</p>
+<p>The <em>intersectionList</em> is a list of tuples with the following values:</p>
+<ul class="simple">
+<li><em>streetname1</em> - should correspond with a nospace_name or street_name from <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>.</li>
+<li><em>streetname2</em> - should correspond with a nospace_name or street_name from <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>.</li>
+<li><em>intersection_id</em> - an integer id.</li>
+<li><em>longitude</em> - the longitude of the intersection.</li>
+<li><em>latitude</em> - the latitude of the intersection.</li>
+</ul>
+<p>Can be used with <a class="reference internal" href="countdracula.CountsWorkbookParser.html#countdracula.CountsWorkbookParser.readIntersectionIds" title="countdracula.CountsWorkbookParser.readIntersectionIds"><tt class="xref py py-meth docutils literal"><span class="pre">CountsWorkbookParser.readIntersectionIds()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseWriter.insertMainlineCounts">
+<tt class="descname">insertMainlineCounts</tt><big>(</big><em>countsList</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.insertMainlineCounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts counts to table counts_ml</p>
+<p>countsList is a list of tuples, each tuple containing the following values:</p>
+<blockquote>
+<div><ul class="simple">
+<li><em>count</em></li>
+<li><em>starttime</em></li>
+<li><em>period</em></li>
+<li><em>vtype</em></li>
+<li><em>onstreet</em></li>
+<li><em>ondir</em></li>
+<li><em>fromstreet</em></li>
+<li><em>tostreet</em></li>
+<li><em>refpos</em></li>
+<li><em>sourcefile</em></li>
+<li><em>project</em></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseWriter.insertStreetNames">
+<tt class="descname">insertStreetNames</tt><big>(</big><em>streetnameList</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.insertStreetNames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts the given list of streetnames into the <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>.</p>
+<p>The <em>streetnameList</em> is a list of tuples with the following values:</p>
+<ul class="simple">
+<li><em>street_name</em> Necessary?</li>
+<li><em>nospace_name</em> Necessary?</li>
+<li><em>short_name</em></li>
+<li><em>suffix</em></li>
+</ul>
+<p>Can be used with <a class="reference internal" href="countdracula.CountsWorkbookParser.html#countdracula.CountsWorkbookParser.readStreetNames" title="countdracula.CountsWorkbookParser.readStreetNames"><tt class="xref py py-meth docutils literal"><span class="pre">CountsWorkbookParser.readStreetNames()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseWriter.insertTurnCounts">
+<tt class="descname">insertTurnCounts</tt><big>(</big><em>turnCountList</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.insertTurnCounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts the given list of turn counts into the <a class="reference internal" href="../tables.html#table-counts-turns"><em>counts_turns Table</em></a>.</p>
+<p>The <em>turnList</em> is a list of tuples with the following values:</p>
+<ul class="simple">
+<li><em>count</em></li>
+<li><em>starttime</em></li>
+<li><em>period</em></li>
+<li><em>vtype</em></li>
+<li><em>fromstreet</em></li>
+<li><em>fromdir</em></li>
+<li><em>tostreet</em></li>
+<li><em>todir</em></li>
+<li><em>intstreet</em></li>
+<li><em>intid</em></li>
+<li><em>sourcefile</em></li>
+<li><em>project</em></li>
+</ul>
+<p>See <a class="reference internal" href="../tables.html#table-counts-turns"><em>counts_turns Table</em></a> for the descriptions of the fields.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="countdracula.CountsDatabaseReader.html"
+                        title="previous chapter">countdracula.CountsDatabaseReader</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="countdracula.CountsWorkbookParser.html"
+                        title="next chapter">countdracula.CountsWorkbookParser</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/_generated/countdracula.CountsDatabaseWriter.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="countdracula.CountsWorkbookParser.html" title="countdracula.CountsWorkbookParser"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="countdracula.CountsDatabaseReader.html" title="countdracula.CountsDatabaseReader"
+             >previous</a> |</li>
+        <li><a href="../index.html">CountDracula v.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, SFCTA Modeling team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

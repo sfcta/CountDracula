@@ -101,8 +101,8 @@ class CountsWorkbookParser():
         ml_tostreet = ""        #D/S street
                 
         book = xlrd.open_workbook(file)
-        sourcefile = self.readSourcefile(book) 
-        sheetnames =  book.sheet_names()        
+        sourcefile = file
+        sheetnames = book.sheet_names()        
                 
         mainStreetslist = cdreader.getPossibleStreetNames(primary_street)
         if mainStreetslist == []:
@@ -251,7 +251,7 @@ class CountsWorkbookParser():
         t_intid         = -1
                 
         book = xlrd.open_workbook(file)       
-        sourcefile = self.readSourcefile(book)
+        sourcefile = file
                 
         NSstreetslist = cdreader.getPossibleStreetNames(streetname1)
         if NSstreetslist == []:
@@ -322,7 +322,7 @@ class CountsWorkbookParser():
                 elif turntype in [' U-Turn','UT','U-Turn']:
                     t_todir = compass[compass.index(t_fromdir[0])-2] + 'B'
                 elif turntype == 'RT':  # right turn
-                    t_todir = compass[compass.index(t_fromdir[0])-1] + 'B'
+                    t_todir = compass[compass.index(t_fromdir[0])-3] + 'B'
                 elif turntype == 'LT':  # left turn
                     t_todir = compass[compass.index(t_fromdir[0])-1] + 'B'
                 elif turntype == 'PD':  # through - pedestrian?

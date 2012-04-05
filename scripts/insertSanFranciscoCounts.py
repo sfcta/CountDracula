@@ -6,15 +6,7 @@ Created on Jul 25, 2011
 
 
 """
-This Script is used to Initialize the database and 
-upload counts to it.
-
-Make sure countdracula package is accessible by python and run it.
-
-Give the inputs when asked
-
-Some directory/host inputs are hard coded
-
+This script reads streetnames, intersection nodes and finally counts from input Excel workbooks and inserts the info into the CountDracula dataabase.
 
 """
 
@@ -34,12 +26,15 @@ if __name__ == '__main__':
     cd_reader = countdracula.CountsDatabaseReader(pw="ReadOnly", logger=logger)
     xl_parser = countdracula.CountsWorkbookParser()
 
+    # Read the streets
     street_names = xl_parser.readStreetNames(r"Q:\Model Development\CountDracula\1_CountDracula_Creation\_EXCEL_CUBE_INPUTS\Streets.xls")
     cd_writer.insertStreetNames(street_names)
     
+    # And the intersections
     intersection_ids = xl_parser.readIntersectionIds( r"Q:\Model Development\CountDracula\1_CountDracula_Creation\_EXCEL_CUBE_INPUTS\Intersections.xls")
     cd_writer.insertIntersectionIds(intersection_ids)
     
+    # Finally, read the counts.  These reference the above streets and intersections.
     dir = r"Q:\Model Development\CountDracula\2_Files_UPLOADABLE_standardized\Standardized\0 ALL"
     for file in os.listdir(dir):
         if file[-4:] !='.xls':
@@ -67,6 +62,5 @@ if __name__ == '__main__':
                 cd_writer.insertTurnCounts(turnCountList)
 
         except Exception as e:
-            logger.error(e)
-    
+            logger.error(e)    
     

@@ -8,6 +8,9 @@ from datetime import date, time, timedelta, datetime
 import logging
 import math
 
+class CountsDatabaseReaderError(Exception):
+    pass
+
 
 class CountsDatabaseReader(object):
     '''
@@ -39,60 +42,176 @@ class CountsDatabaseReader(object):
                                          " user="    +self._user+
                                          " password="+self._pw)
 
-    def mapNodeId(self, node_x, node_y, tolerance):
+    def getNodeNearPoint(self, node_x, node_y, tolerance):
         """
         Function that returns id for a node in CountDracula which lies within 'tolerance' feet
         
         to the coordinates node_x,node_y
         
-        Returns -1 if a match is not found
+        Raises a :py:class:`CountsDatabaseReaderError` if no nodes are found, or if multiple nodes are found.
         """
-        self._cur2db.execute("SELECT int_id from nodes WHERE  sqrt((long_x - %s)^2 + (lat_y - %s)^2) < %s ;",(node_x,node_y,tolerance))
-        answer =  self._cur2db.fetchone()
-
-        #------ASSUMING there is a single match !!!!------ 
-        if answer:
-            return int(answer[0])
-            #counter = counter+1
-        else:
-            return -1
+        cur2db = self._conn2db.cursor()        
+        cur2db.execute("SELECT int_id from nodes WHERE (sqrt((long_x - %s)^2 + (lat_y - %s)^2) < %s);",(node_x,node_y,tolerance))
+        answer = cur2db.fetchall()
+                
+        if len(answer) == 1:
+            return answer[0][0]  # answer = [(12345,)]
+            
+        raise CountsDatabaseReaderError("Found %d nodes within %8.3f of (%8.3f,%8.3f)" % (len(answer), tolerance, node_x, node_y))
     
+    def countCounts(self, turning=True, mainline=True):
+        """
+        Returns info on what kind of turning counts we have by returning a dictionary mapping (starttime, period) -> count
+        """
         
+        counts = {}
+        dbs = []
+        if turning:
+            dbs.append("counts_turns")
+        if mainline:
+            dbs.append("counts_ml")
+
+        cur2db = self._conn2db.cursor()
+        for db in dbs:
+            cur2db.execute("SELECT starttime,period from %s" % db)
+            rows = cur2db.fetchall()
+            
+            for row in rows:
+                key = (row[0], row[1])
+                if key not in counts: counts[key] = 0
+                counts[key] += 1
+        return counts
+    
+    def _getCounts(self, starttime, period, num_intervals, type):
+        """
+        Internal helper to not repeat code.  *type* is one of ``turns`` or ``mainline``.
         
-    def getTurningCounts(self, at_node, from_node, to_node, from_angle, to_angle, starttime, period, num_intervals):
+        See :py:meth:`CountsDatabaseReader.getMainlineCounts` and :py:meth:`CountsDatabaseReader.getTurningCounts` for
+        args.
+        """
+        # this needs to be a datetime.datetime to get adds
+        currenttime = datetime.combine(date(2000,1,1), starttime)
+        cur2db      = self._conn2db.cursor()
+        counts      = {} # key = (fromstreet, fromdir, tostreet, todir, intersection id)
+        days        = {} # same key but counts how many days worth of counts we have
+        
+        for interval_num in range(num_intervals):
+            
+            #Get avg of counts for the given movement and timeperiod
+            if type=="turns":
+                cmd = "SELECT count,fromstreet,fromdir,tostreet,todir,intstreet,intid from counts_turns " + \
+                      "where starttime::time=%s and period=%s"
+            elif type=="mainline":
+                cmd = "SELECT count,onstreet,ondir,fromstreet,tostreet from counts_ml " + \
+                        "where starttime::time=%s and period=%s"
+            else:
+                raise CountsDatabaseReaderError("_getCounts requires type=`turns` or type=`mainline`; type=`%s`" % type)
+                      
+            cur2db.execute(cmd, (currenttime.time(), period))
+            results = cur2db.fetchall()
+            for row in results:
+                if type=="turns":
+                    key = (row[1],row[2],row[3],row[4],row[5],row[6])
+                elif type=="mainline":
+                    key = (row[1],row[2],row[3],row[4])
+
+                # haven't seen this before, initialize previous counts to unknown
+                if key not in counts:
+                    counts[key]  = []
+                    days[key]    = []
+                
+                # fill in non-data
+                while len(counts[key]) < interval_num:
+                    counts[key].append(-1)
+                    days[key].append(0)
+                
+                # initialize for real data
+                if len(counts[key]) < (interval_num+1):
+                    counts[key].append(0)
+                    days[key].append(0)
+                
+                # tally it
+                counts[key][interval_num]  += row[0]
+                days[key][interval_num]    += 1
+                
+            # update the time
+            currenttime += period
+        
+        # fill out the remainder
+        for key in counts:
+            while len(counts[key]) < num_intervals:
+                counts[key].append(-1)
+                days[key].append(0)
+                        
+        # divide out the days
+        for key in counts.iterkeys():
+            for interval_num in range(num_intervals):
+                if days[key][interval_num] > 1:
+                    counts[key][interval_num] = float(counts[key][interval_num])/float(days[key][interval_num])
+        return counts
+
+    def getMainlineCounts(self, starttime, period, num_intervals):
+        """
+        Retrieve all the mainline counts available from the database for the given *starttime* (a datetime.time instance) for 
+        *num_intervals* (int) of the given *period* (a datetime.timedelta instance).
+        
+        Returns table with: (onstreet, ondir, fromstreet, tostreet, intersection id) -> [*num_intervals* counts]
+        """
+        return self._getCounts(starttime, period, num_intervals, type="mainline")
+    
+    def getTurningCounts(self, starttime, period, num_intervals):
+        """
+        Retrieve all the turning counts available from the database for the given *starttime* (a datetime.time instance) for 
+        *num_intervals* (int) of the given *period* (a datetime.timedelta instance).
+        
+        Returns table with: (fromstreet, fromdir, tostreet, todir, intersection id) -> [*num_intervals* counts]
+        """
+        return self._getCounts(starttime, period, num_intervals, type="turns")            
+    
+    def getTurningCountsForMovement(self, at_node, from_node, to_node, from_angle, to_angle, starttime, period, num_intervals):
         """
         Returns the counts from the database for a specific movement
         
         * *at_node* is the intersection node
         * *to_node* is the destination node
         * *from_node* is the origin node
-        * *from_angle* is approach angle with East direction in radians
-        * *to_angle* is the departing angle from East with radians
+        * *from_angle* is approach angle in radians, starting from EB=0 clockwise (so SB=pi/2, WB=pi, NB=3pi/2)
+        * *to_angle* is the departing angle
         * *starttime* is starting time for counts to get
         * *period* is time interval for each count
         * *num_intervals* = number of intervals to retrieve
         
         Returns a list of counts.
         
-        .. todo:: document error conditions.  Also, isn't *from_angle* and *to_angle* something we can calculate here?
+        Raises a CountsDatabaseReaderError if:
+        * No incoming street is found (no common street for *from_node* and *at_node*
+        * No outgoing street is found (no common street for *at_node* and *to_node*
+        * No counts are found.
+        
+        .. todo:: Isn't *from_angle* and *to_angle* something we can calculate here?
+        
         """
-        
-           
-        #counts = [-1]*num_intervals
+          
         ## Find approach street by finding the street name that is common between the list of streets at the at_node and from_node
-        
-        self._cur2db.execute("SELECT street1 from (    ((SELECT DISTINCT street1 from intersection_ids where int_id = %s) UNION (SELECT DISTINCT  street2 from intersection_ids where int_id = %s)) UNION ALL ((SELECT DISTINCT  street1 from intersection_ids where int_id = %s)UNION(SELECT DISTINCT  street2 from intersection_ids where int_id = %s))    ) Street GROUP BY street1 HAVING count(street1) > 1",
+        cur2db = self._conn2db.cursor()                
+        cur2db.execute("SELECT street1 from (    ((SELECT DISTINCT street1 from intersection_ids where int_id = %s) UNION "
+                                                " (SELECT DISTINCT street2 from intersection_ids where int_id = %s)) UNION ALL "
+                                                "((SELECT DISTINCT street1 from intersection_ids where int_id = %s)UNION "
+                                                " (SELECT DISTINCT  street2 from intersection_ids where int_id = %s)) ) "
+                                                " Street GROUP BY street1 HAVING count(street1) > 1",
                        (at_node,at_node,from_node,from_node))
-        fromstreet =   self._cur2db.fetchone()
+        fromstreet =   cur2db.fetchone()
+        if fromstreet == None:
+            raise CountsDatabaseReaderError("getTurningCounts: Street from %d to %d not found" % (from_node, at_node))
         
         ## Find departing street by finding the street name that is common between the list of streets at the at_node and to_node
         
-        self._cur2db.execute("SELECT street1 from (    ((SELECT DISTINCT  street1 from intersection_ids where int_id = %s) UNION (SELECT DISTINCT  street2 from intersection_ids where int_id = %s)) UNION ALL ((SELECT DISTINCT  street1 from intersection_ids where int_id = %s)UNION(SELECT DISTINCT  street2 from intersection_ids where int_id = %s))    ) Street GROUP BY street1 HAVING count(street1) > 1",
-                       (at_node,at_node,to_node,to_node))
-        tostreet =   self._cur2db.fetchone()
+        cur2db.execute("SELECT street1 from (    ((SELECT DISTINCT  street1 from intersection_ids where int_id = %s) UNION (SELECT DISTINCT  street2 from intersection_ids where int_id = %s)) UNION ALL ((SELECT DISTINCT  street1 from intersection_ids where int_id = %s)UNION(SELECT DISTINCT  street2 from intersection_ids where int_id = %s))    ) Street GROUP BY street1 HAVING count(street1) > 1",
+                        (at_node,at_node,to_node,to_node))
+        tostreet =   cur2db.fetchone()
         
-        if fromstreet == None or tostreet== None:
-            return []
+        if tostreet== None:
+            raise CountsDatabaseReaderError("getTurningCounts: Street from %d to %d not found" % (at_node, to_node))
         
         #Decide direction based on angle
         if (from_angle > 0.25*math.pi) and (from_angle <= 0.75*math.pi):
@@ -113,7 +232,7 @@ class CountsDatabaseReader(object):
         else: 
             todir = "EB"
         
-        
+        self._logger.debug("getTurningCounts: found CD intersection %d-%d-%d %s-%s" % (from_node,at_node,to_node,fromdir,todir))
         #intstreets = []
         
         #if fromstreet != tostreet:
@@ -133,7 +252,8 @@ class CountsDatabaseReader(object):
             count = None
             
             #Get avg of counts for the given movement and timeperiod 
-            self._cur2db.execute("SELECT AVG(count) from counts_turns where fromstreet = %s AND fromdir = %s AND tostreet = %s  AND todir = %s AND intid = %s AND period = %s  GROUP BY starttime HAVING  starttime::time = %s",
+            cur2db.execute("SELECT AVG(count) from counts_turns where fromstreet=%s AND fromdir=%s AND "
+                                 "tostreet=%s AND todir=%s AND intid=%s AND period=%s GROUP BY starttime HAVING starttime::time = %s",
                            (fromstreet, fromdir, tostreet, todir, at_node, period, counttime))
             
     # !!! TODO !!!
@@ -151,17 +271,17 @@ class CountsDatabaseReader(object):
         # 
         #=======================================================================
             
-            count =  self._cur2db.fetchone()
-            if not count == None:
+            count = cur2db.fetchone()
+            if count:
                 found +=1 
                 counts[i]=float(count[0])
-                
+                self._logger.debug("getTurningCounts: found count for the movement at %s for %d min" % (counttime.isoformat(), period.seconds/60.0))
             
             counttime = (datetime.combine(date(2000,1,1),counttime) + period).time()
         if found>0:
             return counts
-        else: 
-            return []
+        
+        raise CountsDatabaseReaderError("No turning counts were found for any of the given time periods.")
         
     def retrieve_table (self,filepath,table):        #save a table as csv (used for testing primarily) 
         """
@@ -171,14 +291,8 @@ class CountsDatabaseReader(object):
         
         myfile = open(filepath + '\\' + self._db + '_' + table + '.csv', 'wb') #Create CSV filename
         
-        conn2db = psycopg2.connect("host="+self._host+" dbname="+self._db+" user="+self._user+" password="+self._pw)
-        cur2db = conn2db.cursor()
-        
+        cur2db = self._conn2db.cursor()
         cur2db.copy_to(myfile, table, sep="|")
-        
-        conn2db.commit()
-        cur2db.close()
-        conn2db.close()
 
     #===========================================================================
     # def street_in_streetname(self,name):

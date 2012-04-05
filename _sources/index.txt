@@ -23,6 +23,15 @@ CountDracula API
    countdracula.CountsDatabaseWriter
    countdracula.CountsWorkbookParser
 
+Example: Parsing San Francisco Excel Workbooks and Inserting Into CountDracula
+==============================================================================
+.. literalinclude:: ..\scripts\insertSanFranciscoCounts.py
+   :linenos:
+   
+Example: Querying San Francisco Counts for Data TimeSlices
+==========================================================
+.. literalinclude:: ..\scripts\querySanFranciscoCounts.py
+   :linenos:
 
 Indices and tables
 ==================

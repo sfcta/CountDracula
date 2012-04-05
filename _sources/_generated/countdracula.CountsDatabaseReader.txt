@@ -14,10 +14,13 @@ countdracula.CountsDatabaseReader
    .. autosummary::
    
       ~CountsDatabaseReader.__init__
+      ~CountsDatabaseReader.countCounts
       ~CountsDatabaseReader.getIntersectionId
+      ~CountsDatabaseReader.getMainlineCounts
+      ~CountsDatabaseReader.getNodeNearPoint
       ~CountsDatabaseReader.getPossibleStreetNames
       ~CountsDatabaseReader.getTurningCounts
-      ~CountsDatabaseReader.mapNodeId
+      ~CountsDatabaseReader.getTurningCountsForMovement
       ~CountsDatabaseReader.retrieve_table
    
    

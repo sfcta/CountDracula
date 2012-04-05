@@ -52,7 +52,7 @@
 <h1>countdracula.CountsDatabaseReader<a class="headerlink" href="#countdracula-countsdatabasereader" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="countdracula.CountsDatabaseReader">
-<em class="property">class </em><tt class="descname">CountsDatabaseReader</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027FA6E8&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descname">CountsDatabaseReader</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x02835D28&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Class to handle read operations to the Counts database</p>
 <p>Constructor; connects to the counts database with the given credentials.</p>
@@ -68,7 +68,7 @@
 <p>TODO: optional port?</p>
 <dl class="method">
 <dt id="countdracula.CountsDatabaseReader.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027FA6E8&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x02835D28&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor; connects to the counts database with the given credentials.</p>
 <blockquote>
 <div><ul class="simple">
@@ -92,7 +92,16 @@
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.__init__" title="countdracula.CountsDatabaseReader.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a></td>
 <td>x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
 </tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.countCounts" title="countdracula.CountsDatabaseReader.countCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.countCounts</span></tt></a></td>
+<td></td>
+</tr>
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getIntersectionId" title="countdracula.CountsDatabaseReader.getIntersectionId"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getIntersectionId</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getMainlineCounts" title="countdracula.CountsDatabaseReader.getMainlineCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getMainlineCounts</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getNodeNearPoint" title="countdracula.CountsDatabaseReader.getNodeNearPoint"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getNodeNearPoint</span></tt></a></td>
 <td></td>
 </tr>
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getPossibleStreetNames" title="countdracula.CountsDatabaseReader.getPossibleStreetNames"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getPossibleStreetNames</span></tt></a></td>
@@ -101,7 +110,7 @@
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getTurningCounts" title="countdracula.CountsDatabaseReader.getTurningCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getTurningCounts</span></tt></a></td>
 <td></td>
 </tr>
-<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.mapNodeId" title="countdracula.CountsDatabaseReader.mapNodeId"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.mapNodeId</span></tt></a></td>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getTurningCountsForMovement" title="countdracula.CountsDatabaseReader.getTurningCountsForMovement"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getTurningCountsForMovement</span></tt></a></td>
 <td></td>
 </tr>
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.retrieve_table" title="countdracula.CountsDatabaseReader.retrieve_table"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.retrieve_table</span></tt></a></td>
@@ -110,10 +119,32 @@
 </tbody>
 </table>
 <dl class="method">
+<dt id="countdracula.CountsDatabaseReader.countCounts">
+<tt class="descname">countCounts</tt><big>(</big><em>turning=True</em>, <em>mainline=True</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.countCounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns info on what kind of turning counts we have by returning a dictionary mapping (starttime, period) -&gt; count</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="countdracula.CountsDatabaseReader.getIntersectionId">
 <tt class="descname">getIntersectionId</tt><big>(</big><em>NSstreet</em>, <em>EWstreet</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getIntersectionId" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a NS street and an EW street, looks for the intersection id of their intersection.</p>
 <p>Returns the intersection id or None, if none is found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.getMainlineCounts">
+<tt class="descname">getMainlineCounts</tt><big>(</big><em>starttime</em>, <em>period</em>, <em>num_intervals</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getMainlineCounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all the mainline counts available from the database for the given <em>starttime</em> (a datetime.time instance) for 
+<em>num_intervals</em> (int) of the given <em>period</em> (a datetime.timedelta instance).</p>
+<p>Returns table with: (onstreet, ondir, fromstreet, tostreet, intersection id) -&gt; [<em>num_intervals</em> counts]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.getNodeNearPoint">
+<tt class="descname">getNodeNearPoint</tt><big>(</big><em>node_x</em>, <em>node_y</em>, <em>tolerance</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getNodeNearPoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that returns id for a node in CountDracula which lies within &#8216;tolerance&#8217; feet</p>
+<p>to the coordinates node_x,node_y</p>
+<p>Raises a <tt class="xref py py-class docutils literal"><span class="pre">CountsDatabaseReaderError</span></tt> if no nodes are found, or if multiple nodes are found.</p>
 </dd></dl>
 
 <dl class="method">
@@ -125,31 +156,35 @@ and returns a list of the possible street_names (first column).</p>
 
 <dl class="method">
 <dt id="countdracula.CountsDatabaseReader.getTurningCounts">
-<tt class="descname">getTurningCounts</tt><big>(</big><em>at_node</em>, <em>from_node</em>, <em>to_node</em>, <em>from_angle</em>, <em>to_angle</em>, <em>starttime</em>, <em>period</em>, <em>num_intervals</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getTurningCounts" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">getTurningCounts</tt><big>(</big><em>starttime</em>, <em>period</em>, <em>num_intervals</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getTurningCounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all the turning counts available from the database for the given <em>starttime</em> (a datetime.time instance) for 
+<em>num_intervals</em> (int) of the given <em>period</em> (a datetime.timedelta instance).</p>
+<p>Returns table with: (fromstreet, fromdir, tostreet, todir, intersection id) -&gt; [<em>num_intervals</em> counts]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.getTurningCountsForMovement">
+<tt class="descname">getTurningCountsForMovement</tt><big>(</big><em>at_node</em>, <em>from_node</em>, <em>to_node</em>, <em>from_angle</em>, <em>to_angle</em>, <em>starttime</em>, <em>period</em>, <em>num_intervals</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getTurningCountsForMovement" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the counts from the database for a specific movement</p>
 <ul class="simple">
 <li><em>at_node</em> is the intersection node</li>
 <li><em>to_node</em> is the destination node</li>
 <li><em>from_node</em> is the origin node</li>
-<li><em>from_angle</em> is approach angle with East direction in radians</li>
-<li><em>to_angle</em> is the departing angle from East with radians</li>
+<li><em>from_angle</em> is approach angle in radians, starting from EB=0 clockwise (so SB=pi/2, WB=pi, NB=3pi/2)</li>
+<li><em>to_angle</em> is the departing angle</li>
 <li><em>starttime</em> is starting time for counts to get</li>
 <li><em>period</em> is time interval for each count</li>
 <li><em>num_intervals</em> = number of intervals to retrieve</li>
 </ul>
 <p>Returns a list of counts.</p>
+<p>Raises a CountsDatabaseReaderError if:
+* No incoming street is found (no common street for <em>from_node</em> and <em>at_node</em>
+* No outgoing street is found (no common street for <em>at_node</em> and <em>to_node</em>
+* No counts are found.</p>
 <div class="admonition-todo admonition " id="index-0">
 <p class="first admonition-title">Todo</p>
-<p class="last">document error conditions.  Also, isn&#8217;t <em>from_angle</em> and <em>to_angle</em> something we can calculate here?</p>
+<p class="last">Isn&#8217;t <em>from_angle</em> and <em>to_angle</em> something we can calculate here?</p>
 </div>
-</dd></dl>
-
-<dl class="method">
-<dt id="countdracula.CountsDatabaseReader.mapNodeId">
-<tt class="descname">mapNodeId</tt><big>(</big><em>node_x</em>, <em>node_y</em>, <em>tolerance</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.mapNodeId" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that returns id for a node in CountDracula which lies within &#8216;tolerance&#8217; feet</p>
-<p>to the coordinates node_x,node_y</p>
-<p>Returns -1 if a match is not found</p>
 </dd></dl>
 
 <dl class="method">

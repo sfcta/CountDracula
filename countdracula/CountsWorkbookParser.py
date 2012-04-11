@@ -4,7 +4,7 @@ Created on Jul 25, 2011
 @author: varun
 '''
 
-import xlrd
+import xlrd, sys
 from datetime import datetime,date, time, timedelta
 from types import FloatType
 
@@ -76,121 +76,97 @@ class CountsWorkbookParser():
         return sourcefile
           
         
-    def readMainlineCounts(self, file, primary_street, from_crossstreet, to_crossstreet, cdreader):  
+    def readMainlineCounts(self, file, primary_street, cross_street1, cross_street2, cdreader):  
         """
         Parses the given excel file representing mainline counts into a table of values for the countdracula database.
  
-        * *file* is the Excel workbook file
-        * *streetname1* is the NS-oriented street
-        * *streetname2* is the EW-oriented street
-        * *cdreader* is an instance of a CountsDatabaseReader, used to lookup the relevant streets and intersection.
+        * *file* is the Excel workbook file name
+        * *primary_street* is the street on which the counts were taken
+        * *cross_street1* and *cross_street2* are the bounding cross streets
+        * *cdreader* is an instance of a :py:class:`CountsDatabaseReader`, used to lookup the relevant streets and intersections
         
         Returns a table of values for the countdracula database, for use with :py:meth:`CountsDatabaseWriter.insertMainlineCounts`
-        """
-        
-        #---------Variables used-----------------------------------
-        parametersList = []
-        vtype = 0 # ??
-        project = ""        #!! What to do !!
-        
-        #----- Street vars !! ----------------------------     
-        ml_refpos = 0
-        ml_onstreet = ""       #Mainline street name
-        ml_ondir = ""          #Mainline direction
-        ml_fromstreet = ""      #U/S street
-        ml_tostreet = ""        #D/S street
+        """                
+        primary_street_list = cdreader.getPossibleStreetNames(primary_street)
+        if primary_street_list == []:
+            raise CountsWorkbookParserException("readMainlineCounts: primary street %s not found." % primary_street)
                 
-        book = xlrd.open_workbook(file)
-        sourcefile = file
-        sheetnames = book.sheet_names()        
-                
-        mainStreetslist = cdreader.getPossibleStreetNames(primary_street)
-        if mainStreetslist == []:
-            raise CountsWorkbookParserException("readMainlineCounts: Street %s not found." % primary_street)
+        cross_street1_list = cdreader.getPossibleStreetNames(cross_street1)
+        if cross_street1_list == []:
+            raise CountsWorkbookParserException("readMainlineCounts: cross street 1 %s not found." % cross_street1)
+
+        cross_street2_list = cdreader.getPossibleStreetNames(cross_street2)
+        if cross_street2_list == []:
+            raise CountsWorkbookParserException("readMainlineCounts: cross street 2 %s not found." % cross_street2)
+
+        # looking for a primary street that intersects with both one of cross_street1 cross_Street2
+        # collect this info in two dictionaries: { primary_street_name -> { cross_street1_name -> idset1 }}
+        # and                                    { primary_street_name -> { cross_street2_name -> idset2 }}
+        intersections1 = {}
+        intersections2 = {}
         
-        fromStreetslist = cdreader.getPossibleStreetNames(from_crossstreet)
-        if fromStreetslist == []:
-            raise CountsWorkbookParserException("readMainlineCounts: Street %s not found." % from_crossstreet)
-        
-        toStreetslist = cdreader.getPossibleStreetNames(to_crossstreet)
-        if toStreetslist == []:
-            raise CountsWorkbookParserException("readMainlineCounts: Street %s not found." % to_crossstreet)
-        
-        
-        final_mainstreet = None
-        final_fromstreet = None
-        final_tostreet = None
-        intersection_id1 = None
-        intersection_id2 = None
-        
-        for mainstreet in mainStreetslist:
-            # print "mainstreet = "+ mainstreet
+        for primary_street_name in primary_street_list:
+            intersections1[primary_street_name] = {}
+            intersections2[primary_street_name] = {}
             
-            possibleFromIntersections = 0
-            for NWstreet in fromStreetslist:
-                # print "NWstreet = "+ NWstreet
-                
-                intersection_id = cdreader.getIntersectionId(mainstreet,NWstreet)
-                if not intersection_id: continue
-                
-                possibleFromIntersections += 1
-                if possibleFromIntersections>1:
-                    raise CountsWorkbookParserException("readMainlineCounts: Street %s and %s can have multiple intersections possible." % 
-                                                        (primary_street, from_crossstreet))
-                
-                final_fromstreet = NWstreet
-                intersection_id1 = intersection_id
-                # print "  %s - %s int id %d" % (mainstreet, NWstreet, intersection_id1)
-                
-            possibleToIntersections = 0
-            for SEstreet in toStreetslist:
-                # print "NWstreet = "+ NWstreet
-                
-                intersection_id = cdreader.getIntersectionId(mainstreet,SEstreet)
-                if not intersection_id: continue
-                
-                possibleToIntersections+=1
-                if possibleToIntersections>1:
-                    raise CountsWorkbookParserException("readMainlineCounts: Street %s and %s can have multiple intersections possible." % 
-                                                        (primary_street, to_crossstreet))
+            for cross_street1_name in cross_street1_list:
+                intersections1[primary_street_name][cross_street1_name] = cdreader.getIntersectionIdsForStreets(primary_street_name,
+                                                                                                                cross_street1_name)
+                # don't bother if it's an empty set
+                if len(intersections1[primary_street_name][cross_street1_name]) == 0:
+                    del intersections1[primary_street_name][cross_street1_name]
 
+            for cross_street2_name in cross_street2_list:
+                intersections2[primary_street_name][cross_street2_name] = cdreader.getIntersectionIdsForStreets(primary_street_name,
+                                                                                                                cross_street2_name)
+                # don't bother if it's an empty set
+                if len(intersections2[primary_street_name][cross_street2_name]) == 0:
+                    del intersections2[primary_street_name][cross_street2_name]
+                    
+        # ideally, there will be exactly one primary street with a cross street 1 candidate and a cross street 2 candidate
+        primary_street_name_final = None
+        for primary_street_name in primary_street_list:
+            if len(intersections1[primary_street_name]) == 0: continue
+            if len(intersections2[primary_street_name]) == 0: continue
 
-                final_tostreet = SEstreet
-                intersection_id2 = intersection_id
-                # print "  %s - %s int id %d" % (mainstreet, SEstreet, intersection_id2)
-
-            # done
-            # print possibleFromIntersections, possibleToIntersections
-            if possibleFromIntersections==1 and possibleToIntersections==1:
-                final_mainstreet = mainstreet
-                break
-
-        if not final_mainstreet:
-            raise CountsWorkbookParserException("readMainlineCounts: Couldn't find relevant intersections for %s from %s to %s." % (primary_street, from_crossstreet, to_crossstreet))
- 
-        #----------Assign ml street name, rest streets will be assigned based on column and direction------ 
-        ml_onstreet = final_mainstreet         
-        totalsheets_ids = range(len(sheetnames))  #create sheet id list
+            if len(intersections1[primary_street_name]) > 1:
+                raise CountsWorkbookParserException("readMainlineCounts: Street %s and cross street 1 %s have multiple intersections: %s" % 
+                                                    (primary_street_name, cross_street1, str(intersections1[primary_street_name])))
+            if len(intersections2[primary_street_name]) > 1:
+                raise CountsWorkbookParserException("readMainlineCounts: Street %s and cross street 2 %s have multiple intersections: %s" % 
+                                                    (primary_street_name, cross_street2, str(intersections2[primary_street_name])))
+            # already found one?
+            if primary_street_name_final:
+                raise CountsWorkbookParserException("readMainlineCounts: Multiple primary streets (%s,%s) intersect with %s/%s" % 
+                                                    (primary_street_name,  primary_street_name_final,
+                                                     cross_street1, cross_street2))
+            primary_street_name_final = primary_street_name
         
-        for sheet_idx in totalsheets_ids :
+        if not primary_street_name_final:
+                raise CountsWorkbookParserException("readMainlineCounts: Street %s and cross streets %s,%s have no intersections: %s %s" % 
+                                                    (primary_street, str(cross_street1_list), str(cross_street2_list), 
+                                                     str(intersections1), str(intersections2)))
+
+        # finalize the cross street names and intersection ids        
+        cross_street1_name_final = intersections1[primary_street_name_final].keys()[0]
+        cross_street2_name_final = intersections2[primary_street_name_final].keys()[0]
+        
+        # go through the sheets and prep the data
+        mainlinList = [] 
+        book        = xlrd.open_workbook(file)
+        sheetnames  = book.sheet_names()     
+        for sheet_idx in range(len(sheetnames)) :
            
-            if sheetnames[sheet_idx]=="source": continue           
+            if sheetnames[sheet_idx]=="source": continue
             activesheet = book.sheet_by_name(sheetnames[sheet_idx])
             
-            #-------Create date from sheetname in date format-------------------------------- 
+            # Create date from sheetname in date format 
             tmp_date = sheetnames[sheet_idx].split('.')
             date_yyyy_mm_dd = date(int(tmp_date[0]),int(tmp_date[1]),int(tmp_date[2]) )
+            if len(tmp_date) > 3 and (tmp_date[3].upper()=="TRUCK" or tmp_date[3].upper()=="PEDESTRIAN"):
+                continue
             
-            column_ids = range(1,len(activesheet.row(0))) #find list of columns to process
-            
-            ref = activesheet.cell_value(1,0)
-            if type(ref) is FloatType:
-                ml_refpos = ref
-            else:
-                ml_refpos = 0
-            
-            
-            for column in column_ids :
+            for column in range(1,len(activesheet.row(0))):
                 
                 vehicle = activesheet.cell_value(1,column)
                 if type(vehicle) is FloatType and vehicle in range(-1,16):
@@ -203,103 +179,98 @@ class CountsWorkbookParser():
                 ml_ondir = ml_ondir_temp[:2] 
                 direction = ml_ondir[0]
                 
+                # The convention is that cross street 1 is always north or west of cross street 2
+                # so use this cue to determine the origin/destination of the movement
                 if (direction == 'S' or direction == 'E'):
-                    ml_fromstreet = final_fromstreet       #Veh is going from NtoS or WtoE
-                    ml_tostreet = final_tostreet
+                    ml_fromstreet = cross_street1_name_final
+                    ml_tostreet   = cross_street2_name_final
                 else:
-                    ml_fromstreet = final_tostreet       #Veh is going from StoN or EtoW
-                    ml_tostreet = final_fromstreet
-                #------------------------------------------------------------------------------
-    
-                row_ids = range(2,len(activesheet.col(column))) #find rows to process for column
-                
-                for row in row_ids:
+                    ml_fromstreet = cross_street2_name_final
+                    ml_tostreet   = cross_street1_name_final
+
+                # process the rows                    
+                for row in range(2,len(activesheet.col(column))) :
                     
                     count = activesheet.cell_value(row,column) 
                     if count == "" : continue
                     
                     (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0))     
     
-                    parametersList.append([count,starttime,period,vtype,ml_onstreet,ml_ondir,
-                                           ml_fromstreet,ml_tostreet,ml_refpos,
-                                           sourcefile,project])
-                        
-        return parametersList
+                    mainlinList.append([count,starttime,period,vtype,primary_street_name_final,ml_ondir,
+                                        ml_fromstreet,ml_tostreet,
+                                        -1, # reference position unknown, it's not in the workbook
+                                        file,""])
+                    
+        return mainlinList
     
-    def readTurnCounts(self, file, streetname1, streetname2, cdreader):
+    def readTurnCounts(self, file, street1, street2, cdreader):
         """
         Parses the given excel file representing turn counts into a table of values for the countdracula database.
         
         * *file* is the Excel workbook file
-        * *streetname1* is the NS-oriented street
-        * *streetname2* is the EW-oriented street
-        * *cdreader* is an instance of a CountsDatabaseReader, used to lookup the relevant streets and intersection.
+        * *street1* is the name of the NS-oriented street
+        * *street2* is the name of the EW-oriented street
+        * *cdreader* is an instance of a :py:class:`CountsDatabaseReader`, used to lookup the relevant streets and intersection
         
         Returns a table of values for the countdracula database, for use with :py:meth:`CountsDatabaseWriter.insertTurnCounts`
-        """
-        #---------Variables used-----------------------------------
-        turnCountList = []
-        vtype = None # ??? self._vtype
-        project         = ""        #!! What to do !!
         
-        #----- Street vars !! ----------------------------     
-        t_fromstreet    = ""  #Turn approach street
-        t_fromdir       = ""  #Turn approach direction
-        t_tostreet      = ""  #Turn final street
-        t_todir         = ""  #Turn final direction
-        t_intstreet     = ""  #Intersecting street
-        t_intid         = -1
-                
-        book = xlrd.open_workbook(file)       
-        sourcefile = file
-                
-        NSstreetslist = cdreader.getPossibleStreetNames(streetname1)
+        Note that this method is a little counter-intuitive because the arguments determine the way the movements are stored in
+        the database.  For example, suppose you have an intersection where the street changes names from "SouthOne Street" to 
+        "SouthTwo Street" as it passes through an intersection with "EastWest Street".  This method would be called with
+        street1="SouthOne Street" and street2="EastWest Street" and the through movement would be stored with
+        from_street="SouthOne Street" fromdir="SB", tostreet="SouthOne Street" todir="SB" even though "SouthOne Street"
+        doesn't have a southbound link from the intersection, since it's really "SouthTwo Street".  Thus, using this
+        implementation, the fromstreet and tostreet define the intersection only, and not the movement.
+        """    
+        NSstreetslist = cdreader.getPossibleStreetNames(street1)
         if NSstreetslist == []:
-            raise CountsWorkbookParserException("readTurnCounts: Street %s not found." % streetname1)
+            raise CountsWorkbookParserException("readTurnCounts: Street %s not found." % street1)
         
-        EWstreetslist = cdreader.getPossibleStreetNames(streetname2)
+        EWstreetslist = cdreader.getPossibleStreetNames(street2)
         if EWstreetslist == []:
-            raise CountsWorkbookParserException("readTurnCounts: Street %s not found." % streetname2)
-                
-        # find the relevant intersection id
-        possible_intersections = 0
-        final_NSstreet = ""
-        final_EWstreet = ""
+            raise CountsWorkbookParserException("readTurnCounts: Street %s not found." % street2)
+
+        # look for intersections of these streets; intersections maps { (streetname1, streetname2) -> set of intersections }
+        intersections = {}
         for NSstreet in NSstreetslist:
             for EWstreet in EWstreetslist:
-                intersection_id = cdreader.getIntersectionId(NSstreet,EWstreet)
-                # print NSstreet, EWstreet, intersection_id
-                if not intersection_id: continue
+                intersection_ids = cdreader.getIntersectionIdsForStreets(NSstreet,EWstreet)
                 
-                possible_intersections+=1
-                if possible_intersections>1:
-                    raise CountsWorkbookParserException("readTurnCounts: Streets %s and %s can have multiple intersections possible." % 
-                                                       (streetname1, streetname2))
-
-                final_NSstreet = NSstreet
-                final_EWstreet = EWstreet
-                t_intid = intersection_id
-            
-        if possible_intersections ==0:
-            raise CountsWorkbookParserException("readTurnCounts: Streets %s and %s don't intersect." %
-                                                (streetname1, streetname2)) 
-
+                if len(intersection_ids) > 0:
+                    intersections[(NSstreet, EWstreet)] = intersection_ids
+        # ideally, we'll have one intersection with one intersection id
+        if len(intersections) == 0:
+            raise CountsWorkbookParserException("readTurnCounts: No intersections found for %s and %s" % (street1, street2))
         
-        sheetnames =  book.sheet_names()
-        totalsheets_ids = range(len(sheetnames))  #create sheet id list
+        if len(intersections) > 1:
+            raise CountsWorkbookParserException("readTurnCounts: Multiple intersections found for %s and %s: %s" % (street1, street2, str(intersections)))
+
+        if len(intersections.values()[0]) > 1:
+            raise CountsWorkbookParserException("readTurnCounts: Multiple intersections found for %s and %s: %s" % (street1, street2, str(intersections)))
+
+        # len(intersections) == 1
+        final_NSstreet  = intersections.keys()[0][0]
+        final_EWstreet  = intersections.keys()[0][1]
+        final_intid     = intersections[(final_NSstreet,final_EWstreet)].pop()
         
-        for sheet in totalsheets_ids :
+        # go through the sheets and prep the data        
+        turnCountList   = []
+        book            = xlrd.open_workbook(file)       
+        sheetnames      = book.sheet_names()
+        
+        for sheet_idx in range(len(sheetnames)) :
             
-            if sheetnames[sheet]=="source": continue
-            activesheet = book.sheet_by_name(sheetnames[sheet])
+            if sheetnames[sheet_idx]=="source": continue
+            activesheet = book.sheet_by_name(sheetnames[sheet_idx])
             
-            #-------Create date from sheetname in date format-------------------------------- 
-            tmp_date = sheetnames[sheet].split('.')
-            date_yyyy_mm_dd = date(int(tmp_date[0]),int(tmp_date[1]),int(tmp_date[2]) )  
-            
-            column_ids = range(1,len(activesheet.row(0))) #find list of columns to process
-            
-            for column in column_ids :
+            # create date from sheetname in date format 
+            tmp_date = sheetnames[sheet_idx].split('.')
+            date_yyyy_mm_dd = date(int(tmp_date[0]),int(tmp_date[1]),int(tmp_date[2]) )
+            if len(tmp_date) > 3 and (tmp_date[3].upper()=="TRUCK" or tmp_date[3].upper()=="PEDESTRIAN"):
+                continue
+                                    
+            for column in range(1,len(activesheet.row(0))):
+                
                 vehicle = activesheet.cell_value(1,column)
                 if type(vehicle) is FloatType and vehicle in range(-1,16):
                     vtype = vehicle
@@ -312,8 +283,8 @@ class CountsWorkbookParser():
                 turntype = movement[2:]
                 
                 if t_fromdir not in ["NB", "WB", "EB", "SB"]:
-                    raise CountsWorkbookParserException("readTurnCounts: Could not parse column header of %s; expect movement to start with direction.  Movement=%s" %
-                                                        (file, movement))
+                    raise CountsWorkbookParserException("readTurnCounts: Could not parse column header of %s!%s; expect movement to start with direction.  Movement=[%s] Column=%d Type=%d" %
+                                                        (file, sheetnames[sheet_idx], movement, column, activesheet.cell_type(0,column)))
 
                 # First determines direction
                 compass = ['N','E','S','W']                
@@ -351,11 +322,8 @@ class CountsWorkbookParser():
                         t_fromstreet    = final_EWstreet
                         t_tostreet      = final_NSstreet
                         t_intstreet     = final_NSstreet
-                #------------------------------------------------------------------------------
-    
-                row_ids = range(2,len(activesheet.col(column))) #find rows to process for column
-                
-                for row in row_ids:
+                    
+                for row in range(2,len(activesheet.col(column))):
                     
                     count = activesheet.cell_value(row,column) 
                     if count == "" : continue
@@ -363,8 +331,7 @@ class CountsWorkbookParser():
                     (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0))     
                         
                     turnCountList.append([count,starttime,period,vtype,t_fromstreet,t_fromdir,t_tostreet,t_todir,
-                                           t_intstreet,t_intid, sourcefile,project])
-                        
+                                           t_intstreet,final_intid, file, ""])
         return turnCountList
     
     def readIntersectionIds(self,file):  

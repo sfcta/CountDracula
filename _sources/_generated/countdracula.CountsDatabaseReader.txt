@@ -15,7 +15,7 @@ countdracula.CountsDatabaseReader
    
       ~CountsDatabaseReader.__init__
       ~CountsDatabaseReader.countCounts
-      ~CountsDatabaseReader.getIntersectionId
+      ~CountsDatabaseReader.getIntersectionIdsForStreets
       ~CountsDatabaseReader.getMainlineCounts
       ~CountsDatabaseReader.getNodeNearPoint
       ~CountsDatabaseReader.getPossibleStreetNames

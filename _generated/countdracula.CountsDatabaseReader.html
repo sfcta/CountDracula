@@ -52,7 +52,7 @@
 <h1>countdracula.CountsDatabaseReader<a class="headerlink" href="#countdracula-countsdatabasereader" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="countdracula.CountsDatabaseReader">
-<em class="property">class </em><tt class="descname">CountsDatabaseReader</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x02835D28&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descname">CountsDatabaseReader</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027A6DF0&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Class to handle read operations to the Counts database</p>
 <p>Constructor; connects to the counts database with the given credentials.</p>
@@ -68,7 +68,7 @@
 <p>TODO: optional port?</p>
 <dl class="method">
 <dt id="countdracula.CountsDatabaseReader.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x02835D28&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027A6DF0&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor; connects to the counts database with the given credentials.</p>
 <blockquote>
 <div><ul class="simple">
@@ -95,7 +95,7 @@
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.countCounts" title="countdracula.CountsDatabaseReader.countCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.countCounts</span></tt></a></td>
 <td></td>
 </tr>
-<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getIntersectionId" title="countdracula.CountsDatabaseReader.getIntersectionId"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getIntersectionId</span></tt></a></td>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getIntersectionIdsForStreets" title="countdracula.CountsDatabaseReader.getIntersectionIdsForStreets"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getIntersectionIdsForStreets</span></tt></a></td>
 <td></td>
 </tr>
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getMainlineCounts" title="countdracula.CountsDatabaseReader.getMainlineCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getMainlineCounts</span></tt></a></td>
@@ -125,10 +125,10 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="countdracula.CountsDatabaseReader.getIntersectionId">
-<tt class="descname">getIntersectionId</tt><big>(</big><em>NSstreet</em>, <em>EWstreet</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getIntersectionId" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a NS street and an EW street, looks for the intersection id of their intersection.</p>
-<p>Returns the intersection id or None, if none is found.</p>
+<dt id="countdracula.CountsDatabaseReader.getIntersectionIdsForStreets">
+<tt class="descname">getIntersectionIdsForStreets</tt><big>(</big><em>street1</em>, <em>street2</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getIntersectionIdsForStreets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a two streets, returns a set of the intersection ids matching both.</p>
+<p><em>street1</em> and <em>street2</em> are matched against the <em>street_name</em> field in <a class="reference internal" href="../tables.html#table-node-streets"><em>node_streets Table</em></a></p>
 </dd></dl>
 
 <dl class="method">
@@ -152,6 +152,7 @@
 <tt class="descname">getPossibleStreetNames</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getPossibleStreetNames" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a street name string, looks up the name in the various columns of the <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>
 and returns a list of the possible street_names (first column).</p>
+<p>This search is case-insensitive.</p>
 </dd></dl>
 
 <dl class="method">

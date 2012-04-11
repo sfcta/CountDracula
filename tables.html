@@ -173,17 +173,13 @@
 </div>
 <div class="admonition-todo admonition " id="index-1">
 <p class="first admonition-title">Todo</p>
-<p class="last">why are spaces not in the short_name field?</p>
+<p class="last">is nospace_name = short_name + suffix with spaces removed?</p>
 </div>
 <div class="admonition-todo admonition " id="index-2">
 <p class="first admonition-title">Todo</p>
-<p class="last">is nospace_name = short_name + suffix with spaces removed?</p>
-</div>
-<div class="admonition-todo admonition " id="index-3">
-<p class="first admonition-title">Todo</p>
 <p class="last">is street_name = short_name + &#8221; &#8221; + suffix?</p>
 </div>
-<div class="admonition-todo admonition " id="index-4">
+<div class="admonition-todo admonition " id="index-3">
 <p class="first admonition-title">Todo</p>
 <p class="last">what about alternative names?</p>
 </div>
@@ -203,7 +199,7 @@
 <tbody valign="top">
 <tr><td>street_name</td>
 <td>text</td>
-<td>primary key.  e.g. <em>CESARCHAVEZ ST</em></td>
+<td>primary key.  e.g. <em>CESAR CHAVEZ ST</em></td>
 </tr>
 <tr><td>nospace_name</td>
 <td>text</td>
@@ -211,7 +207,7 @@
 </tr>
 <tr><td>short_name</td>
 <td>text</td>
-<td>name without suffix. e.g. <em>CESARCHAVEZ</em></td>
+<td>name without suffix. e.g. <em>CESAR CHAVEZ</em></td>
 </tr>
 <tr><td>suffix</td>
 <td>text</td>
@@ -220,56 +216,9 @@
 </tbody>
 </table>
 </div>
-<div class="section" id="intersection-ids-table">
-<span id="table-intersection-ids"></span><h2>intersection_ids Table<a class="headerlink" href="#intersection-ids-table" title="Permalink to this headline">¶</a></h2>
-<p>This table corresonds intersections with their named streets as well as
-their latitude/longitude coordinates.  The table has no primary key but
-it does have the constraint that (street1, street2) is unique.
-Can be updated with <a class="reference internal" href="_generated/countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter.insertIntersectionIds" title="countdracula.CountsDatabaseWriter.insertIntersectionIds"><tt class="xref py py-meth docutils literal"><span class="pre">countdracula.CountsDatabaseWriter.insertIntersectionIds()</span></tt></a></p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="18%" />
-<col width="12%" />
-<col width="71%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">column name</th>
-<th class="head">data type</th>
-<th class="head">notes</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>street1</td>
-<td>text</td>
-<td>corresponds to <em>street_name</em> in
-<a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
-</tr>
-<tr><td>street2</td>
-<td>text</td>
-<td>corresponds to <em>street_name</em> in
-<a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
-</tr>
-<tr><td>int_id</td>
-<td>integer</td>
-<td>corresponds to <em>int_id</em> in <a class="reference internal" href="#table-nodes"><em>nodes Table</em></a></td>
-</tr>
-<tr><td>long_x</td>
-<td>double</td>
-<td>longitude of the intersection</td>
-</tr>
-<tr><td>lat_y</td>
-<td>double</td>
-<td>latitude of the intersection</td>
-</tr>
-</tbody>
-</table>
-</div>
 <div class="section" id="nodes-table">
 <span id="table-nodes"></span><h2>nodes Table<a class="headerlink" href="#nodes-table" title="Permalink to this headline">¶</a></h2>
-<div class="admonition-todo admonition " id="index-5">
-<p class="first admonition-title">Todo</p>
-<p class="last">duplicative of intersection_ids ?</p>
-</div>
+<p>Master list of (intersection) nodes and their coordinates.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="18%" />
@@ -289,11 +238,41 @@ Can be updated with <a class="reference internal" href="_generated/countdracula.
 </tr>
 <tr><td>long_x</td>
 <td>double</td>
-<td>&nbsp;</td>
+<td>x-coordinate (could be longitude but not necessary)</td>
 </tr>
 <tr><td>lat_y</td>
 <td>double</td>
-<td>&nbsp;</td>
+<td>y-coordinate (could be latitutde but not necessary)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="node-streets-table">
+<span id="table-node-streets"></span><h2>node_streets Table<a class="headerlink" href="#node-streets-table" title="Permalink to this headline">¶</a></h2>
+<p>This table corresonds intersections with their named streets. The table has no
+primary key but it does have the constraint that (int_id, street) is unique.
+Can be updated with <a class="reference internal" href="_generated/countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter.insertNodeStreets" title="countdracula.CountsDatabaseWriter.insertNodeStreets"><tt class="xref py py-meth docutils literal"><span class="pre">countdracula.CountsDatabaseWriter.insertNodeStreets()</span></tt></a></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="12%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">column name</th>
+<th class="head">data type</th>
+<th class="head">notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>int_id</td>
+<td>integer</td>
+<td>corresponds to <em>int_id</em> in <a class="reference internal" href="#table-nodes"><em>nodes Table</em></a></td>
+</tr>
+<tr><td>street</td>
+<td>text</td>
+<td>corresponds to <em>street_name</em> in
+<a class="reference internal" href="#table-street-names"><em>street_names Table</em></a></td>
 </tr>
 </tbody>
 </table>
@@ -360,7 +339,7 @@ for turns, this is the same as <em>tostreet</em></td>
 <tr><td>intid</td>
 <td>integer</td>
 <td>corresponds to <em>int_id</em> in
-<a class="reference internal" href="#table-intersection-ids"><em>intersection_ids Table</em></a></td>
+<em class="xref std std-ref">table-intersection_ids</em></td>
 </tr>
 <tr><td>sourcefile</td>
 <td>text</td>
@@ -430,7 +409,8 @@ in <a class="reference internal" href="#table-street-names"><em>street_names Tab
 </tr>
 <tr><td>refpos</td>
 <td>float</td>
-<td>???</td>
+<td>reference position for how far along the link the count
+was actually taken; use -1 for uknown</td>
 </tr>
 <tr><td>sourcefile</td>
 <td>text</td>
@@ -458,8 +438,8 @@ when the counts were gathered for a specific project</td>
 <li><a class="reference internal" href="#vtype-table">vtype Table</a></li>
 <li><a class="reference internal" href="#directions-table">directions Table</a></li>
 <li><a class="reference internal" href="#street-names-table">street_names Table</a></li>
-<li><a class="reference internal" href="#intersection-ids-table">intersection_ids Table</a></li>
 <li><a class="reference internal" href="#nodes-table">nodes Table</a></li>
+<li><a class="reference internal" href="#node-streets-table">node_streets Table</a></li>
 <li><a class="reference internal" href="#counts-turns-table">counts_turns Table</a></li>
 <li><a class="reference internal" href="#counts-ml-table">counts_ml Table</a></li>
 </ul>

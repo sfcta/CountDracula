@@ -52,7 +52,7 @@
 <h1>countdracula.CountsDatabaseWriter<a class="headerlink" href="#countdracula-countsdatabasewriter" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="countdracula.CountsDatabaseWriter">
-<em class="property">class </em><tt class="descname">CountsDatabaseWriter</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdadmin'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x0284A968&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descname">CountsDatabaseWriter</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdadmin'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027BFA30&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Class to handle write operations to the Counts database</p>
 <p>Constructor; connects to the counts database with the given credentials.</p>
@@ -68,7 +68,7 @@
 <p>TODO: optional port?</p>
 <dl class="method">
 <dt id="countdracula.CountsDatabaseWriter.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdadmin'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x0284A968&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdadmin'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027BFA30&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor; connects to the counts database with the given credentials.</p>
 <blockquote>
 <div><ul class="simple">
@@ -92,10 +92,13 @@
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.__init__" title="countdracula.CountsDatabaseWriter.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a></td>
 <td>x.__init__(...) initializes x; see x.__class__.__doc__ for signature</td>
 </tr>
-<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertIntersectionIds" title="countdracula.CountsDatabaseWriter.insertIntersectionIds"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertIntersectionIds</span></tt></a></td>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertMainlineCounts" title="countdracula.CountsDatabaseWriter.insertMainlineCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertMainlineCounts</span></tt></a></td>
 <td></td>
 </tr>
-<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertMainlineCounts" title="countdracula.CountsDatabaseWriter.insertMainlineCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertMainlineCounts</span></tt></a></td>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertNodeStreets" title="countdracula.CountsDatabaseWriter.insertNodeStreets"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertNodeStreets</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertNodes" title="countdracula.CountsDatabaseWriter.insertNodes"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertNodes</span></tt></a></td>
 <td></td>
 </tr>
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseWriter.insertStreetNames" title="countdracula.CountsDatabaseWriter.insertStreetNames"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseWriter.insertStreetNames</span></tt></a></td>
@@ -107,25 +110,11 @@
 </tbody>
 </table>
 <dl class="method">
-<dt id="countdracula.CountsDatabaseWriter.insertIntersectionIds">
-<tt class="descname">insertIntersectionIds</tt><big>(</big><em>intersectionList</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.insertIntersectionIds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inserts the given list of intersections into the <a class="reference internal" href="../tables.html#table-intersection-ids"><em>intersection_ids Table</em></a>.</p>
-<p>The <em>intersectionList</em> is a list of tuples with the following values:</p>
-<ul class="simple">
-<li><em>streetname1</em> - should correspond with a nospace_name or street_name from <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>.</li>
-<li><em>streetname2</em> - should correspond with a nospace_name or street_name from <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>.</li>
-<li><em>intersection_id</em> - an integer id.</li>
-<li><em>longitude</em> - the longitude of the intersection.</li>
-<li><em>latitude</em> - the latitude of the intersection.</li>
-</ul>
-<p>Can be used with <a class="reference internal" href="countdracula.CountsWorkbookParser.html#countdracula.CountsWorkbookParser.readIntersectionIds" title="countdracula.CountsWorkbookParser.readIntersectionIds"><tt class="xref py py-meth docutils literal"><span class="pre">CountsWorkbookParser.readIntersectionIds()</span></tt></a></p>
-</dd></dl>
-
-<dl class="method">
 <dt id="countdracula.CountsDatabaseWriter.insertMainlineCounts">
 <tt class="descname">insertMainlineCounts</tt><big>(</big><em>countsList</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.insertMainlineCounts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inserts counts to table counts_ml</p>
-<p>countsList is a list of tuples, each tuple containing the following values:</p>
+<dd><p>Inserts <em>countsList</em> into the <a class="reference internal" href="../tables.html#table-counts-ml"><em>counts_ml Table</em></a>; see that documentation for more on
+what these variables actually represent.</p>
+<p>countsList is a list of tuples, each tuple containing the following values;</p>
 <blockquote>
 <div><ul class="simple">
 <li><em>count</em></li>
@@ -141,6 +130,31 @@
 <li><em>project</em></li>
 </ul>
 </div></blockquote>
+<p>Database errors will be ignored.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseWriter.insertNodeStreets">
+<tt class="descname">insertNodeStreets</tt><big>(</big><em>nodeStreetList</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.insertNodeStreets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts the given list of intersections into the <a class="reference internal" href="../tables.html#table-node-streets"><em>node_streets Table</em></a>.</p>
+<p>The <em>nodeStreetList</em> is a list of tuples with the following values:</p>
+<ul class="simple">
+<li><em>intersection_id</em> - an integer id, should correspond with an int_id from <a class="reference internal" href="../tables.html#table-nodes"><em>nodes Table</em></a>.</li>
+<li><em>streetname</em> - should correspond with a street_name or nospace_name from <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>.</li>
+</ul>
+<p>Can be used with <a class="reference internal" href="countdracula.CountsWorkbookParser.html#countdracula.CountsWorkbookParser.readIntersectionIds" title="countdracula.CountsWorkbookParser.readIntersectionIds"><tt class="xref py py-meth docutils literal"><span class="pre">CountsWorkbookParser.readIntersectionIds()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseWriter.insertNodes">
+<tt class="descname">insertNodes</tt><big>(</big><em>nodeList</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseWriter.insertNodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts the given list of intersection nodes into the <a class="reference internal" href="../tables.html#table-nodes"><em>nodes Table</em></a>.</p>
+<p>The <em>nodeList</em> is a list of tuples with the following values:</p>
+<ul class="simple">
+<li><em>intersection_id</em> - an integer id.</li>
+<li><em>x</em> - the x coordinate, such as the latitude</li>
+<li><em>y</em> - the y coordinate, such as the longitude</li>
+</ul>
 </dd></dl>
 
 <dl class="method">
@@ -149,8 +163,8 @@
 <dd><p>Inserts the given list of streetnames into the <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>.</p>
 <p>The <em>streetnameList</em> is a list of tuples with the following values:</p>
 <ul class="simple">
-<li><em>street_name</em> Necessary?</li>
-<li><em>nospace_name</em> Necessary?</li>
+<li><em>street_name</em></li>
+<li><em>nospace_name</em></li>
 <li><em>short_name</em></li>
 <li><em>suffix</em></li>
 </ul>

@@ -59,8 +59,8 @@
 <li class="toctree-l2"><a class="reference internal" href="tables.html#vtype-table">vtype Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tables.html#directions-table">directions Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tables.html#street-names-table">street_names Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tables.html#intersection-ids-table">intersection_ids Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tables.html#nodes-table">nodes Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tables.html#node-streets-table">node_streets Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tables.html#counts-turns-table">counts_turns Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tables.html#counts-ml-table">counts_ml Table</a></li>
 </ul>
@@ -90,72 +90,108 @@
 </div>
 <div class="section" id="example-parsing-san-francisco-excel-workbooks-and-inserting-into-countdracula">
 <h1>Example: Parsing San Francisco Excel Workbooks and Inserting Into CountDracula<a class="headerlink" href="#example-parsing-san-francisco-excel-workbooks-and-inserting-into-countdracula" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">&#39;&#39;&#39;</span>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Created on Jul 25, 2011</span>
 
 <span class="sd">@author: lmz</span>
@@ -168,32 +204,60 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">countdracula</span>
-<span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">traceback</span>
+
+<span class="n">USAGE</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+
+<span class="s"> python insertSanFranciscoCounts.py countsWorkbookFile.xls|countsWorkbookDirectory</span>
+
+<span class="s"> If a workbook file is passed, reads that workbook into the CountDracula database.</span>
+<span class="s"> If a directory is passed, reads all the workbook files in the given directory into the CountDracula database.</span>
+<span class="s"> </span>
+<span class="s"> example: python insertSanFranciscoCounts.py &quot;Q:\Roadway Observed Data\Counts\_Standardized_chs&quot;</span>
+<span class="s"> </span>
+<span class="s">&quot;&quot;&quot;</span>
 
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">USAGE</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="n">counts_input</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;countdracula&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    
     <span class="n">consolehandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
     <span class="n">consolehandler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
     <span class="n">consolehandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(name)-12s</span><span class="s">: </span><span class="si">%(levelname)-8s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">))</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">consolehandler</span><span class="p">)</span>        
-    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    
+    <span class="n">debugFilename</span> <span class="o">=</span> <span class="s">&quot;insertSanFranciscoCounts_</span><span class="si">%s</span><span class="s">.DEBUG.log&quot;</span> <span class="o">%</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%Y%b</span><span class="si">%d</span><span class="s">.%H%M%S&quot;</span><span class="p">)</span>
+    <span class="n">debugloghandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">debugFilename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">))</span>
+    <span class="n">debugloghandler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    <span class="n">debugloghandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> </span><span class="si">%(levelname)s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M&#39;</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">debugloghandler</span><span class="p">)</span>
+        
     
     <span class="n">cd_writer</span> <span class="o">=</span> <span class="n">countdracula</span><span class="o">.</span><span class="n">CountsDatabaseWriter</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s">&quot;CDadmin&quot;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
     <span class="n">cd_reader</span> <span class="o">=</span> <span class="n">countdracula</span><span class="o">.</span><span class="n">CountsDatabaseReader</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s">&quot;ReadOnly&quot;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
     <span class="n">xl_parser</span> <span class="o">=</span> <span class="n">countdracula</span><span class="o">.</span><span class="n">CountsWorkbookParser</span><span class="p">()</span>
-
-    <span class="c"># Read the streets</span>
-    <span class="n">street_names</span> <span class="o">=</span> <span class="n">xl_parser</span><span class="o">.</span><span class="n">readStreetNames</span><span class="p">(</span><span class="s">r&quot;Q:\Model Development\CountDracula\1_CountDracula_Creation\_EXCEL_CUBE_INPUTS\Streets.xls&quot;</span><span class="p">)</span>
-    <span class="n">cd_writer</span><span class="o">.</span><span class="n">insertStreetNames</span><span class="p">(</span><span class="n">street_names</span><span class="p">)</span>
+   
+    <span class="c"># Read the counts.  These reference the above streets and intersections.</span>
+    <span class="n">mainline_processed</span>  <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">mainline_attempted</span>  <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">turns_processed</span>     <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">turns_attempted</span>     <span class="o">=</span> <span class="mi">0</span>
     
-    <span class="c"># And the intersections</span>
-    <span class="n">intersection_ids</span> <span class="o">=</span> <span class="n">xl_parser</span><span class="o">.</span><span class="n">readIntersectionIds</span><span class="p">(</span> <span class="s">r&quot;Q:\Model Development\CountDracula\1_CountDracula_Creation\_EXCEL_CUBE_INPUTS\Intersections.xls&quot;</span><span class="p">)</span>
-    <span class="n">cd_writer</span><span class="o">.</span><span class="n">insertIntersectionIds</span><span class="p">(</span><span class="n">intersection_ids</span><span class="p">)</span>
-    
-    <span class="c"># Finally, read the counts.  These reference the above streets and intersections.</span>
-    <span class="nb">dir</span> <span class="o">=</span> <span class="s">r&quot;Q:\Model Development\CountDracula\2_Files_UPLOADABLE_standardized\Standardized\0 ALL&quot;</span>
-    <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">counts_input</span><span class="p">):</span>
+        <span class="nb">dir</span> <span class="o">=</span> <span class="n">counts_input</span>
+        <span class="n">files_to_process</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">counts_input</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="p">(</span><span class="nb">dir</span><span class="p">,</span><span class="nb">file</span><span class="p">)</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">counts_input</span><span class="p">)</span>
+        <span class="n">files_to_process</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">file</span> <span class="p">]</span>
+        
+    <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">files_to_process</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">file</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">!=</span><span class="s">&#39;.xls&#39;</span><span class="p">:</span>
             <span class="k">print</span> <span class="s">&quot;File suffix is not .xls: </span><span class="si">%s</span><span class="s"> -- skipping&quot;</span> <span class="o">%</span> <span class="nb">file</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span>
             <span class="k">continue</span>
@@ -211,16 +275,24 @@
         <span class="k">try</span><span class="p">:</span>
             
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">streetlist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">mainline_attempted</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">mainlineCountList</span> <span class="o">=</span> <span class="n">xl_parser</span><span class="o">.</span><span class="n">readMainlineCounts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="nb">file</span><span class="p">),</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cd_reader</span><span class="p">)</span>
                 <span class="n">cd_writer</span><span class="o">.</span><span class="n">insertMainlineCounts</span><span class="p">(</span><span class="n">mainlineCountList</span><span class="p">)</span>
-                            
+                <span class="n">mainline_processed</span> <span class="o">+=</span> <span class="mi">1</span>
+                                           
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">streetlist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">turns_attempted</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">turnCountList</span> <span class="o">=</span> <span class="n">xl_parser</span><span class="o">.</span><span class="n">readTurnCounts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="nb">file</span><span class="p">),</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cd_reader</span><span class="p">)</span>
                 <span class="n">cd_writer</span><span class="o">.</span><span class="n">insertTurnCounts</span><span class="p">(</span><span class="n">turnCountList</span><span class="p">)</span>
+                <span class="n">turns_processed</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>    
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+
     
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Mainline counts: </span><span class="si">%4d</span><span class="s"> processed out of </span><span class="si">%4d</span><span class="s"> attempts&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mainline_processed</span><span class="p">,</span> <span class="n">mainline_attempted</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Turn     counts: </span><span class="si">%4d</span><span class="s"> processed out of </span><span class="si">%4d</span><span class="s"> attempts&quot;</span> <span class="o">%</span> <span class="p">(</span>   <span class="n">turns_processed</span><span class="p">,</span>    <span class="n">turns_attempted</span><span class="p">))</span>
 </pre></div>
 </td></tr></table></div>
 </div>
@@ -380,7 +452,7 @@
 <p class="first admonition-title">Todo</p>
 <p class="last">Isn&#8217;t <em>from_angle</em> and <em>to_angle</em> something we can calculate here?</p>
 </div>
-<p class="todo-source">(The <a class="reference internal" href="_generated/countdracula.CountsDatabaseReader.html#index-0"><em>original entry</em></a> is located in  _generated\countdracula.CountsDatabaseReader.rst, line 106.)</p>
+<p class="todo-source">(The <a class="reference internal" href="_generated/countdracula.CountsDatabaseReader.html#index-0"><em>original entry</em></a> is located in  _generated\countdracula.CountsDatabaseReader.rst, line 108.)</p>
 <div class="admonition-todo admonition " id="index-0">
 <p class="first admonition-title">Todo</p>
 <p class="last">This table of streetnames is for ...?</p>
@@ -388,29 +460,19 @@
 <p class="todo-source">(The <a class="reference internal" href="tables.html#index-0"><em>original entry</em></a> is located in  tables.rst, line 57.)</p>
 <div class="admonition-todo admonition " id="index-1">
 <p class="first admonition-title">Todo</p>
-<p class="last">why are spaces not in the short_name field?</p>
+<p class="last">is nospace_name = short_name + suffix with spaces removed?</p>
 </div>
 <p class="todo-source">(The <a class="reference internal" href="tables.html#index-1"><em>original entry</em></a> is located in  tables.rst, line 58.)</p>
 <div class="admonition-todo admonition " id="index-2">
 <p class="first admonition-title">Todo</p>
-<p class="last">is nospace_name = short_name + suffix with spaces removed?</p>
+<p class="last">is street_name = short_name + &#8221; &#8221; + suffix?</p>
 </div>
 <p class="todo-source">(The <a class="reference internal" href="tables.html#index-2"><em>original entry</em></a> is located in  tables.rst, line 59.)</p>
 <div class="admonition-todo admonition " id="index-3">
 <p class="first admonition-title">Todo</p>
-<p class="last">is street_name = short_name + &#8221; &#8221; + suffix?</p>
-</div>
-<p class="todo-source">(The <a class="reference internal" href="tables.html#index-3"><em>original entry</em></a> is located in  tables.rst, line 60.)</p>
-<div class="admonition-todo admonition " id="index-4">
-<p class="first admonition-title">Todo</p>
 <p class="last">what about alternative names?</p>
 </div>
-<p class="todo-source">(The <a class="reference internal" href="tables.html#index-4"><em>original entry</em></a> is located in  tables.rst, line 61.)</p>
-<div class="admonition-todo admonition " id="index-5">
-<p class="first admonition-title">Todo</p>
-<p class="last">duplicative of intersection_ids ?</p>
-</div>
-<p class="todo-source">(The <a class="reference internal" href="tables.html#index-5"><em>original entry</em></a> is located in  tables.rst, line 101.)</p>
+<p class="todo-source">(The <a class="reference internal" href="tables.html#index-3"><em>original entry</em></a> is located in  tables.rst, line 60.)</p>
 </div>
 
 

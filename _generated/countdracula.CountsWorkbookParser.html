@@ -104,18 +104,18 @@ which postgres can interpret (e.g. <cite>1 day</cite>, <cite>34 minute</cite>)</
 <dt id="countdracula.CountsWorkbookParser.readIntersectionIds">
 <tt class="descname">readIntersectionIds</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#countdracula.CountsWorkbookParser.readIntersectionIds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads an excel workbook with intersection information (see exampledataintersections.xls) and returns
-the rows, for use with <a class="reference internal" href="countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter.insertIntersectionIds" title="countdracula.CountsDatabaseWriter.insertIntersectionIds"><tt class="xref py py-meth docutils literal"><span class="pre">CountsDatabaseWriter.insertIntersectionIds()</span></tt></a></p>
+the rows, for use with <tt class="xref py py-meth docutils literal"><span class="pre">CountsDatabaseWriter.insertIntersectionIds()</span></tt></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="countdracula.CountsWorkbookParser.readMainlineCounts">
-<tt class="descname">readMainlineCounts</tt><big>(</big><em>file</em>, <em>primary_street</em>, <em>from_crossstreet</em>, <em>to_crossstreet</em>, <em>cdreader</em><big>)</big><a class="headerlink" href="#countdracula.CountsWorkbookParser.readMainlineCounts" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">readMainlineCounts</tt><big>(</big><em>file</em>, <em>primary_street</em>, <em>cross_street1</em>, <em>cross_street2</em>, <em>cdreader</em><big>)</big><a class="headerlink" href="#countdracula.CountsWorkbookParser.readMainlineCounts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the given excel file representing mainline counts into a table of values for the countdracula database.</p>
 <ul class="simple">
-<li><em>file</em> is the Excel workbook file</li>
-<li><em>streetname1</em> is the NS-oriented street</li>
-<li><em>streetname2</em> is the EW-oriented street</li>
-<li><em>cdreader</em> is an instance of a CountsDatabaseReader, used to lookup the relevant streets and intersection.</li>
+<li><em>file</em> is the Excel workbook file name</li>
+<li><em>primary_street</em> is the street on which the counts were taken</li>
+<li><em>cross_street1</em> and <em>cross_street2</em> are the bounding cross streets</li>
+<li><em>cdreader</em> is an instance of a <a class="reference internal" href="countdracula.CountsDatabaseReader.html#countdracula.CountsDatabaseReader" title="countdracula.CountsDatabaseReader"><tt class="xref py py-class docutils literal"><span class="pre">CountsDatabaseReader</span></tt></a>, used to lookup the relevant streets and intersections</li>
 </ul>
 <p>Returns a table of values for the countdracula database, for use with <a class="reference internal" href="countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter.insertMainlineCounts" title="countdracula.CountsDatabaseWriter.insertMainlineCounts"><tt class="xref py py-meth docutils literal"><span class="pre">CountsDatabaseWriter.insertMainlineCounts()</span></tt></a></p>
 </dd></dl>
@@ -137,15 +137,22 @@ the rows, for use with <a class="reference internal" href="countdracula.CountsDa
 
 <dl class="method">
 <dt id="countdracula.CountsWorkbookParser.readTurnCounts">
-<tt class="descname">readTurnCounts</tt><big>(</big><em>file</em>, <em>streetname1</em>, <em>streetname2</em>, <em>cdreader</em><big>)</big><a class="headerlink" href="#countdracula.CountsWorkbookParser.readTurnCounts" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">readTurnCounts</tt><big>(</big><em>file</em>, <em>street1</em>, <em>street2</em>, <em>cdreader</em><big>)</big><a class="headerlink" href="#countdracula.CountsWorkbookParser.readTurnCounts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the given excel file representing turn counts into a table of values for the countdracula database.</p>
 <ul class="simple">
 <li><em>file</em> is the Excel workbook file</li>
-<li><em>streetname1</em> is the NS-oriented street</li>
-<li><em>streetname2</em> is the EW-oriented street</li>
-<li><em>cdreader</em> is an instance of a CountsDatabaseReader, used to lookup the relevant streets and intersection.</li>
+<li><em>street1</em> is the name of the NS-oriented street</li>
+<li><em>street2</em> is the name of the EW-oriented street</li>
+<li><em>cdreader</em> is an instance of a <a class="reference internal" href="countdracula.CountsDatabaseReader.html#countdracula.CountsDatabaseReader" title="countdracula.CountsDatabaseReader"><tt class="xref py py-class docutils literal"><span class="pre">CountsDatabaseReader</span></tt></a>, used to lookup the relevant streets and intersection</li>
 </ul>
 <p>Returns a table of values for the countdracula database, for use with <a class="reference internal" href="countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter.insertTurnCounts" title="countdracula.CountsDatabaseWriter.insertTurnCounts"><tt class="xref py py-meth docutils literal"><span class="pre">CountsDatabaseWriter.insertTurnCounts()</span></tt></a></p>
+<p>Note that this method is a little counter-intuitive because the arguments determine the way the movements are stored in
+the database.  For example, suppose you have an intersection where the street changes names from &#8220;SouthOne Street&#8221; to 
+&#8220;SouthTwo Street&#8221; as it passes through an intersection with &#8220;EastWest Street&#8221;.  This method would be called with
+street1=&#8221;SouthOne Street&#8221; and street2=&#8221;EastWest Street&#8221; and the through movement would be stored with
+from_street=&#8221;SouthOne Street&#8221; fromdir=&#8221;SB&#8221;, tostreet=&#8221;SouthOne Street&#8221; todir=&#8221;SB&#8221; even though &#8220;SouthOne Street&#8221;
+doesn&#8217;t have a southbound link from the intersection, since it&#8217;s really &#8220;SouthTwo Street&#8221;.  Thus, using this
+implementation, the fromstreet and tostreet define the intersection only, and not the movement.</p>
 </dd></dl>
 
 </dd></dl>

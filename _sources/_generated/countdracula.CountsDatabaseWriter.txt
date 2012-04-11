@@ -14,8 +14,9 @@ countdracula.CountsDatabaseWriter
    .. autosummary::
    
       ~CountsDatabaseWriter.__init__
-      ~CountsDatabaseWriter.insertIntersectionIds
       ~CountsDatabaseWriter.insertMainlineCounts
+      ~CountsDatabaseWriter.insertNodeStreets
+      ~CountsDatabaseWriter.insertNodes
       ~CountsDatabaseWriter.insertStreetNames
       ~CountsDatabaseWriter.insertTurnCounts
    

@@ -55,7 +55,6 @@ direction      text      Initial values are `NB`, `SB`, `EB`, and `WB`
 street_names Table
 ------------------
 .. todo:: This table of streetnames is for ...?
-.. todo:: why are spaces not in the short_name field?
 .. todo:: is nospace_name = short_name + suffix with spaces removed?
 .. todo:: is street_name = short_name + " " + suffix?
 .. todo:: what about alternative names?
@@ -65,32 +64,10 @@ Can be updated with :py:meth:`countdracula.CountsDatabaseWriter.insertStreetName
 ============== ========= =======================================================
 column name    data type notes
 ============== ========= =======================================================
-street_name    text      primary key.  e.g. *CESARCHAVEZ ST*
+street_name    text      primary key.  e.g. *CESAR CHAVEZ ST*
 nospace_name   text      name without spaces. e.g. *CESARCHAVEZST*
-short_name     text      name without suffix. e.g. *CESARCHAVEZ*
+short_name     text      name without suffix. e.g. *CESAR CHAVEZ*
 suffix         text      *BLVD*, *AVE*, etc
-============== ========= =======================================================
-
-.. _table-intersection_ids:
-
-intersection_ids Table
-----------------------
-
-This table corresonds intersections with their named streets as well as
-their latitude/longitude coordinates.  The table has no primary key but 
-it does have the constraint that (street1, street2) is unique.
-Can be updated with :py:meth:`countdracula.CountsDatabaseWriter.insertIntersectionIds`
-
-============== ========= =======================================================
-column name    data type notes
-============== ========= =======================================================
-street1        text      corresponds to *street_name* in 
-                         :ref:`table-street_names`
-street2        text      corresponds to *street_name* in 
-                         :ref:`table-street_names`
-int_id         integer   corresponds to *int_id* in :ref:`table-nodes`
-long_x         double    longitude of the intersection
-lat_y          double    latitude of the intersection
 ============== ========= =======================================================
 
 .. _table-nodes:
@@ -98,14 +75,31 @@ lat_y          double    latitude of the intersection
 nodes Table
 -----------
 
-.. todo:: duplicative of intersection_ids ?
+Master list of (intersection) nodes and their coordinates.
 
 ============== ========= =======================================================
 column name    data type notes
 ============== ========= =======================================================
 int_id         integer   primary key
-long_x         double
-lat_y          double
+long_x         double    x-coordinate (could be longitude but not necessary)
+lat_y          double    y-coordinate (could be latitutde but not necessary)
+============== ========= =======================================================
+
+.. _table-node_streets:
+
+node_streets Table
+------------------
+
+This table corresonds intersections with their named streets. The table has no
+primary key but it does have the constraint that (int_id, street) is unique.
+Can be updated with :py:meth:`countdracula.CountsDatabaseWriter.insertNodeStreets`
+
+============== ========= =======================================================
+column name    data type notes
+============== ========= =======================================================
+int_id         integer   corresponds to *int_id* in :ref:`table-nodes`
+street         text      corresponds to *street_name* in 
+                         :ref:`table-street_names`
 ============== ========= =======================================================
 
 .. _table-counts_turns:
@@ -165,7 +159,8 @@ fromstreet     text      cross street before count, corresponds to *street_name*
                          in :ref:`table-street_names`
 tostreet       text      cross street before count, corresponds to *street_name*
                          in :ref:`table-street_names`
-refpos         float     ???
+refpos         float     reference position for how far along the link the count
+                         was actually taken; use -1 for uknown
 sourcefile     text      labeling string to keep track of where this came from
 project        text      another labeling string for tracking, meant to be used
                          when the counts were gathered for a specific project

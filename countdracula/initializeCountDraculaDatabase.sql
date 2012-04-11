@@ -63,23 +63,20 @@ suffix text
 
 ------------------------------------------------------------
 
-CREATE TABLE intersection_ids (
-street1 text REFERENCES street_names ON UPDATE CASCADE,
-street2 text REFERENCES street_names ON UPDATE CASCADE,
-int_id int,
-long_x float,
-lat_y float
-);
-
-ALTER TABLE intersection_ids ADD UNIQUE (street1,street2);
-
 CREATE TABLE nodes (
 int_id int PRIMARY KEY,
 long_x float,
 lat_y float
 );
 
-ALTER TABLE intersection_ids ADD FOREIGN KEY (int_id) REFERENCES nodes ON UPDATE CASCADE;
+------------------------------------------------------------
+
+CREATE TABLE node_streets (
+int_id int REFERENCES nodes ON UPDATE CASCADE,
+street_name text REFERENCES street_names ON UPDATE CASCADE
+);
+
+ALTER TABLE node_streets ADD UNIQUE (int_id,street_name);
 
 ------------------------------------------------------------
 
@@ -124,7 +121,7 @@ ALTER TABLE counts_turns ADD UNIQUE (count,starttime,vtype,period,fromstreet,fro
 GRANT SELECT ON counts_ml        TO cdreader;
 GRANT SELECT ON counts_turns     TO cdreader;
 GRANT SELECT ON directions       TO cdreader;
-GRANT SELECT ON intersection_ids TO cdreader;
+GRANT SELECT ON node_streets     TO cdreader;
 GRANT SELECT ON nodes            TO cdreader;
 GRANT SELECT ON street_names     TO cdreader;
 GRANT SELECT ON vtype            TO cdreader;
@@ -132,7 +129,7 @@ GRANT SELECT ON vtype            TO cdreader;
 GRANT SELECT,INSERT,UPDATE,DELETE ON counts_ml        TO cdadmin;
 GRANT SELECT,INSERT,UPDATE,DELETE ON counts_turns     TO cdadmin;
 GRANT SELECT,INSERT,UPDATE,DELETE ON directions       TO cdadmin;
-GRANT SELECT,INSERT,UPDATE,DELETE ON intersection_ids TO cdadmin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON node_streets     TO cdadmin;
 GRANT SELECT,INSERT,UPDATE,DELETE ON nodes            TO cdadmin;
 GRANT SELECT,INSERT,UPDATE,DELETE ON street_names     TO cdadmin;
 GRANT SELECT,INSERT,UPDATE,DELETE ON vtype            TO cdadmin;

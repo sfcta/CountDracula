@@ -340,37 +340,50 @@ class CountsDatabaseReader(object):
         """
         Given a street name string, looks up the name in the various columns of the :ref:`table-street_names`
         and returns a list of the possible street_names (first column).
+        
+        This search is case-insensitive.
         """
         cur2db = self._conn2db.cursor()
         
-        cur2db.execute("SELECT street_name from street_names where upper(street_name) = %s ;", (name.upper(),));
+        cur2db.execute("SELECT street_name from street_names where upper(street_name) = %s ;", (name.upper(),))
         entries = cur2db.fetchall()
         if len(entries) > 0:
             return list(i for i, in entries)
         
-        cur2db.execute("SELECT street_name from street_names where upper(nospace_name) = %s ;", (name.upper(),));
+        cur2db.execute("SELECT street_name from street_names where upper(nospace_name) = %s ;", (name.upper().replace(" ",""),))
         entries = cur2db.fetchall()
         if len(entries) > 0:
             return list(i for i, in entries)
 
-        cur2db.execute("SELECT street_name from street_names where upper(short_name) = %s ;", (name.upper(),));
+        cur2db.execute("SELECT street_name from street_names where upper(short_name) = %s ;", (name.upper(),))
         entries = cur2db.fetchall()
-        return list(i for i, in entries)
+        if len(entries) > 0:
+            return list(i for i, in entries)
         
-    def getIntersectionId(self,NSstreet,EWstreet):
+        # see if we can match the nospace_name with a wild card for the suffix
+        cur2db.execute("SELECT street_name from street_names where nospace_name LIKE '" + name.upper().replace(" ","") + "%' ;")
+        entries = cur2db.fetchall()
+        if len(entries) > 0:
+            return list(i for i, in entries)
+        
+        return []
+        
+    def getIntersectionIdsForStreets(self,street1,street2):
         """
-        Given a NS street and an EW street, looks for the intersection id of their intersection.
+        Given a two streets, returns a set of the intersection ids matching both.
         
-        Returns the intersection id or None, if none is found.
+        *street1* and *street2* are matched against the *street_name* field in :ref:`table-node_streets`
         """
         cur2db = self._conn2db.cursor()
 
-        cur2db.execute("SELECT int_id from intersection_ids WHERE ((street1=%s AND street2=%s) OR (street1=%s AND street2=%s));",
-                       (NSstreet,EWstreet,EWstreet,NSstreet))
-        result = cur2db.fetchone()
-        if result:
-            result = result[0]
+        cur2db.execute("SELECT int_id from node_streets WHERE street_name=%s ;", (street1,))
+        result1 = cur2db.fetchall()
+        result1 = set(i for i, in result1)
 
-        return result
+        cur2db.execute("SELECT int_id from node_streets WHERE street_name=%s ;", (street2,))
+        result2 = cur2db.fetchall()
+        result2 = set(i for i, in result2)        
+        
+        return result1 & result2
         
         

@@ -4,7 +4,7 @@ Created on Jul 25, 2011
 @author: varun
 '''
 
-import logging, psycopg2
+import logging, psycopg2, sys
 
 class CountsDatabaseWriter(object):
     '''
@@ -45,9 +45,10 @@ class CountsDatabaseWriter(object):
         
     def insertMainlineCounts(self, countsList):
         """
-        Inserts counts to table counts_ml
+        Inserts *countsList* into the :ref:`table-counts_ml`; see that documentation for more on
+        what these variables actually represent.
         
-        countsList is a list of tuples, each tuple containing the following values:
+        countsList is a list of tuples, each tuple containing the following values; 
         
          * *count*
          * *starttime*
@@ -60,7 +61,9 @@ class CountsDatabaseWriter(object):
          * *refpos*
          * *sourcefile*
          * *project*
-                
+        
+        Database errors will be ignored.
+        
         """
         
         upload_count = 0
@@ -76,7 +79,8 @@ class CountsDatabaseWriter(object):
                                "(%s, %s, %s ,%s ,%s ,%s ,%s ,%s ,%s ,%s ,%s )", count_tuple)
                 self._conn2db.commit()
                 upload_count+=1
-            except psycopg2.IntegrityError:
+            except psycopg2.IntegrityError as e:
+                # print str(e)
                 #print command
                 #print "Error inserting in DB"
                 duplicate_count += 1
@@ -151,67 +155,84 @@ class CountsDatabaseWriter(object):
         if duplicate_count !=0:
             self._logger.info("insertTurnCounts: %4d duplicate or erroneous count(s) found and skipped." % duplicate_count)
             
-    def insertIntersectionIds(self, intersectionList):    #uploads intersection ids table
-        """
-        Inserts the given list of intersections into the :ref:`table-intersection_ids`.
-        
-        The *intersectionList* is a list of tuples with the following values:
 
-        * *streetname1* - should correspond with a nospace_name or street_name from :ref:`table-street_names`.
-        * *streetname2* - should correspond with a nospace_name or street_name from :ref:`table-street_names`.
+    def insertNodes(self, nodeList):
+        """
+        Inserts the given list of intersection nodes into the :ref:`table-nodes`.
+
+        The *nodeList* is a list of tuples with the following values:
+        
         * *intersection_id* - an integer id.
-        * *longitude* - the longitude of the intersection.
-        * *latitude* - the latitude of the intersection.
+        * *x* - the x coordinate, such as the latitude
+        * *y* - the y coordinate, such as the longitude
+        
+        """
+        cur2db = self._conn2db.cursor()
+        
+        insert_count = 0
+        for intersection_tuple in nodeList:
+            
+            try:
+                cur2db.execute("INSERT INTO nodes (int_id, long_x, lat_y) values (%s, %s, %s)",
+                               (intersection_tuple[0],intersection_tuple[1], intersection_tuple[2]))
+                insert_count += 1
+            except Exception, e: 
+                # self._logger.warn(e.pgerror)
+                pass
+                        
+        self._conn2db.commit()
+        cur2db.close()
+        
+        self._logger.info("insertNodes: %4d intersection ids inserted out of %4d" % (insert_count, len(nodeList)))
+                
+    def insertNodeStreets(self, nodeStreetList):
+        """
+        Inserts the given list of intersections into the :ref:`table-node_streets`.
+        
+        The *nodeStreetList* is a list of tuples with the following values:
+
+        * *intersection_id* - an integer id, should correspond with an int_id from :ref:`table-nodes`.
+        * *streetname* - should correspond with a street_name or nospace_name from :ref:`table-street_names`.
         
         Can be used with :py:meth:`CountsWorkbookParser.readIntersectionIds`
         """
         
         cur2db = self._conn2db.cursor()
         
-        #________________THIS IS ONLY FOR TESTING !!!
-        #OR EMPTY EXISTING INTERSECTIONS BEFORE ENTERING NEW TABLE
-        # cur2db.execute("DELETE from intersection_ids;")
-        # cur2db.execute("DELETE from nodes;")
-        # cur2db.execute("ALTER TABLE intersection_ids DROP CONSTRAINT intersection_ids_int_id_fkey;")
-        
         insert_count = 0
-        for intersection_tuple in intersectionList:
-            #ONLY done if street-pair doesn't exist already 
-            cur2db.execute("Select street_name from street_names where nospace_name = %s or street_name = %s",
-                           (intersection_tuple[0],intersection_tuple[0]))
-            street1 = cur2db.fetchone()
-            
-            cur2db.execute("Select street_name from street_names where nospace_name = %s or street_name = %s",
+        for intersection_tuple in nodeStreetList:
+            try:
+                cur2db.execute("Select street_name from street_names where nospace_name = %s or street_name = %s",
                            (intersection_tuple[1],intersection_tuple[1]))
-            street2 = cur2db.fetchone()
+                street = cur2db.fetchone()
+            except Exception, e:
+                # self._logger.warn(e.pgerror)
+                continue
             
-            if street1==None or street2==None:
-                self._logger.warn("insertIntersectionIds: street %s or %s not found in street_names table -- skipping" %
-                                  (intersection_tuple[0],intersection_tuple[1]))
+            if street==None:
+                self._logger.warn("insertNodeStreets: street %s not found in street_names table -- skipping" %
+                                  intersection_tuple[1])
                 continue
             
             # update nodes
-            cur2db.execute("SELECT int_id, long_x, lat_y FROM nodes WHERE int_id=%d;" % intersection_tuple[2])
-            nodes_tuple = cur2db.fetchone()
-            if nodes_tuple == None:
-                cur2db.execute("INSERT INTO nodes (int_id, long_x, lat_y) values (%s, %s, %s)", 
-                               (intersection_tuple[2], intersection_tuple[3], intersection_tuple[4]))
-                self._conn2db.commit()
-            elif nodes_tuple[1] != intersection_tuple[3] or nodes_tuple[2] != intersection_tuple[4]:
-                self._logger.warn("Inserting intersection %d with coordinates (%f, %f) that mismatch existing nodes table coordinates (%f,%f) -- skipping" %
-                                  (intersection_tuple[2], intersection_tuple[3], intersection_tuple[4],
-                                   nodes_tuple[1], nodes_tuple[2]))
+            cur2db.execute("SELECT int_id FROM nodes WHERE int_id=%d;" % intersection_tuple[0])
+            nodes_id= cur2db.fetchone()
+            if nodes_id == None:
+                self._logger.warn("insertNodeStreets: node %d not found in nodes table -- skipping" % intersection_tuple[0])
                 continue
             
-            cur2db.execute("INSERT INTO intersection_ids (street1, street2, int_id, long_x, lat_y) " +
-                           "SELECT %s, %s, %s,%s,%s  WHERE NOT EXISTS (SELECT street1, street2 FROM intersection_ids WHERE street1 = %s AND street2 = %s);",
-                           (street1,street2,intersection_tuple[2],intersection_tuple[3],intersection_tuple[4],street1,street2))
-            insert_count += 1
+            try:          
+                cur2db.execute("INSERT INTO node_streets (int_id, street_name) values (%s, %s)",
+                               (intersection_tuple[0],street))
+                insert_count += 1
+            except Exception, e: 
+                # self._logger.warn(e.pgerror)
+                pass
             
         self._conn2db.commit()
         cur2db.close()
         
-        self._logger.info("insertIntersectionIds: %4d intersection ids inserted" % insert_count)
+        self._logger.info("insertIntersectionIds: %4d intersection ids inserted out of %4d" % (insert_count, len(nodeStreetList)))
         
         
     def insertStreetNames(self, streetnameList):
@@ -221,8 +242,8 @@ class CountsDatabaseWriter(object):
         
         The *streetnameList* is a list of tuples with the following values:
         
-        * *street_name* Necessary?
-        * *nospace_name* Necessary?
+        * *street_name* 
+        * *nospace_name*
         * *short_name*
         * *suffix*
         
@@ -230,10 +251,21 @@ class CountsDatabaseWriter(object):
         """
         cur2db = self._conn2db.cursor()
 
+        insert_count = 0
         for streetname_tuple in streetnameList:
-            try:
+            
+            # if the streetname is already in there *with a suffix* and we have no suffix, then skip
+            if streetname_tuple[3]=="":
+                cur2db.execute("SELECT street_name, nospace_name, short_name, suffix from street_names where short_name = %s ;", (streetname_tuple[2],))
+                result = cur2db.fetchall()
+                if len(result) > 0: 
+                    self._logger.warn("Assuming that existing street_names entry %s is the same as given entry %s, skipping" % (result, streetname_tuple))
+                    continue
+                                
+            try:                    
                 cur2db.execute("INSERT INTO street_names VALUES (%s, %s, %s, %s)",
                                streetname_tuple)
+                insert_count += 1
             except Exception, e: 
                 # self._logger.warn(e.pgerror)
                 pass
@@ -247,4 +279,6 @@ class CountsDatabaseWriter(object):
         
         self._conn2db.commit()
         cur2db.close()
+        
+        self._logger.info("insertStreetNames: %4d streets inserted out of %4d" % (insert_count, len(streetnameList)))
 

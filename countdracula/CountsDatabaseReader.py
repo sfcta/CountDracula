@@ -82,7 +82,7 @@ class CountsDatabaseReader(object):
                 counts[key] += 1
         return counts
     
-    def _getCounts(self, starttime, period, num_intervals, type):
+    def _getCounts(self, starttime, period, num_intervals, type, from_date, to_date, weekdays):
         """
         Internal helper to not repeat code.  *type* is one of ``turns`` or ``mainline``.
         
@@ -99,21 +99,38 @@ class CountsDatabaseReader(object):
             
             #Get avg of counts for the given movement and timeperiod
             if type=="turns":
-                cmd = "SELECT count,fromstreet,fromdir,tostreet,todir,intstreet,intid from counts_turns " + \
+                cmd = "SELECT count,starttime,fromstreet,fromdir,tostreet,todir,intstreet,intid from counts_turns " + \
                       "where starttime::time=%s and period=%s"
             elif type=="mainline":
-                cmd = "SELECT count,onstreet,ondir,fromstreet,tostreet from counts_ml " + \
+                cmd = "SELECT count,starttime,onstreet,ondir,fromstreet,tostreet from counts_ml " + \
                         "where starttime::time=%s and period=%s"
             else:
                 raise CountsDatabaseReaderError("_getCounts requires type=`turns` or type=`mainline`; type=`%s`" % type)
-                      
-            cur2db.execute(cmd, (currenttime.time(), period))
+            
+            args = [currenttime.time(), period]
+            if from_date:
+                cmd += " and starttime::date>=%s"
+                args.append(from_date)
+            if to_date:
+                cmd += " and starttime::date<=%s"
+                args.append(to_date)
+            if weekdays:
+                cmd += " and ("
+                for idx in range(len(weekdays)):
+                    # input: Monday is 0
+                    # pgsql: Sunday is 0 Monday is 1
+                    cmd += "date_part('DOW', starttime)=%d" % (weekdays[idx] + 1 % 7)
+                    if idx < len(weekdays)-1: cmd += " or "
+                cmd += ")"
+
+            #self._logger.debug(cmd)
+            cur2db.execute(cmd, args)
             results = cur2db.fetchall()
             for row in results:
                 if type=="turns":
-                    key = (row[1],row[2],row[3],row[4],row[5],row[6])
+                    key = (row[2],row[3],row[4],row[5],row[6],row[7])
                 elif type=="mainline":
-                    key = (row[1],row[2],row[3],row[4])
+                    key = (row[2],row[3],row[4],row[5])
 
                 # haven't seen this before, initialize previous counts to unknown
                 if key not in counts:
@@ -134,6 +151,8 @@ class CountsDatabaseReader(object):
                 counts[key][interval_num]  += row[0]
                 days[key][interval_num]    += 1
                 
+                #self._logger.debug(row)
+                
             # update the time
             currenttime += period
         
@@ -150,23 +169,36 @@ class CountsDatabaseReader(object):
                     counts[key][interval_num] = float(counts[key][interval_num])/float(days[key][interval_num])
         return counts
 
-    def getMainlineCounts(self, starttime, period, num_intervals):
+    def getMainlineCounts(self, starttime, period, num_intervals, from_date=None, to_date=None, weekdays=None):
         """
         Retrieve all the mainline counts available from the database for the given *starttime* (a datetime.time instance) for 
         *num_intervals* (int) of the given *period* (a datetime.timedelta instance).
         
+        If *from_date* is passed (a datetime.date instance), then counts will be on or after *from_date*.
+        If *to_date* is passed (a datetime.date instance), then counts will be on or before *to_date*.
+        If *weekdays* is passed (a list of integers, where Monday is 0 and Sunday is 6), then counts will
+        only include the given weekdays.
+        
         Returns table with: (onstreet, ondir, fromstreet, tostreet, intersection id) -> [*num_intervals* counts]
         """
-        return self._getCounts(starttime, period, num_intervals, type="mainline")
+        return self._getCounts(starttime, period, num_intervals, type="mainline",
+                               from_date=from_date, to_date=to_date, weekdays=weekdays)
     
-    def getTurningCounts(self, starttime, period, num_intervals):
+    def getTurningCounts(self, starttime, period, num_intervals, from_date=None, to_date=None, weekdays=None):
         """
         Retrieve all the turning counts available from the database for the given *starttime* (a datetime.time instance) for 
         *num_intervals* (int) of the given *period* (a datetime.timedelta instance).
         
+        If *from_date* is passed (a datetime.date instance), then counts will be on or after *from_date*.
+        If *to_date* is passed (a datetime.date instance), then counts will be on or before *to_date*.
+        If *weekdays* is passed (a list of integers, where Monday is 0 and Sunday is 6), then counts will
+        only include the given weekdays.
+        
         Returns table with: (fromstreet, fromdir, tostreet, todir, intersection id) -> [*num_intervals* counts]
         """
-        return self._getCounts(starttime, period, num_intervals, type="turns")            
+        return self._getCounts(starttime, period, num_intervals, type="turns",
+                               from_date=from_date, to_date=to_date, weekdays=weekdays)
+                               
     
     def getTurningCountsForMovement(self, at_node, from_node, to_node, from_angle, to_angle, starttime, period, num_intervals):
         """

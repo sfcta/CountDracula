@@ -52,7 +52,7 @@
 <h1>countdracula.CountsDatabaseReader<a class="headerlink" href="#countdracula-countsdatabasereader" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="countdracula.CountsDatabaseReader">
-<em class="property">class </em><tt class="descname">CountsDatabaseReader</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027A6DF0&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descname">CountsDatabaseReader</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x02841850&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Class to handle read operations to the Counts database</p>
 <p>Constructor; connects to the counts database with the given credentials.</p>
@@ -68,7 +68,7 @@
 <p>TODO: optional port?</p>
 <dl class="method">
 <dt id="countdracula.CountsDatabaseReader.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x027A6DF0&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x02841850&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor; connects to the counts database with the given credentials.</p>
 <blockquote>
 <div><ul class="simple">
@@ -133,9 +133,13 @@
 
 <dl class="method">
 <dt id="countdracula.CountsDatabaseReader.getMainlineCounts">
-<tt class="descname">getMainlineCounts</tt><big>(</big><em>starttime</em>, <em>period</em>, <em>num_intervals</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getMainlineCounts" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">getMainlineCounts</tt><big>(</big><em>starttime</em>, <em>period</em>, <em>num_intervals</em>, <em>from_date=None</em>, <em>to_date=None</em>, <em>weekdays=None</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getMainlineCounts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve all the mainline counts available from the database for the given <em>starttime</em> (a datetime.time instance) for 
 <em>num_intervals</em> (int) of the given <em>period</em> (a datetime.timedelta instance).</p>
+<p>If <em>from_date</em> is passed (a datetime.date instance), then counts will be on or after <em>from_date</em>.
+If <em>to_date</em> is passed (a datetime.date instance), then counts will be on or before <em>to_date</em>.
+If <em>weekdays</em> is passed (a list of integers, where Monday is 0 and Sunday is 6), then counts will
+only include the given weekdays.</p>
 <p>Returns table with: (onstreet, ondir, fromstreet, tostreet, intersection id) -&gt; [<em>num_intervals</em> counts]</p>
 </dd></dl>
 
@@ -157,9 +161,13 @@ and returns a list of the possible street_names (first column).</p>
 
 <dl class="method">
 <dt id="countdracula.CountsDatabaseReader.getTurningCounts">
-<tt class="descname">getTurningCounts</tt><big>(</big><em>starttime</em>, <em>period</em>, <em>num_intervals</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getTurningCounts" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">getTurningCounts</tt><big>(</big><em>starttime</em>, <em>period</em>, <em>num_intervals</em>, <em>from_date=None</em>, <em>to_date=None</em>, <em>weekdays=None</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getTurningCounts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve all the turning counts available from the database for the given <em>starttime</em> (a datetime.time instance) for 
 <em>num_intervals</em> (int) of the given <em>period</em> (a datetime.timedelta instance).</p>
+<p>If <em>from_date</em> is passed (a datetime.date instance), then counts will be on or after <em>from_date</em>.
+If <em>to_date</em> is passed (a datetime.date instance), then counts will be on or before <em>to_date</em>.
+If <em>weekdays</em> is passed (a list of integers, where Monday is 0 and Sunday is 6), then counts will
+only include the given weekdays.</p>
 <p>Returns table with: (fromstreet, fromdir, tostreet, todir, intersection id) -&gt; [<em>num_intervals</em> counts]</p>
 </dd></dl>
 

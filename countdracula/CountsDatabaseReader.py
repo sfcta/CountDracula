@@ -57,7 +57,8 @@ class CountsDatabaseReader(object):
         if len(answer) == 1:
             return answer[0][0]  # answer = [(12345,)]
             
-        raise CountsDatabaseReaderError("Found %d nodes within %8.3f of (%8.3f,%8.3f)" % (len(answer), tolerance, node_x, node_y))
+        raise CountsDatabaseReaderError("Found %d nodes within %8.3f of (%8.3f,%8.3f)" % (len(answer), tolerance, node_x, node_y))     
+
     
     def countCounts(self, turning=True, mainline=True):
         """
@@ -418,4 +419,19 @@ class CountsDatabaseReader(object):
         
         return result1 & result2
         
+    def getStreetsForIntersectionId(self, node_id):
+        """
+        Returns a set of streetnames for the intersection with the id given by *node_id*.
         
+        Raises a :py:class:`CountsDatabaseReaderError` if no nodes are found.
+        """
+        cur2db = self._conn2db.cursor()
+        
+        cur2db.execute("SELECT street_name FROM node_streets WHERE int_id=%s ;", (node_id,))
+        result = cur2db.fetchall()
+        
+        if len(result) == 0:
+            raise CountsDatabaseReaderError("No streets found for node id %d" % node_id)
+        
+        result = set(i for i, in result)
+        return result

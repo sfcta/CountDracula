@@ -80,7 +80,7 @@ class CountsDatabaseWriter(object):
                 self._conn2db.commit()
                 upload_count+=1
             except psycopg2.IntegrityError as e:
-                # print str(e)
+                self._logger.debug(sys.exc_info())
                 #print command
                 #print "Error inserting in DB"
                 duplicate_count += 1
@@ -93,6 +93,8 @@ class CountsDatabaseWriter(object):
                                                  " user="    +self._user+
                                                  " password="+self._pw)
                 cur2db = self._conn2db.cursor()
+            except e:
+                self._logger.debug(sys.exc_info())
             
         self._conn2db.commit()
         cur2db.close()

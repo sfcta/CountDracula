@@ -6,7 +6,7 @@ Created on Jul 25, 2011
 
 
 """
-This script reads streetnames, intersection nodes and finally counts from input Excel workbooks and inserts the info into the CountDracula dataabase.
+This script reads counts data from input Excel workbooks and inserts the info into the CountDracula dataabase.
 
 """
 

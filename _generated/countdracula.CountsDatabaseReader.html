@@ -52,7 +52,7 @@
 <h1>countdracula.CountsDatabaseReader<a class="headerlink" href="#countdracula-countsdatabasereader" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="countdracula.CountsDatabaseReader">
-<em class="property">class </em><tt class="descname">CountsDatabaseReader</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x02841850&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descname">CountsDatabaseReader</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x028CD828&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Class to handle read operations to the Counts database</p>
 <p>Constructor; connects to the counts database with the given credentials.</p>
@@ -68,7 +68,7 @@
 <p>TODO: optional port?</p>
 <dl class="method">
 <dt id="countdracula.CountsDatabaseReader.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x02841850&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.__init__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__init__</tt><big>(</big><em>host='localhost'</em>, <em>database='countdracula'</em>, <em>username='cdreader'</em>, <em>pw=''</em>, <em>logger=&lt;logging.Logger instance at 0x028CD828&gt;</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor; connects to the counts database with the given credentials.</p>
 <blockquote>
 <div><ul class="simple">
@@ -105,6 +105,9 @@
 <td></td>
 </tr>
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getPossibleStreetNames" title="countdracula.CountsDatabaseReader.getPossibleStreetNames"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getPossibleStreetNames</span></tt></a></td>
+<td></td>
+</tr>
+<tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getStreetsForIntersectionId" title="countdracula.CountsDatabaseReader.getStreetsForIntersectionId"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getStreetsForIntersectionId</span></tt></a></td>
 <td></td>
 </tr>
 <tr><td><a class="reference internal" href="#countdracula.CountsDatabaseReader.getTurningCounts" title="countdracula.CountsDatabaseReader.getTurningCounts"><tt class="xref py py-obj docutils literal"><span class="pre">CountsDatabaseReader.getTurningCounts</span></tt></a></td>
@@ -157,6 +160,13 @@ only include the given weekdays.</p>
 <dd><p>Given a street name string, looks up the name in the various columns of the <a class="reference internal" href="../tables.html#table-street-names"><em>street_names Table</em></a>
 and returns a list of the possible street_names (first column).</p>
 <p>This search is case-insensitive.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.CountsDatabaseReader.getStreetsForIntersectionId">
+<tt class="descname">getStreetsForIntersectionId</tt><big>(</big><em>node_id</em><big>)</big><a class="headerlink" href="#countdracula.CountsDatabaseReader.getStreetsForIntersectionId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a set of streetnames for the intersection with the id given by <em>node_id</em>.</p>
+<p>Raises a <tt class="xref py py-class docutils literal"><span class="pre">CountsDatabaseReaderError</span></tt> if no nodes are found.</p>
 </dd></dl>
 
 <dl class="method">

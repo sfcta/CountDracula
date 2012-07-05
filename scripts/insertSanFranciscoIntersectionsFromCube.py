@@ -99,12 +99,14 @@ def coordInSanFrancisco(x,y):
     in GIS (Create a new selection on a FREEFLOW_nodes.shp file).  The second bit is to include
     Treasure Island without the southern tip of Marin.
     
-    (Y > 2086000 And Y < 2129000 And X < 6024550) Or 
-    (Y > 2086000 And Y < 2140000 And X > 6019000 And X < 6024550) 
+    (Y > 2085000 And Y < 2129000 And X < 6024550) Or 
+    (Y > 2085000 And Y < 2140000 And X > 6019000 And X < 6024550)
+    
+    7/3/2012 edit: extended south to include some border nodes 
     """
-    if y > 2086000 and y < 2129000 and x < 6024550:
+    if y > 2082000 and y < 2129000 and x < 6024550:
         return True
-    if y > 2086000 and y < 2140000 and x > 6019000 and x < 6024550:
+    if y > 2082000 and y < 2140000 and x > 6019000 and x < 6024550:
         return True
     return False
         

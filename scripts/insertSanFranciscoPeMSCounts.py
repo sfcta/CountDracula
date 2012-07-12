@@ -240,7 +240,7 @@ def readVDSCounts(mapping, vds_datfilename, cd_reader, cd_writer):
                             pems_dir,                           # ondir
                             pemsid_to_cdlocation[pems_key][1],  # fromstreet
                             pemsid_to_cdlocation[pems_key][2],  # tostreet
-                            0,                                  # refpos??
+                            -1,                                  # refpos??
                             vds_datfilename_abspath,            # sourcefile
                             "PeMS VDS %s - %s" % (pems_id, mapping[pems_key][3])])  # project
 
@@ -316,7 +316,7 @@ def readCensusCounts(mapping, census_dirname, cd_reader, cd_writer):
                                     pems_dir,                           # ondir
                                     intersection[1],                    # fromstreet
                                     intersection[2],                    # tostreet
-                                    0,                                  # refpos??
+                                    -1,                                  # refpos??
                                     workbook_filename,                  # sourcefile
                                     "PeMS Census %s - %s" % (pems_id, mapping[pems_key][3])])  # project
                 num_counts += 1

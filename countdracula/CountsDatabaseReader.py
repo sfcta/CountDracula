@@ -83,7 +83,7 @@ class CountsDatabaseReader(object):
                 counts[key] += 1
         return counts
     
-    def _getCounts(self, starttime, period, num_intervals, type, from_date, to_date, weekdays):
+    def _getCounts(self, starttime, period, num_intervals, type, from_date, to_date, weekdays, return_averages):
         """
         Internal helper to not repeat code.  *type* is one of ``turns`` or ``mainline``.
         
@@ -98,13 +98,17 @@ class CountsDatabaseReader(object):
         
         for interval_num in range(num_intervals):
             
-            #Get avg of counts for the given movement and timeperiod
+            # Get counts for the given movement and timeperiod
             if type=="turns":
-                cmd = "SELECT count,starttime,fromstreet,fromdir,tostreet,todir,intstreet,intid from counts_turns " + \
-                      "where starttime::time=%s and period=%s"
+                cmd = "SELECT count,starttime,fromstreet,fromdir,tostreet,todir,intstreet,intid"
+                if not return_averages:
+                    cmd += ",period,vtype,sourcefile,project"
+                cmd += " from counts_turns where starttime::time=%s and period=%s"
             elif type=="mainline":
-                cmd = "SELECT count,starttime,onstreet,ondir,fromstreet,tostreet from counts_ml " + \
-                        "where starttime::time=%s and period=%s"
+                cmd = "SELECT count,starttime,onstreet,ondir,fromstreet,tostreet"
+                if not return_averages:
+                    cmd += ",period,vtype,refpos,sourcefile,project"
+                cmd += " from counts_ml where starttime::time=%s and period=%s"
             else:
                 raise CountsDatabaseReaderError("_getCounts requires type=`turns` or type=`mainline`; type=`%s`" % type)
             
@@ -124,7 +128,7 @@ class CountsDatabaseReader(object):
                     if idx < len(weekdays)-1: cmd += " or "
                 cmd += ")"
 
-            #self._logger.debug(cmd)
+            self._logger.debug(cmd)
             cur2db.execute(cmd, args)
             results = cur2db.fetchall()
             for row in results:
@@ -138,39 +142,53 @@ class CountsDatabaseReader(object):
                     counts[key]  = []
                     days[key]    = []
                 
-                # fill in non-data
-                while len(counts[key]) < interval_num:
-                    counts[key].append(-1)
-                    days[key].append(0)
-                
-                # initialize for real data
-                if len(counts[key]) < (interval_num+1):
-                    counts[key].append(0)
-                    days[key].append(0)
-                
-                # tally it
-                counts[key][interval_num]  += row[0]
-                days[key][interval_num]    += 1
-                
+                # average counts
+                if return_averages:
+                    # fill in non-data
+                    while len(counts[key]) < interval_num:
+                        counts[key].append(-1)
+                        days[key].append(0)
+                    
+                    # initialize for real data
+                    if len(counts[key]) < (interval_num+1):
+                        counts[key].append(0)
+                        days[key].append(0)
+                    
+                    # tally it
+                    counts[key][interval_num]  += row[0]
+                    days[key][interval_num]    += 1
+                    
+                # no averaging - just store it
+                else:
+                    if type=="turns":
+                        # [ count, starttime, period, vtype, sourcefile, project ]
+                        counts[key].append([row[0], row[1], row[8], row[9], row[10], row[11]])
+                    elif type=="mainline":
+                        # [ count, starttime, period, vtype, refpos, sourcefile, project ]
+                        counts[key].append([row[0], row[1], row[6], row[7], row[8], row[9], row[10]])
+                        
                 #self._logger.debug(row)
                 
             # update the time
             currenttime += period
         
-        # fill out the remainder
-        for key in counts:
-            while len(counts[key]) < num_intervals:
-                counts[key].append(-1)
-                days[key].append(0)
-                        
-        # divide out the days
-        for key in counts.iterkeys():
-            for interval_num in range(num_intervals):
-                if days[key][interval_num] > 1:
-                    counts[key][interval_num] = float(counts[key][interval_num])/float(days[key][interval_num])
+        # finish averages
+        if return_averages:
+            # fill out the remainder
+            for key in counts:
+                while len(counts[key]) < num_intervals:
+                    counts[key].append(-1)
+                    days[key].append(0)
+                            
+            # divide out the days
+            for key in counts.iterkeys():
+                for interval_num in range(num_intervals):
+                    if days[key][interval_num] > 1:
+                        counts[key][interval_num] = float(counts[key][interval_num])/float(days[key][interval_num])
         return counts
 
-    def getMainlineCounts(self, starttime, period, num_intervals, from_date=None, to_date=None, weekdays=None):
+    def getMainlineCounts(self, starttime, period, num_intervals, from_date=None, to_date=None, 
+                            weekdays=None, return_averages=True):
         """
         Retrieve all the mainline counts available from the database for the given *starttime* (a datetime.time instance) for 
         *num_intervals* (int) of the given *period* (a datetime.timedelta instance).
@@ -180,12 +198,18 @@ class CountsDatabaseReader(object):
         If *weekdays* is passed (a list of integers, where Monday is 0 and Sunday is 6), then counts will
         only include the given weekdays.
         
-        Returns table with: (onstreet, ondir, fromstreet, tostreet, intersection id) -> [*num_intervals* counts]
+        If *return_averages* is True, then returns a dict with: (onstreet, ondir, fromstreet, tostreet) -> [*num_intervals* counts]
+        Otherwise, returns full details of the counts, a dict with: (onstreet, ondir, fromstreet, tostreet) -> [ count, starttime, period, vtype, refpos, sourcefile, project ]
+
+        .. todo:: handle Vehicle types
+        
         """
         return self._getCounts(starttime, period, num_intervals, type="mainline",
-                               from_date=from_date, to_date=to_date, weekdays=weekdays)
+                               from_date=from_date, to_date=to_date, weekdays=weekdays, 
+                               return_averages=return_averages)
     
-    def getTurningCounts(self, starttime, period, num_intervals, from_date=None, to_date=None, weekdays=None):
+    def getTurningCounts(self, starttime, period, num_intervals, from_date=None, to_date=None,
+                           weekdays=None, return_averages=True):
         """
         Retrieve all the turning counts available from the database for the given *starttime* (a datetime.time instance) for 
         *num_intervals* (int) of the given *period* (a datetime.timedelta instance).
@@ -195,10 +219,14 @@ class CountsDatabaseReader(object):
         If *weekdays* is passed (a list of integers, where Monday is 0 and Sunday is 6), then counts will
         only include the given weekdays.
         
+        If *return_averages* is True, then returns a dict with: (fromstreet, fromdir, tostreet, todir, intersection id) -> [*num_intervals* counts]
+        Otherwise, returns full details of the counts, a dict with: fromstreet, fromdir, tostreet, todir, intersection id) -> [ count, starttime, period, vtype, sourcefile, project ]
+
         Returns table with: (fromstreet, fromdir, tostreet, todir, intersection id) -> [*num_intervals* counts]
         """
         return self._getCounts(starttime, period, num_intervals, type="turns",
-                               from_date=from_date, to_date=to_date, weekdays=weekdays)
+                               from_date=from_date, to_date=to_date, weekdays=weekdays, 
+                               return_averages=return_averages)
                                
     
     def getTurningCountsForMovement(self, at_node, from_node, to_node, from_angle, to_angle, starttime, period, num_intervals):
@@ -217,6 +245,7 @@ class CountsDatabaseReader(object):
         Returns a list of counts.
         
         Raises a CountsDatabaseReaderError if:
+        
         * No incoming street is found (no common street for *from_node* and *at_node*
         * No outgoing street is found (no common street for *at_node* and *to_node*
         * No counts are found.

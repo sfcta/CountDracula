@@ -15,8 +15,18 @@ USAGE = r"""
 
 """
 
-import countdracula
-import logging, os, shutil, subprocess, sys, tempfile
+import logging, os, shutil, subprocess, sys, tempfile, traceback
+
+libdir = os.path.realpath(os.path.join(os.path.split(__file__)[0], "..", "geodjango"))
+sys.path.append(libdir)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'geodjango.settings'
+
+from django.core.management import setup_environ
+from geodjango import settings
+
+import countdracula.models
+from django.contrib.gis.geos import Point
+
 
 EXPORT_SCRIPTNAME = "ExportCubeForCountDracula.s"
 EXPORT_SCRIPT = r"""
@@ -109,7 +119,6 @@ def coordInSanFrancisco(x,y):
     if y > 2082000 and y < 2140000 and x > 6019000 and x < 6024550:
         return True
     return False
-        
 
 if __name__ == '__main__':
     logger = logging.getLogger('countdracula')
@@ -124,7 +133,6 @@ if __name__ == '__main__':
         sys.exit(2)
         
     CUBE_NETWORK = sys.argv[1]    
-    cd_writer = countdracula.CountsDatabaseWriter(pw="CDadmin", logger=logger)
     
     (nodes,links) = readCubeNetwork(CUBE_NETWORK, logger)
 
@@ -161,8 +169,15 @@ if __name__ == '__main__':
     # insert the nodes first
     insert_node_list = []
     for nodeid in node_to_streets.iterkeys():
-        insert_node_list.append( (nodeid, nodes[nodeid][0], nodes[nodeid][1]) )
-    cd_writer.insertNodes(insert_node_list)
+        try:
+            node = countdracula.models.Node(id=nodeid, point=Point(nodes[nodeid][0], nodes[nodeid][1], srid=3494))
+            node.save()
+        except:
+            print "Unexpected error:", sys.exc_info()[0]       
+            traceback.print_exc()
+            print node
+            sys.exit(2)
+    sys.exit(2)
     
     # then the streets
     insert_streets_list = []

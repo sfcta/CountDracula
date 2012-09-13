@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+<script>
+var map, marker, nodeByID = {};
+
+function initialize() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: new google.maps.LatLng(37.7750, -122.4183),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+    
+    var marker_image = new google.maps.MarkerImage("{{ STATIC_URL }}small_red.png");
+    
+    {% for node in nodes %}
+		marker = new google.maps.Marker({map:map, position:new google.maps.LatLng({{node.point.y}}, {{node.point.x}}), icon:marker_image});
+		{% endfor %}
+}
+
+$(document).ready(function () {
+    function activateNodes() {
+        // Add node click handler
+        $('.node').each(function () {
+            $(this).click(function() {
+                var node = nodeByID[this.id];
+                var center = new google.maps.LatLng(node.lat, node.lng);
+                if (marker) marker.setMap();
+                marker = new google.maps.Marker({map: map, position: center});
+                map.panTo(center);
+            }).hover(
+                function () {this.className = this.className.replace('OFF', 'ON');},
+                function () {this.className = this.className.replace('ON', 'OFF');}
+            );
+        });
+    }
+    activateNodes();
+});
+</script>
+<style>
+    body {font-family: sans-serif}
+    #map {width: 600px; height: 600px}
+    #nodes {overflow: auto; width: 500px; height: 100px}
+    .linkOFF {color: darkblue}
+    .linkON {color: white; background-color: darkblue}
+</style>
+</head>
+<body onload='initialize()'>
+    <div id=map></div>
+    <div id=nodes>
+        {{content}}
+    </div>
+    <img src="{{ STATIC_URL }}small_red.png" />
+</body>
+</html>

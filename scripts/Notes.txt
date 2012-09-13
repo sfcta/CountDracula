@@ -1,23 +1,31 @@
 :: make sure my path is aok
-Y:\lmz\CountDracula\scripts>echo %PATH%
+C:\Users\lmz\CountDracula>echo %PATH%
 C:\Python27;C:\Python27\Scripts;C:\OSGeo4W\bin;C:\Program Files (x86)\PostgreSQL\9.0\bin;C:\Program Files (x86)\Citilabs\CubeVoyager;C:\Program Files (x86)\Git\bin
 
+:: create the countdracula user
+C:\Users\lmz\CountDracula>createuser -SDR --username postgres -P countdracula
+
 :: create the postgis database
-Y:\lmz\django\geodjango>createdb --username postgres -T template_postgis countdracula_geodjango
+C:\Users\lmz\CountDracula>createdb --username postgres --owner=countdracula -T template_postgis countdracula_geodjango
+
+:: change the user for the two tables to countdracula
+C:\Users\lmz\CountDracula>psql -U postgres -d countdracula_geodjango -c "ALTER TABLE spatial_ref_sys OWNER to countdracula;"
+C:\Users\lmz\CountDracula>psql -U postgres -d countdracula_geodjango -c "ALTER TABLE geometry_columns OWNER to countdracula;"
 
 :: start the geodjango project
-Y:\lmz\CountDracula>django-admin.py startproject geodjango
+C:Users\lmz\CountDracula>django-admin.py startproject geodjango
 
 :: start the geodjango app, countdracula
-Y:\lmz\CountDracula\geodjango>python manage.py startapp countdracula
+C:Users\lmz\CountDracula>cd geodjango
+C:Users\lmz\CountDracula\geodjango>python manage.py startapp countdracula
 
 :: develop the models file here...
 :: test sql
-Y:\lmz\CountDracula\geodjango>python manage.py sqlall countdracula
+C:Users\lmz\CountDracula\geodjango>python manage.py sqlall countdracula
 :: this outputs lots of stuff
 
 :: all ready -- sync it
-Y:\lmz\CountDracula\geodjango>python manage.py syncdb
+C:Users\lmz\CountDracula\geodjango>python manage.py syncdb
 Creating tables ...
 Creating table auth_permission
 Creating table auth_group_permissions
@@ -42,3 +50,9 @@ Creating table countdracula_mainlinecount_on_street
 Creating table countdracula_mainlinecount_to_street
 Creating table countdracula_mainlinecount
 
+:: set up the static files into STATIC_ROOT
+C:\Users\lisa\CountDracula\geodjango>python manage.py collectstatic
+
+:: run scripts
+C:Users\lmz\CountDracula\geodjango>cd ..\scripts
+C:\Users\lisa\CountDracula\scripts>python insertSanFranciscoIntersectionsFromCube.py Y:\networks\Roads2010\FREEFLOW.net

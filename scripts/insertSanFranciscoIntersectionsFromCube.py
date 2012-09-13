@@ -167,7 +167,6 @@ if __name__ == '__main__':
             node_to_streets[linknodes[1]].append(streetnametuple)
     
     # insert the nodes first
-    insert_node_list = []
     for nodeid in node_to_streets.iterkeys():
         try:
             node = countdracula.models.Node(id=nodeid, point=Point(nodes[nodeid][0], nodes[nodeid][1], srid=3494))
@@ -177,20 +176,23 @@ if __name__ == '__main__':
             traceback.print_exc()
             print node
             sys.exit(2)
-    sys.exit(2)
     
-    # then the streets
-    insert_streets_list = []
+    # then the streets {(a,b) -> (streetname, type)})
     for street_tuple in streetnames:
         combined = street_tuple[0]+" "+street_tuple[1]
-        insert_streets_list.append( (combined, combined.replace(" ",""), street_tuple[0], street_tuple[1]) )
-    cd_writer.insertStreetNames(insert_streets_list)
+        streetname = countdracula.models.StreetName(street_name=combined,
+                                                    nospace_name=combined.replace(" ",""),
+                                                    short_name=street_tuple[0],
+                                                    suffix=street_tuple[1])
+        streetname.save()
         
     # insert the node/street correspondence
-    insert_node_street_list = []
+    # nodeid -> [(streetname1,type1), (streetname2,type2) ]
     for nodeid,streetset in node_to_streets.iteritems():
+        node = countdracula.models.Node.objects.get(id=nodeid)
         for street_tuple in streetset:
-            insert_node_street_list.append( (nodeid, street_tuple[0]+" "+street_tuple[1]) )
-    cd_writer.insertNodeStreets(insert_node_street_list)
-    
+            street_name = countdracula.models.StreetName.objects.get(street_name=street_tuple[0]+" "+street_tuple[1])
+            
+            # add the association
+            street_name.nodes.add(node)    
     

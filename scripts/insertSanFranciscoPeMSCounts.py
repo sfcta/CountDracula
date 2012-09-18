@@ -1,18 +1,21 @@
-'''
+"""
 Created on Jul 25, 2011
 
 @author: lmz
-'''
 
-
-"""
 This script reads PEMS counts from Excel workbooks and inserts the info into the CountDracula dataabase.
-
 """
 
-import countdracula
-import xlrd
-import datetime, getopt, logging, os, sys, time, traceback
+import datetime, getopt, logging, os, sys, time, traceback, xlrd
+
+libdir = os.path.realpath(os.path.join(os.path.split(__file__)[0], "..", "geodjango"))
+sys.path.append(libdir)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'geodjango.settings'
+
+from django.core.management import setup_environ
+from geodjango import settings
+
+import countdracula.models
 
 USAGE = """
 
@@ -72,40 +75,53 @@ def readMappingWorkbook(workbook_filename):
         return_dict[pems_tuple] = result_tuple
     return return_dict
 
-def getIntersectionStreetnamesForPemsKey(mapping, pems_key, cd_reader):
+def getIntersectionStreetnamesForPemsKey(mapping, pems_key):
     """
     Given *mapping*, which is the result of :py:func:`readMappingWorkbook`
     and *pems_key*, a tuple key into *mapping* (e.g. ``( "VDS", "40255")``,
     looks up the link in the *mapping* and then looks up the nodes in the Count Dracula database using
     *cd_reader* (an instance of :py:class:`CountsDatabaseReader`).
     
-    Returns a tuple: ( on_street, from_street, to_street )
+    Returns a tuple: ( on_street, from_street, from_node, to_street, to_node )
     
     Raises an Exception for failure.
     """
     # grab the model nodes and their streets
-    loc_desc     = mapping[pems_key][3]
-    model_node_A = mapping[pems_key][4]
-    try:
-        streets_A_set = cd_reader.getStreetsForIntersectionId(model_node_A)
-    except:
-        raise Exception("Couldn't find streets for model node A %6d in countdracula.  Skipping %s." % 
-                        (model_node_A, loc_desc))
-    #logger.debug("model_node_A = %d  streets_A_set = %s" % (model_node_A, streets_A_set))
+    loc_desc            = mapping[pems_key][3]
+    model_node_A_num    = mapping[pems_key][4]
+    model_node_B_num    = mapping[pems_key][5]
     
-    model_node_B = mapping[pems_key][5]
     try:
-        streets_B_set = cd_reader.getStreetsForIntersectionId(model_node_B)
+        model_node_A    = countdracula.models.Node.objects.get(id=model_node_A_num)
     except:
-        raise Exception("Couldn't find streets for model node B %6d in countdracula.  Skipping %s." % 
-                        (model_node_B, loc_desc))
-    #logger.debug("model_node_B = %d  streets_B_set = %s" % (model_node_B, streets_B_set))
+        raise Exception("Couldn't find node %6d in countdracula. Skipping %s" %
+                        (model_node_A_num, loc_desc))
+    
+    try:
+        streets_A_set = set(streetname for streetname in model_node_A.streetname_set.all())
+    except:
+        raise Exception("Couldn't find streets for model node A %6d in countdracula.  Skipping %s." %
+                        (model_node_A_num, loc_desc))
+    # logger.debug("model_node_A = %s  streets_A_set = %s" % (model_node_A, streets_A_set))
+    
+    try:
+        model_node_B    = countdracula.models.Node.objects.get(id=model_node_B_num)
+    except:
+        raise Exception("Couldn't find node %6d in countdracula. Skipping %s" %
+                        (model_node_B_num, loc_desc))    
+    
+    try:
+        streets_B_set = set(streetname for streetname in model_node_B.streetname_set.all())
+    except:
+        raise Exception("Couldn't find streets for model node B %6d in countdracula.  Skipping %s." %
+                        (model_node_B_num, loc_desc))
+    # logger.debug("model_node_B = %s  streets_B_set = %s" % (model_node_B, streets_B_set))
     
     # figure out the on_street 
     on_street_set = streets_A_set & streets_B_set
     if len(on_street_set) != 1:
         raise Exception("Couldn't find a unique single street for both node A %d (%s) and node B %d (%s)" %
-                        (model_node_A, str(streets_A_set), model_node_B, str(streets_B_set)))
+                        (model_node_A_num, str(streets_A_set), model_node_B_num, str(streets_B_set)))
     on_street = on_street_set.pop()
     on_street_set.add(on_street)
     
@@ -120,8 +136,8 @@ def getIntersectionStreetnamesForPemsKey(mapping, pems_key, cd_reader):
         else:
             from_street = from_street_set.pop()
     if from_street == "":
-        raise Exception("Couldn't find from street for node A %d (%s) to node B %d (%s)" % 
-                        (model_node_A, str(streets_A_set), model_node_B, str(streets_B_set)))
+        raise Exception("Couldn't find from street for node A %d (%s) to node B %d (%s)" %
+                        (model_node_A_num, str(streets_A_set), model_node_B_num, str(streets_B_set)))
 
     # and the to_street
     to_street_set = streets_B_set
@@ -134,13 +150,12 @@ def getIntersectionStreetnamesForPemsKey(mapping, pems_key, cd_reader):
         else:
             to_street = to_street_set.pop()
     if to_street == "":
-        raise Exception("Couldn't find to street for node A %d (%s) to node B %d (%s)" % 
-                        (model_node_A, str(streets_A_set), model_node_B, str(streets_B_set)))
-            
+        raise Exception("Couldn't find to street for node A %d (%s) to node B %d (%s)" %
+                        (model_node_A_num, str(streets_A_set), model_node_B_num, str(streets_B_set)))
     
-    return (on_street, from_street, to_street)
+    return (on_street, from_street, model_node_A, to_street, model_node_B)
 
-def readVDSCounts(mapping, vds_datfilename, cd_reader, cd_writer):
+def readVDSCounts(mapping, vds_datfilename):
     """
     Read the VDS (Vehicle Detector Station) data from the given *vds_datafilename*, and insert the mainline
     counts into countdracula.
@@ -179,7 +194,7 @@ def readVDSCounts(mapping, vds_datfilename, cd_reader, cd_writer):
         if pems_key in pemsid_to_cdlocation: continue
 
         try:
-            pemsid_to_cdlocation[pems_key] = getIntersectionStreetnamesForPemsKey(mapping, pems_key, cd_reader)
+            pemsid_to_cdlocation[pems_key] = getIntersectionStreetnamesForPemsKey(mapping, pems_key)
             
             logger.debug("Mapped key=%s route=[%s] dir=[%s] description=[%s] to on_street=[%s] from_street=[%s] to_street=[%s]" % 
                          (str(pems_key), fields[fieldname_to_fieldidx["route"]], fields[fieldname_to_fieldidx["dir"]], 
@@ -187,6 +202,7 @@ def readVDSCounts(mapping, vds_datfilename, cd_reader, cd_writer):
             
         except Exception, e:
             logger.error(e)
+            # logger.exception('Exception received!')
              
         
     for pems_key,intersection in pemsid_to_cdlocation.iteritems():
@@ -194,7 +210,7 @@ def readVDSCounts(mapping, vds_datfilename, cd_reader, cd_writer):
                         
     # create the counts list for countdracula
     vds_datfile.seek(first_line_pos)
-    counts_list = []
+    counts_saved = 0
     for line in vds_datfile:
         line = line.strip()
         fields = line.split("\t")
@@ -231,22 +247,27 @@ def readVDSCounts(mapping, vds_datfilename, cd_reader, cd_writer):
                                       hour=int(pems_time_fields[0]),
                                       minute=int(pems_time_fields[1]),
                                       second=int(pems_time_fields[2]))
+        project_str = "PeMS VDS %s - %s" % (pems_id, mapping[pems_key][3])
+                
+        mainline_count = countdracula.models.MainlineCount(count=pems_flow,
+                                                           start_time=starttime,
+                                                           period_minutes=60,
+                                                           vehicle_type=0, # ALL
+                                                           on_street=pemsid_to_cdlocation[pems_key][0],
+                                                           on_dir=pems_dir,
+                                                           from_street=pemsid_to_cdlocation[pems_key][1],
+                                                           from_int=pemsid_to_cdlocation[pems_key][2],
+                                                           to_street=pemsid_to_cdlocation[pems_key][3],
+                                                           to_int=pemsid_to_cdlocation[pems_key][4],
+                                                           reference_position=-1,
+                                                           sourcefile=vds_datfilename_abspath,
+                                                           project=project_str)
+        mainline_count.save()
+        counts_saved += 1
 
-        counts_list.append([pems_flow,                          # count
-                            starttime,                          # starttime
-                            "1 hour",                           # period
-                            0,                                  # vtype=ALL
-                            pemsid_to_cdlocation[pems_key][0],  # onstreet
-                            pems_dir,                           # ondir
-                            pemsid_to_cdlocation[pems_key][1],  # fromstreet
-                            pemsid_to_cdlocation[pems_key][2],  # tostreet
-                            -1,                                  # refpos??
-                            vds_datfilename_abspath,            # sourcefile
-                            "PeMS VDS %s - %s" % (pems_id, mapping[pems_key][3])])  # project
-
-    logger.info("Attempting to insert %d PeMS VDS counts into countdracula" % len(counts_list))
-    cd_writer.insertMainlineCounts(counts_list)
+    logger.info("Attempted to insert %d PeMS VDS counts into countdracula" % counts_saved)
     vds_datfile.close()
+    sys.exit(1)
 
 def readCensusCounts(mapping, census_dirname, cd_reader, cd_writer):
     """
@@ -355,15 +376,10 @@ if __name__ == '__main__':
     debugloghandler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s', '%Y-%m-%d %H:%M'))
     logger.addHandler(debugloghandler)
         
-    
-    cd_writer = countdracula.CountsDatabaseWriter(pw="CDadmin", logger=logger)
-    cd_reader = countdracula.CountsDatabaseReader(pw="ReadOnly", logger=logger)
-    xl_parser = countdracula.CountsWorkbookParser()
-   
     mapping = readMappingWorkbook(MAPPING_FILE)
     
     for (opttype, optarg) in opts:
         if opttype == "-v":
-            readVDSCounts(mapping, optarg, cd_reader, cd_writer)
+            readVDSCounts(mapping, optarg)
         if opttype == "-c":
-            readCensusCounts(mapping, optarg, cd_reader, cd_writer)
+            readCensusCounts(mapping, optarg)

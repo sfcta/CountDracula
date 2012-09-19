@@ -249,37 +249,37 @@ def readVDSCounts(mapping, vds_datfilename):
                                       second=int(pems_time_fields[2]))
         project_str = "PeMS VDS %s - %s" % (pems_id, mapping[pems_key][3])
                 
-        mainline_count = countdracula.models.MainlineCount(count=pems_flow,
-                                                           start_time=starttime,
-                                                           period_minutes=60,
-                                                           vehicle_type=0, # ALL
-                                                           on_street=pemsid_to_cdlocation[pems_key][0],
-                                                           on_dir=pems_dir,
-                                                           from_street=pemsid_to_cdlocation[pems_key][1],
-                                                           from_int=pemsid_to_cdlocation[pems_key][2],
-                                                           to_street=pemsid_to_cdlocation[pems_key][3],
-                                                           to_int=pemsid_to_cdlocation[pems_key][4],
-                                                           reference_position=-1,
-                                                           sourcefile=vds_datfilename_abspath,
-                                                           project=project_str)
+        mainline_count = countdracula.models.MainlineCount(count                = pems_flow,
+                                                           start_time           = starttime,
+                                                           period_minutes       = 60,
+                                                           vehicle_type         = 0, # ALL
+                                                           on_street            = pemsid_to_cdlocation[pems_key][0],
+                                                           on_dir               = pems_dir,
+                                                           from_street          = pemsid_to_cdlocation[pems_key][1],
+                                                           from_int             = pemsid_to_cdlocation[pems_key][2],
+                                                           to_street            = pemsid_to_cdlocation[pems_key][3],
+                                                           to_int               = pemsid_to_cdlocation[pems_key][4],
+                                                           reference_position   = -1,
+                                                           sourcefile           = vds_datfilename_abspath,
+                                                           project              = project_str)
         mainline_count.save()
         counts_saved += 1
 
-    logger.info("Attempted to insert %d PeMS VDS counts into countdracula" % counts_saved)
+    logger.info("Saved %d PeMS VDS counts into countdracula" % counts_saved)
     vds_datfile.close()
-    sys.exit(1)
 
-def readCensusCounts(mapping, census_dirname, cd_reader, cd_writer):
+def readCensusCounts(mapping, census_dirname):
     """
     Reads the census station count workbooks and inputs those counts into the Count Dracula database.
     """
     filenames = sorted(os.listdir(census_dirname))
-    counts_list = [] # fill this
     for filename in filenames:
         
         if filename[-4:] != ".xls":
             logger.debug("Skipping non-xls file %s" % filename)
             continue
+        
+        logger.info("Processing PeMS Census file %s" % filename)
         
         filename_parts = filename[:-4].split("_")
         pems_id = filename_parts[0]
@@ -295,7 +295,7 @@ def readCensusCounts(mapping, census_dirname, cd_reader, cd_writer):
             continue        
         
         try:
-            intersection = getIntersectionStreetnamesForPemsKey(mapping, pems_key, cd_reader)
+            intersection = getIntersectionStreetnamesForPemsKey(mapping, pems_key)
             logger.debug("%20s -> %s" % (str(pems_key), str(intersection)))
         except Exception, e:
             logger.error(e)
@@ -307,7 +307,7 @@ def readCensusCounts(mapping, census_dirname, cd_reader, cd_writer):
         # open the workbook
         assert("Report Data" in book.sheet_names()) # standard PeMS sheetnames
         datasheet = book.sheet_by_name("Report Data")
-        num_counts = 0
+        counts_saved = 0
         
         # for each day
         for col in range(1, len(datasheet.row(0))):
@@ -327,27 +327,28 @@ def readCensusCounts(mapping, census_dirname, cd_reader, cd_writer):
                 count = datasheet.cell_value(row,col)
                 if count == "": continue  # skip blanks
                 if count == 0.0: continue # skip zeros, they aren't real zero counts                
+                project_str = "PeMS Census %s - %s" % (pems_id, mapping[pems_key][3])
         
                 # read the counts
-                counts_list.append([datasheet.cell_value(row,col),      # count
-                                    starttime,                          # starttime
-                                    "1 hour",                           # period
-                                    0,                                  # vtype=ALL
-                                    intersection[0],                    # onstreet
-                                    pems_dir,                           # ondir
-                                    intersection[1],                    # fromstreet
-                                    intersection[2],                    # tostreet
-                                    -1,                                  # refpos??
-                                    workbook_filename,                  # sourcefile
-                                    "PeMS Census %s - %s" % (pems_id, mapping[pems_key][3])])  # project
-                num_counts += 1
+                mainline_count = countdracula.models.MainlineCount(count                = count,
+                                                                   start_time           = starttime,
+                                                                   period_minutes       = 60,
+                                                                   vehicle_type         = 0, # ALL
+                                                                   on_street            = intersection[0],
+                                                                   on_dir               = pems_dir,
+                                                                   from_street          = intersection[1],
+                                                                   from_int             = intersection[2],
+                                                                   to_street            = intersection[3],
+                                                                   to_int               = intersection[4],
+                                                                   reference_position   = -1,
+                                                                   sourcefile           = workbook_filename,
+                                                                   project              = project_str)
+                mainline_count.save()
+                counts_saved += 1
         
         del book
-        logger.info("Read %3d counts from %s" % (num_counts, workbook_filename))
-    
-    logger.info("Attempting to insert %d PeMS Census counts into countdracula" % len(counts_list))
-    cd_writer.insertMainlineCounts(counts_list)
-        
+        logger.info("Saved %3d census counts from %s into countdracula" % (counts_saved, workbook_filename))
+            
 if __name__ == '__main__':
 
     opts, args = getopt.getopt(sys.argv[1:], 'c:v:')

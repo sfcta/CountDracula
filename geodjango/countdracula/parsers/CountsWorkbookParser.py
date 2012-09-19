@@ -4,9 +4,11 @@ Created on Jul 25, 2011
 @author: varun
 '''
 
-import xlrd, sys
+import xlrd, sys, traceback
 from datetime import datetime,date, time, timedelta
 from types import FloatType
+import countdracula.models
+
 
 class CountsWorkbookParserException(Exception):
     pass
@@ -32,18 +34,17 @@ class CountsWorkbookParser():
         * *time_period_str*: can be one of `AMPKHOUR`, `PMPKHOUR`, `ADT`, or a range in military time, such as `1600-1615`.
 
         
-        Returns tuple -> (starttime, period) where startime is a datetime object and period is a string
-        which postgres can interpret (e.g. `1 day`, `34 minute`)
+        Returns tuple -> (starttime, period_minutes) where startime is a datetime object and period_minutes is a integer representing number of minutes
         """    
         special_times = {'AMPKHOUR':[time( 8,00,00,100801),time( 9,00,00,100801)],
                          'PMPKHOUR':[time(17,00,00,101701),time(18,00,00,101701)],
                          'ADT'     :[time( 0,00,00,102424),time(23,30,00,102424)]}  # ???  what the deuce are the microseconds
         
         if time_period_str == 'ADT':
-            return (datetime.combine(date_yyyy_mm_dd, special_times[time_period_str][0]), "1 day")
+            return (datetime.combine(date_yyyy_mm_dd, special_times[time_period_str][0]),  24*60)
         
         elif time_period_str in special_times:            
-            return (datetime.combine(date_yyyy_mm_dd, special_times[time_period_str][0]), "1 hour")
+            return (datetime.combine(date_yyyy_mm_dd, special_times[time_period_str][0]), 60)
 
         
         (start, end) = time_period_str.split("-")    
@@ -52,7 +53,7 @@ class CountsWorkbookParser():
         endtime   = timedelta(hours=int(  end[:2]), minutes=int(  end[2:]))
             
         return (datetime.combine(date_yyyy_mm_dd,time(hour=int(start[:2]),minute=int(start[2:]))), 
-                '%i minute' % int((endtime - starttime).seconds/60))
+                int((endtime - starttime).seconds/60))
 
 
     def readSourcefile(self,book):
@@ -76,32 +77,33 @@ class CountsWorkbookParser():
         return sourcefile
           
         
-    def readMainlineCounts(self, file, primary_street, cross_street1, cross_street2, cdreader):  
+    def readAndInsertMainlineCounts(self, file, primary_street, cross_street1, cross_street2, logger):  
         """
-        Parses the given excel file representing mainline counts into a table of values for the countdracula database.
+        Parses the given excel file representing mainline counts and inserts those counts into the countdracula database.
  
         * *file* is the Excel workbook file name
         * *primary_street* is the street on which the counts were taken
         * *cross_street1* and *cross_street2* are the bounding cross streets
-        * *cdreader* is an instance of a :py:class:`CountsDatabaseReader`, used to lookup the relevant streets and intersections
+        * *logger* is a logging instance
         
-        Returns a table of values for the countdracula database, for use with :py:meth:`CountsDatabaseWriter.insertMainlineCounts`
+        Returns (successful counts inserted, failed counts inserted)
         """                
-        primary_street_list = cdreader.getPossibleStreetNames(primary_street)
-        if primary_street_list == []:
+        primary_street_list = countdracula.models.StreetName.getPossibleStreetNames(primary_street)
+        if len(primary_street_list) == 0:
             raise CountsWorkbookParserException("readMainlineCounts: primary street %s not found." % primary_street)
                 
-        cross_street1_list = cdreader.getPossibleStreetNames(cross_street1)
-        if cross_street1_list == []:
+        cross_street1_list = countdracula.models.StreetName.getPossibleStreetNames(cross_street1)
+        if len(cross_street1_list) == 0:
             raise CountsWorkbookParserException("readMainlineCounts: cross street 1 %s not found." % cross_street1)
 
-        cross_street2_list = cdreader.getPossibleStreetNames(cross_street2)
-        if cross_street2_list == []:
+        cross_street2_list = countdracula.models.StreetName.getPossibleStreetNames(cross_street2)
+        if len(cross_street2_list) == 0:
             raise CountsWorkbookParserException("readMainlineCounts: cross street 2 %s not found." % cross_street2)
 
         # looking for a primary street that intersects with both one of cross_street1 cross_Street2
-        # collect this info in two dictionaries: { primary_street_name -> { cross_street1_name -> idset1 }}
-        # and                                    { primary_street_name -> { cross_street2_name -> idset2 }}
+        # collect this info in two dictionaries: 
+        #  { primary_street_name (StreetName instance) -> { cross_street1_name (StreetName instance) -> QuerySet of Node instances }}
+        #  { primary_street_name (StreetName instance) -> { cross_street2_name (StreetName instance) -> QuerySet of Node instances }}
         intersections1 = {}
         intersections2 = {}
         
@@ -110,15 +112,16 @@ class CountsWorkbookParser():
             intersections2[primary_street_name] = {}
             
             for cross_street1_name in cross_street1_list:
-                intersections1[primary_street_name][cross_street1_name] = cdreader.getIntersectionIdsForStreets(primary_street_name,
-                                                                                                                cross_street1_name)
+                
+                intersections1[primary_street_name][cross_street1_name] = countdracula.models.Node.objects.filter(streetname__street_name=primary_street_name.street_name) \
+                                                                                                          .filter(streetname__street_name=cross_street1_name.street_name)                
                 # don't bother if it's an empty set
                 if len(intersections1[primary_street_name][cross_street1_name]) == 0:
                     del intersections1[primary_street_name][cross_street1_name]
 
             for cross_street2_name in cross_street2_list:
-                intersections2[primary_street_name][cross_street2_name] = cdreader.getIntersectionIdsForStreets(primary_street_name,
-                                                                                                                cross_street2_name)
+                intersections2[primary_street_name][cross_street2_name] = countdracula.models.Node.objects.filter(streetname__street_name=primary_street_name) \
+                                                                                                          .filter(streetname__street_name=cross_street2_name)
                 # don't bother if it's an empty set
                 if len(intersections2[primary_street_name][cross_street2_name]) == 0:
                     del intersections2[primary_street_name][cross_street2_name]
@@ -151,10 +154,11 @@ class CountsWorkbookParser():
         cross_street1_name_final = intersections1[primary_street_name_final].keys()[0]
         cross_street2_name_final = intersections2[primary_street_name_final].keys()[0]
         
-        # go through the sheets and prep the data
-        mainlinList = [] 
-        book        = xlrd.open_workbook(file)
-        sheetnames  = book.sheet_names()     
+        # go through the sheets and read the data
+        book                = xlrd.open_workbook(file)
+        sheetnames          = book.sheet_names()     
+        counts_saved        = 0
+        counts_not_saved    = 0
         for sheet_idx in range(len(sheetnames)) :
            
             if sheetnames[sheet_idx]=="source": continue
@@ -183,10 +187,14 @@ class CountsWorkbookParser():
                 # so use this cue to determine the origin/destination of the movement
                 if (direction == 'S' or direction == 'E'):
                     ml_fromstreet = cross_street1_name_final
+                    ml_fromint    = intersections1[primary_street_name_final][ml_fromstreet][0]
                     ml_tostreet   = cross_street2_name_final
+                    ml_toint      = intersections2[primary_street_name_final][ml_tostreet][0]
                 else:
                     ml_fromstreet = cross_street2_name_final
+                    ml_fromint    = intersections2[primary_street_name_final][ml_fromstreet][0]
                     ml_tostreet   = cross_street1_name_final
+                    ml_toint      = intersections1[primary_street_name_final][ml_tostreet][0]
 
                 # process the rows                    
                 for row in range(2,len(activesheet.col(column))) :
@@ -196,24 +204,44 @@ class CountsWorkbookParser():
                     
                     (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0))     
     
-                    mainlinList.append([count,starttime,period,vtype,primary_street_name_final,ml_ondir,
-                                        ml_fromstreet,ml_tostreet,
-                                        -1, # reference position unknown, it's not in the workbook
-                                        file,""])
-                    
-        return mainlinList
+                    try:
+                        mainline_count = countdracula.models.MainlineCount(count                = count,
+                                                                           start_time           = starttime,
+                                                                           period_minutes       = period,
+                                                                           vehicle_type         = vtype,
+                                                                           on_street            = primary_street_name_final,
+                                                                           on_dir               = ml_ondir,
+                                                                           from_street          = ml_fromstreet,
+                                                                           from_int             = ml_fromint,
+                                                                           to_street            = ml_tostreet,
+                                                                           to_int               = ml_toint,
+                                                                           reference_position   = -1, # reference position unknown, it's not in the workbook
+                                                                           sourcefile           = file,
+                                                                           project              = "")
+                        mainline_count.save()
+                        counts_saved += 1
+                        
+                    except Exception as e:
+                        logger.error(e)
+                        logger.error(traceback.format_exc())
+                        counts_not_saved += 1
+
+        logger.info("  Processed %s into countdracula" % file)                        
+        logger.info("  Successfully saved %4d mainline counts" % counts_saved)
+        logger.info("  Failed to save     %4d mainline counts" % counts_not_saved)
+        return (counts_saved, counts_not_saved)
     
-    def readTurnCounts(self, file, street1, street2, cdreader):
+    def readAndInsertTurnCounts(self, file, street1, street2, logger):
         """
-        Parses the given excel file representing turn counts into a table of values for the countdracula database.
+        Parses the given excel file representing turn counts and inserts them into the countdracula database.
         
         * *file* is the Excel workbook file
         * *street1* is the name of the NS-oriented street
         * *street2* is the name of the EW-oriented street
-        * *cdreader* is an instance of a :py:class:`CountsDatabaseReader`, used to lookup the relevant streets and intersection
+        * *logger* is a logging instance
         
-        Returns a table of values for the countdracula database, for use with :py:meth:`CountsDatabaseWriter.insertTurnCounts`
-        
+        Returns (successful counts inserted, failed counts inserted)
+                
         Note that this method is a little counter-intuitive because the arguments determine the way the movements are stored in
         the database.  For example, suppose you have an intersection where the street changes names from "SouthOne Street" to 
         "SouthTwo Street" as it passes through an intersection with "EastWest Street".  This method would be called with
@@ -222,19 +250,21 @@ class CountsWorkbookParser():
         doesn't have a southbound link from the intersection, since it's really "SouthTwo Street".  Thus, using this
         implementation, the fromstreet and tostreet define the intersection only, and not the movement.
         """    
-        NSstreetslist = cdreader.getPossibleStreetNames(street1)
-        if NSstreetslist == []:
+        NSstreetslist = countdracula.models.StreetName.getPossibleStreetNames(street1)
+        if len(NSstreetslist) == 0:
             raise CountsWorkbookParserException("readTurnCounts: Street %s not found." % street1)
         
-        EWstreetslist = cdreader.getPossibleStreetNames(street2)
-        if EWstreetslist == []:
+        EWstreetslist = countdracula.models.StreetName.getPossibleStreetNames(street2)
+        if len(EWstreetslist) == 0:
             raise CountsWorkbookParserException("readTurnCounts: Street %s not found." % street2)
 
-        # look for intersections of these streets; intersections maps { (streetname1, streetname2) -> set of intersections }
+        # look for intersections of these streets; intersections maps 
+        #   { (streetname1 StreetName instance, streetname2 StreetName instance) -> QuerySet of intersections }
         intersections = {}
         for NSstreet in NSstreetslist:
             for EWstreet in EWstreetslist:
-                intersection_ids = cdreader.getIntersectionIdsForStreets(NSstreet,EWstreet)
+                intersection_ids = countdracula.models.Node.objects.filter(streetname__street_name=NSstreet.street_name) \
+                                                                   .filter(streetname__street_name=EWstreet.street_name)
                 
                 if len(intersection_ids) > 0:
                     intersections[(NSstreet, EWstreet)] = intersection_ids
@@ -251,13 +281,14 @@ class CountsWorkbookParser():
         # len(intersections) == 1
         final_NSstreet  = intersections.keys()[0][0]
         final_EWstreet  = intersections.keys()[0][1]
-        final_intid     = intersections[(final_NSstreet,final_EWstreet)].pop()
+        final_intid     = intersections[(final_NSstreet,final_EWstreet)][0]
         
-        # go through the sheets and prep the data        
-        turnCountList   = []
-        book            = xlrd.open_workbook(file)       
-        sheetnames      = book.sheet_names()
-        
+        # go through the sheets and read the data        
+        book                = xlrd.open_workbook(file)       
+        sheetnames          = book.sheet_names()
+        counts_saved        = 0
+        counts_not_saved    = 0
+                
         for sheet_idx in range(len(sheetnames)) :
             
             if sheetnames[sheet_idx]=="source": continue
@@ -329,11 +360,32 @@ class CountsWorkbookParser():
                     if count == "" : continue
                     
                     (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0))     
+                    
+                    try:
+                        turn_count = countdracula.models.TurnCount(count            = count,
+                                                                   start_time       = starttime,
+                                                                   period_minutes   = period,
+                                                                   vehicle_type     = vtype,
+                                                                   from_street      = t_fromstreet,
+                                                                   from_dir         = t_fromdir,
+                                                                   to_street        = t_tostreet,
+                                                                   to_dir           = t_todir,
+                                                                   intersection_street = t_intstreet,
+                                                                   int              = final_intid,
+                                                                   sourcefile       = file,
+                                                                   project          = "")
+                        turn_count.save()
+                        counts_saved += 1
+                    except Exception as e:
+                        logger.error(e)
+                        logger.error(traceback.format_exc())
+                        counts_not_saved += 1
                         
-                    turnCountList.append([count,starttime,period,vtype,t_fromstreet,t_fromdir,t_tostreet,t_todir,
-                                           t_intstreet,final_intid, file, ""])
-        return turnCountList
-    
+        logger.info("  Processed %s into countdracula" % file)                        
+        logger.info("  Successfully saved %4d turn counts" % counts_saved)
+        logger.info("  Failed to save     %4d turn counts" % counts_not_saved)
+        return (counts_saved, counts_not_saved)
+
     def readIntersectionIds(self,file):  
         """
         Reads an excel workbook with intersection information (see exampledata\intersections.xls) and returns

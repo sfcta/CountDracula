@@ -65,6 +65,31 @@ class StreetName(models.Model):
     def __unicode__(self):
         return self.street_name
 
+    @staticmethod
+    def getPossibleStreetNames(name):
+        """
+        Given a street name string, looks up the name in the various columns of the :ref:`table-street_names`
+        and returns a QuerySet of the possible :py:class:`StreetName` instances.
+        
+        This search is case-insensitive.
+        
+        Returns an empty QuerySet on failure.
+        """        
+        street_names = StreetName.objects.filter(street_name__iexact=name)
+        if len(street_names) > 0: return street_names
+        
+        street_names = StreetName.objects.filter(nospace_name__iexact=name.replace(" ",""))
+        if len(street_names) > 0: return street_names
+        
+        street_names = StreetName.objects.filter(short_name__iexact=name)
+        if len(street_names) > 0: return street_names
+
+        # see if we can match the nospace_name with a wild card for the suffix        
+        street_names = StreetName.objects.filter(nospace_name__istartswith=name.replace(" ",""))
+        return street_names
+        
+        
+        
 # Turn counts for an intersection
 class TurnCount(models.Model):
     count               = models.IntegerField()
@@ -80,6 +105,10 @@ class TurnCount(models.Model):
     sourcefile          = models.CharField(max_length=500, help_text="For tracking where this count came from")
     project             = models.CharField(max_length=100, help_text="For tracking if this count was collected for a specific project")
     
+    def __unicode__(self):
+        return "%3d-minute Turn count from %s %s to %s %s" % \
+            (self.period_minutes, self.from_street, self.from_dir, self.to_street, self.to_dir)
+            
 # Mainline counts for an intersection
 class MainlineCount(models.Model):
     count               = models.IntegerField()
@@ -97,5 +126,5 @@ class MainlineCount(models.Model):
     project             = models.CharField(max_length=100, help_text="For tracking if this count was collected for a specific project")
 
     def __unicode__(self):
-        return "%3d-minute Mailine count on %s (from %s to %s)" % \
-                (self.period_minutes, self.on_street, self.from_street, self.to_street)
+        return "%3d-minute Mainline count on %s %s (from %s to %s)" % \
+                (self.period_minutes, self.on_street, self.on_dir, self.from_street, self.to_street)

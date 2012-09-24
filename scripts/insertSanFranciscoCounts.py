@@ -101,20 +101,18 @@ if __name__ == '__main__':
         if len(streetlist) == 3:           
             mainline_attempted_files += 1
             
-            (processed,failed) = xl_parser.readAndInsertMainlineCounts(os.path.join(dir, file), streetlist[0], streetlist[1], streetlist[2], logger)
+            processed = xl_parser.readAndInsertMainlineCounts(os.path.join(dir, file), streetlist[0], streetlist[1], streetlist[2], logger)
 
             mainline_processed_counts += processed
-            mainline_processed_files += (1 if processed > 0 else 0)
+            mainline_processed_files += (1 if processed >= 0 else 0)
                                        
         elif len(streetlist) == 2:
             turns_attempted_files += 1
 
-            (processed,failed) = xl_parser.readAndInsertTurnCounts(os.path.join(dir, file), streetlist[0], streetlist[1], logger)
+            processed = xl_parser.readAndInsertTurnCounts(os.path.join(dir, file), streetlist[0], streetlist[1], logger)
             
             turns_processed_counts += processed
-            turns_processed_files += (1 if processed > 0 else 0)
+            turns_processed_files += (1 if processed >= 0 else 0)
 
-
-    
     logger.info("Mainline counts: %4d processed files out of %4d attempts" % (mainline_processed_files, mainline_attempted_files))
     logger.info("Turn     counts: %4d processed files out of %4d attempts" % (   turns_processed_files,    turns_attempted_files))

@@ -68,6 +68,6 @@ python insertSanFranciscoPeMSCounts.py -v "Q:\Roadway Observed Data\PeMS\D4_Data
 ::
 :: insert other counts
 ::
-python scripts\insertSanFranciscoCounts.py "Q:\Roadway Observed Data\Counts\Standard\v1.0"
+python insertSanFranciscoCounts.py "Q:\Roadway Observed Data\Counts\Standard\v1.0"
 
 :done

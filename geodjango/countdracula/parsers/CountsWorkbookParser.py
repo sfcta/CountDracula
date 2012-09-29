@@ -7,7 +7,9 @@ Created on Jul 25, 2011
 import xlrd, sys, traceback
 from datetime import datetime,date, time, timedelta
 from types import FloatType
-import countdracula.models
+
+from countdracula.models import Node, StreetName, MainlineCountLocation, MainlineCount, TurnCountLocation, TurnCount
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class CountsWorkbookParserException(Exception):
@@ -26,7 +28,7 @@ class CountsWorkbookParser():
         '''
         pass
       
-    def createtimestamp (self, date_yyyy_mm_dd, time_period_str):
+    def createtimestamp (self, date_yyyy_mm_dd, time_period_str, tzinfo):
         """
         Interprets date and time period string
         
@@ -52,7 +54,7 @@ class CountsWorkbookParser():
         starttime = timedelta(hours=int(start[:2]), minutes=int(start[2:]))
         endtime   = timedelta(hours=int(  end[:2]), minutes=int(  end[2:]))
             
-        return (datetime.combine(date_yyyy_mm_dd,time(hour=int(start[:2]),minute=int(start[2:]))), 
+        return (datetime.combine(date_yyyy_mm_dd, time(hour=int(start[:2]),minute=int(start[2:]), tzinfo=tzinfo) ), 
                 int((endtime - starttime).seconds/60))
 
 
@@ -77,7 +79,7 @@ class CountsWorkbookParser():
         return sourcefile
           
         
-    def readAndInsertMainlineCounts(self, file, primary_street, cross_street1, cross_street2, logger):  
+    def readAndInsertMainlineCounts(self, file, primary_street, cross_street1, cross_street2, logger, tzinfo=None):  
         """
         Parses the given excel file representing mainline counts and inserts those counts into the countdracula database.
  
@@ -91,7 +93,7 @@ class CountsWorkbookParser():
         On failure, removes all counts from this workbook so it can be fixed and inserted again, and returns -1.
         """
         
-        mainline_counts = countdracula.models.MainlineCount.objects.filter(sourcefile=file)
+        mainline_counts = MainlineCount.objects.filter(sourcefile=file)
         if len(mainline_counts) > 0:
             logger.error("  readAndInsertMainlineCounts() called on %s, but %d mainline counts already "\
                         "exist with that sourcefile.  Skipping." % (file, len(mainline_counts)))
@@ -99,15 +101,15 @@ class CountsWorkbookParser():
         
         try:                      
                         
-            primary_street_list = countdracula.models.StreetName.getPossibleStreetNames(primary_street)
+            primary_street_list = StreetName.getPossibleStreetNames(primary_street)
             if len(primary_street_list) == 0:
                 raise CountsWorkbookParserException("readMainlineCounts: primary street %s not found." % primary_street)
                     
-            cross_street1_list = countdracula.models.StreetName.getPossibleStreetNames(cross_street1)
+            cross_street1_list = StreetName.getPossibleStreetNames(cross_street1)
             if len(cross_street1_list) == 0:
                 raise CountsWorkbookParserException("readMainlineCounts: cross street 1 %s not found." % cross_street1)
     
-            cross_street2_list = countdracula.models.StreetName.getPossibleStreetNames(cross_street2)
+            cross_street2_list = StreetName.getPossibleStreetNames(cross_street2)
             if len(cross_street2_list) == 0:
                 raise CountsWorkbookParserException("readMainlineCounts: cross street 2 %s not found." % cross_street2)
     
@@ -124,15 +126,15 @@ class CountsWorkbookParser():
                 
                 for cross_street1_name in cross_street1_list:
                     
-                    intersections1[primary_street_name][cross_street1_name] = countdracula.models.Node.objects.filter(streetname__street_name=primary_street_name.street_name) \
-                                                                                                              .filter(streetname__street_name=cross_street1_name.street_name)                
+                    intersections1[primary_street_name][cross_street1_name] = Node.objects.filter(streetname__street_name=primary_street_name.street_name) \
+                                                                                          .filter(streetname__street_name=cross_street1_name.street_name)                
                     # don't bother if it's an empty set
                     if len(intersections1[primary_street_name][cross_street1_name]) == 0:
                         del intersections1[primary_street_name][cross_street1_name]
     
                 for cross_street2_name in cross_street2_list:
-                    intersections2[primary_street_name][cross_street2_name] = countdracula.models.Node.objects.filter(streetname__street_name=primary_street_name) \
-                                                                                                              .filter(streetname__street_name=cross_street2_name)
+                    intersections2[primary_street_name][cross_street2_name] = Node.objects.filter(streetname__street_name=primary_street_name) \
+                                                                                          .filter(streetname__street_name=cross_street2_name)
                     # don't bother if it's an empty set
                     if len(intersections2[primary_street_name][cross_street2_name]) == 0:
                         del intersections2[primary_street_name][cross_street2_name]
@@ -206,27 +208,37 @@ class CountsWorkbookParser():
                         ml_tostreet   = cross_street1_name_final
                         ml_toint      = intersections1[primary_street_name_final][ml_tostreet][0]
     
+                    # look for the mainline count location in countdracula
+                    try:
+                        mainline_count_location = MainlineCountLocation.objects.get(from_int    = ml_fromint,
+                                                                                    to_int      = ml_toint,
+                                                                                    on_street   = primary_street_name_final,
+                                                                                    on_dir      = ml_ondir)
+                    except ObjectDoesNotExist:
+                        mainline_count_location = MainlineCountLocation(on_street           = primary_street_name_final,
+                                                                        on_dir              = ml_ondir,
+                                                                        from_street         = ml_fromstreet,
+                                                                        from_int            = ml_fromint,
+                                                                        to_street           = ml_tostreet,
+                                                                        to_int              = ml_toint)
+                        mainline_count_location.save()
+    
                     # process the rows                    
                     for row in range(2,len(activesheet.col(column))) :
                         
                         count = activesheet.cell_value(row,column) 
                         if count == "" : continue
                         
-                        (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0))     
+                        (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0), tzinfo=tzinfo)     
         
-                        mainline_count = countdracula.models.MainlineCount(count                = count,
-                                                                           start_time           = starttime,
-                                                                           period_minutes       = period,
-                                                                           vehicle_type         = vtype,
-                                                                           on_street            = primary_street_name_final,
-                                                                           on_dir               = ml_ondir,
-                                                                           from_street          = ml_fromstreet,
-                                                                           from_int             = ml_fromint,
-                                                                           to_street            = ml_tostreet,
-                                                                           to_int               = ml_toint,
-                                                                           reference_position   = -1, # reference position unknown, it's not in the workbook
-                                                                           sourcefile           = file,
-                                                                           project              = "")
+                        mainline_count = MainlineCount(location             = mainline_count_location,
+                                                       count                = count,
+                                                       start_time           = starttime,
+                                                       period_minutes       = period,
+                                                       vehicle_type         = vtype,
+                                                       reference_position   = -1, # reference position unknown, it's not in the workbook
+                                                       sourcefile           = file,
+                                                       project              = "")
                         mainline_count.save()
                         counts_saved += 1
                                 
@@ -240,7 +252,7 @@ class CountsWorkbookParser():
             logger.error("  " + traceback.format_exc())
             
             # remove the rest of the counts for this sourcefile so it can be retried
-            mainline_counts = countdracula.models.MainlineCount.objects.filter(sourcefile=file)
+            mainline_counts = MainlineCount.objects.filter(sourcefile=file)
             if len(mainline_counts) > 0:
                 logger.debug("  Removing %d counts from countdracula so sourcefile %s can be reprocessed" % 
                              (len(mainline_counts), file))
@@ -250,7 +262,7 @@ class CountsWorkbookParser():
                 
             return -1
     
-    def readAndInsertTurnCounts(self, file, street1, street2, logger):
+    def readAndInsertTurnCounts(self, file, street1, street2, logger, tzinfo=None):
         """
         Parses the given excel file representing turn counts and inserts them into the countdracula database.
         
@@ -271,7 +283,7 @@ class CountsWorkbookParser():
         doesn't have a southbound link from the intersection, since it's really "SouthTwo Street".  Thus, using this
         implementation, the fromstreet and tostreet define the intersection only, and not the movement.
         """
-        turn_counts = countdracula.models.TurnCount.objects.filter(sourcefile=file)
+        turn_counts = TurnCount.objects.filter(sourcefile=file)
         if len(turn_counts) > 0:
             logger.error("  readAndInsertTurnCounts() called on %s, but %d turn counts already "\
                         "exist with that sourcefile.  Skipping." % (file, len(turn_counts)))
@@ -279,11 +291,11 @@ class CountsWorkbookParser():
         
         try:  
             
-            NSstreetslist = countdracula.models.StreetName.getPossibleStreetNames(street1)
+            NSstreetslist = StreetName.getPossibleStreetNames(street1)
             if len(NSstreetslist) == 0:
                 raise CountsWorkbookParserException("readTurnCounts: Street %s not found." % street1)
             
-            EWstreetslist = countdracula.models.StreetName.getPossibleStreetNames(street2)
+            EWstreetslist = StreetName.getPossibleStreetNames(street2)
             if len(EWstreetslist) == 0:
                 raise CountsWorkbookParserException("readTurnCounts: Street %s not found." % street2)
     
@@ -292,8 +304,8 @@ class CountsWorkbookParser():
             intersections = {}
             for NSstreet in NSstreetslist:
                 for EWstreet in EWstreetslist:
-                    intersection_ids = countdracula.models.Node.objects.filter(streetname__street_name=NSstreet.street_name) \
-                                                                       .filter(streetname__street_name=EWstreet.street_name)
+                    intersection_ids = Node.objects.filter(streetname__street_name=NSstreet.street_name) \
+                                                   .filter(streetname__street_name=EWstreet.street_name)
                     
                     if len(intersection_ids) > 0:
                         intersections[(NSstreet, EWstreet)] = intersection_ids
@@ -381,26 +393,37 @@ class CountsWorkbookParser():
                             t_fromstreet    = final_EWstreet
                             t_tostreet      = final_NSstreet
                             t_intstreet     = final_NSstreet
-                        
+
+                    # look for the turn count location in countdracula
+                    try:
+                        turn_count_location = TurnCountLocation.objects.get(from_street    = t_fromstreet,
+                                                                            from_dir       = t_todir,
+                                                                            to_street      = t_tostreet,
+                                                                            to_dir         = t_todir,
+                                                                            intersection   = final_intid)
+                    except ObjectDoesNotExist:
+                        turn_count_location = TurnCountLocation(from_street    = t_fromstreet,
+                                                                from_dir       = t_todir,
+                                                                to_street      = t_tostreet,
+                                                                to_dir         = t_todir,
+                                                                intersection_street = t_intstreet,
+                                                                intersection   = final_intid)
+                        turn_count_location.save()
+                                                
                     for row in range(2,len(activesheet.col(column))):
                         
                         count = activesheet.cell_value(row,column) 
                         if count == "" : continue
                         
-                        (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0))     
+                        (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0), tzinfo=tzinfo)     
                         
-                        turn_count = countdracula.models.TurnCount(count            = count,
-                                                                   start_time       = starttime,
-                                                                   period_minutes   = period,
-                                                                   vehicle_type     = vtype,
-                                                                   from_street      = t_fromstreet,
-                                                                   from_dir         = t_fromdir,
-                                                                   to_street        = t_tostreet,
-                                                                   to_dir           = t_todir,
-                                                                   intersection_street = t_intstreet,
-                                                                   int              = final_intid,
-                                                                   sourcefile       = file,
-                                                                   project          = "")
+                        turn_count = TurnCount(location         = turn_count_location,
+                                               count            = count,
+                                               start_time       = starttime,
+                                               period_minutes   = period,
+                                               vehicle_type     = vtype,
+                                               sourcefile       = file,
+                                               project          = "")
                         turn_count.save()
                         counts_saved += 1
                         
@@ -414,7 +437,7 @@ class CountsWorkbookParser():
             logger.error("  "+traceback.format_exc())
             
             # remove the rest of the counts for this sourcefile so it can be retried
-            turn_counts = countdracula.models.TurnCount.objects.filter(sourcefile=file)
+            turn_counts = TurnCount.objects.filter(sourcefile=file)
             if len(turn_counts) > 0:
                 logger.debug("  Removing %d counts from countdracula so sourcefile %s can be reprocessed" % 
                              (len(turn_counts), file))

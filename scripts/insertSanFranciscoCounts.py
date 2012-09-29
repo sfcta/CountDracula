@@ -7,6 +7,7 @@ This script reads counts data from input Excel workbooks and inserts the info in
 """
 
 import logging, os, sys, time, traceback
+import pytz
 
 libdir = os.path.realpath(os.path.join(os.path.split(__file__)[0], "..", "geodjango"))
 print libdir
@@ -19,6 +20,7 @@ from geodjango import settings
 import countdracula.models
 from countdracula.parsers.CountsWorkbookParser import CountsWorkbookParser
 
+TIMEZONE = pytz.timezone('America/Los_Angeles')
 USAGE = """
 
  python insertSanFranciscoCounts.py countsWorkbookFile.xls|countsWorkbookDirectory [startFile]
@@ -101,7 +103,7 @@ if __name__ == '__main__':
         if len(streetlist) == 3:           
             mainline_attempted_files += 1
             
-            processed = xl_parser.readAndInsertMainlineCounts(os.path.join(dir, file), streetlist[0], streetlist[1], streetlist[2], logger)
+            processed = xl_parser.readAndInsertMainlineCounts(os.path.join(dir, file), streetlist[0], streetlist[1], streetlist[2], logger, TIMEZONE)
 
             mainline_processed_counts += processed
             mainline_processed_files += (1 if processed >= 0 else 0)
@@ -109,7 +111,7 @@ if __name__ == '__main__':
         elif len(streetlist) == 2:
             turns_attempted_files += 1
 
-            processed = xl_parser.readAndInsertTurnCounts(os.path.join(dir, file), streetlist[0], streetlist[1], logger)
+            processed = xl_parser.readAndInsertTurnCounts(os.path.join(dir, file), streetlist[0], streetlist[1], logger, TIMEZONE)
             
             turns_processed_counts += processed
             turns_processed_files += (1 if processed >= 0 else 0)

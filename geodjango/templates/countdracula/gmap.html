@@ -2,57 +2,100 @@
 <html>
 <head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<title>Count Dracula Map</title>
 <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
-<script src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+<script src="{{ STATIC_URL }}jquery-1.8.2.js"></script>
 <script>
-var map, marker, nodeByID = {};
+var map, infowindow = {};
+var markers = new Object();
 
 function initialize() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
-        center: new google.maps.LatLng(37.7750, -122.4183),
+
+  // start out with the checkboxes checked
+  $(":checkbox").prop("checked", true);
+
+  map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 13,
+        center: new google.maps.LatLng(37.76, -122.44),
         mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
+  });
+  
+  infowindow = new google.maps.InfoWindow({
+    content:'<div id="content">I miss Fury.</div>'
+  });
     
-    var marker_image = new google.maps.MarkerImage("{{ STATIC_URL }}small_red.png");
-    
-    {% for node in nodes %}
-		marker = new google.maps.Marker({map:map, position:new google.maps.LatLng({{node.point.y}}, {{node.point.x}}), icon:marker_image});
-		{% endfor %}
+  var marker_image = new google.maps.MarkerImage("{{ STATIC_URL }}small_red.png");
+
+  {% for turn_count_loc in turn_count_locs %}
+  key = "turn_" + {{turn_count_loc.id}}
+  markers[key] = new google.maps.Marker({
+    map:map, icon:marker_image,
+    position:new google.maps.LatLng({{turn_count_loc.intersection.point.y}}, {{turn_count_loc.intersection.point.x}}),
+    title:"{{turn_count_loc}}"
+  });
+  google.maps.event.addListener(markers[key], 'click', function() { getCountsInfo("turn", {{turn_count_loc.id}}); });
+  {% endfor %}
+  
+  {% for mainline_count_loc in mainline_count_locs %}
+  key = "mainline_" + {{mainline_count_loc.id}}
+  markers[key] = new google.maps.Polyline({
+    map:map,
+    path:[new google.maps.LatLng({{mainline_count_loc.from_int.point.y}}, {{mainline_count_loc.from_int.point.x}}),
+          new google.maps.LatLng({{mainline_count_loc.to_int.point.y}}  , {{mainline_count_loc.to_int.point.x}}  )
+          ],
+    strokeColor:"#FF0000", strokeOpacity:0.8, strokeWeight:3,
+    // title:"{{mainline_count_loc}}"
+  });
+  google.maps.event.addListener(markers[key], 'click', function() { getCountsInfo("mainline", {{mainline_count_loc.id}}); });  
+  {% endfor %}
 }
 
-$(document).ready(function () {
-    function activateNodes() {
-        // Add node click handler
-        $('.node').each(function () {
-            $(this).click(function() {
-                var node = nodeByID[this.id];
-                var center = new google.maps.LatLng(node.lat, node.lng);
-                if (marker) marker.setMap();
-                marker = new google.maps.Marker({map: map, position: center});
-                map.panTo(center);
-            }).hover(
-                function () {this.className = this.className.replace('OFF', 'ON');},
-                function () {this.className = this.className.replace('ON', 'OFF');}
-            );
-        });
-    }
-    activateNodes();
-});
+function showInfoWindow(json) {
+  console.log(json);
+  
+  var content_str = '<div class="content">';
+  for (var period_str in json.period_minutes) {
+    content_str   += json.period_minutes[period_str] + ' ' + period_str + '-minute counts<br />';
+  }
+  content_str     += "collected between " + json.date_min + " and " + json.date_max;  
+  content_str     += '</div>';
+  infowindow.setContent(content_str);
+  
+  var key = json.count_type + "_" + json.loc_id;
+  if (json.count_type == 'turn') {
+    infowindow.open(map, markers[json.count_type + "_" + json.loc_id ]);
+  } else {
+    infowindow.position = google.maps.geometry.spherical.interpolate(markers[key].getPath().getAt(0), markers[key].getPath().getAt(1), 0.5);
+    infowindow.open(map);
+  }
+}
+
+function getCountsInfo(type, id) {
+  // request information on the counts available here  
+  $.getJSON("/countdracula/counts_for_location/", { count_type:type, loc_id:id }, showInfoWindow );
+}
+
+$(document).ready(function () {});
 </script>
-<style>
-    body {font-family: sans-serif}
-    #map {width: 600px; height: 600px}
-    #nodes {overflow: auto; width: 500px; height: 100px}
-    .linkOFF {color: darkblue}
-    .linkON {color: white; background-color: darkblue}
-</style>
+<link rel="stylesheet" href="{{ STATIC_URL }}gmap.css"/>
 </head>
 <body onload='initialize()'>
-    <div id=map></div>
-    <div id=nodes>
-        {{content}}
-    </div>
-    <img src="{{ STATIC_URL }}small_red.png" />
+  <div id="header"><h1>Count Dracula</h1></div>
+  <div id="nav">
+   <table id='filters'>
+   <tr><th>Count Types</th>
+       <td id="count-type">
+       <input type="checkbox" id="Movements" />Movements<br />
+       <input type="checkbox" id="Mainline" />Mainline<br />
+       </td>
+   </tr>       
+   </table>
+   
+   <p>Movement locations: {{ turn_count_locs|length }}</p>
+   <p>Mainline locations: {{ mainline_count_locs|length }}</p>
+   
+  </div>
+  <div id="map"></div>
+  <div id="footer">This page is brought to you by <a href="https://github.com/sfcta/CountDracula">CountDracula</a> and <a href="http://geodjango.org/">GeoDjango</a>.</div>
 </body>
 </html>

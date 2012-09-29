@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models
+import math
 
 # Master list of (intersection) nodes and their coordinates
 class Node(gis_models.Model):
@@ -89,42 +90,65 @@ class StreetName(models.Model):
         return street_names
         
         
-        
-# Turn counts for an intersection
-class TurnCount(models.Model):
-    count               = models.IntegerField()
-    start_time          = models.TimeField(help_text="Start time for the count")
-    period_minutes      = models.IntegerField("Period the count was taken (minutes)")
-    vehicle_type        = models.IntegerField(choices=VehicleTypes)
+
+class TurnCountLocation(models.Model):    
     from_street         = models.ForeignKey(StreetName, help_text="Street from which turn originates")
     from_dir            = models.CharField(max_length=5, choices=Directions, help_text="Direction going into turn")
-    to_street           = models.ForeignKey(StreetName, help_text="Street to which the turn is destined", related_name="tc_to_street+")
+    to_street           = models.ForeignKey(StreetName, help_text="Street to which the turn is destined", related_name="tc_to_street")
     to_dir              = models.CharField(max_length=5, choices=Directions, help_text="Direction coming out of turn")
-    intersection_street = models.ForeignKey(StreetName, help_text="Cross street to identify the intersection", related_name="tc_int_street+")
-    int                 = models.ForeignKey(Node, help_text="Intersection", related_name="tc_int_id+")
-    sourcefile          = models.CharField(max_length=500, help_text="For tracking where this count came from")
-    project             = models.CharField(max_length=100, help_text="For tracking if this count was collected for a specific project")
+    intersection_street = models.ForeignKey(StreetName, help_text="Cross street to identify the intersection", related_name="tc_int_street")
+    intersection        = models.ForeignKey(Node, help_text="Intersection", related_name="tc_int_id")
     
+    class Meta:
+        unique_together = (('from_street', 'from_dir', 'to_street', 'to_dir', 'intersection'))
+        
     def __unicode__(self):
-        return "%3d-minute Turn count from %s %s to %s %s" % \
-            (self.period_minutes, self.from_street, self.from_dir, self.to_street, self.to_dir)
-            
-# Mainline counts for an intersection
-class MainlineCount(models.Model):
+        return "%s %s to %s %s" % \
+            (self.from_street, self.from_dir, self.to_street, self.to_dir)
+
+# Turn counts for an intersection        
+class TurnCount(models.Model):
+    location            = models.ForeignKey(TurnCountLocation, related_name="turncount")
+    
     count               = models.IntegerField()
-    start_time          = models.TimeField(help_text="Start time for the count")
+    start_time          = models.DateTimeField(help_text="Start time for the count")
     period_minutes      = models.IntegerField("Period the count was taken (minutes)")
     vehicle_type        = models.IntegerField(choices=VehicleTypes)
-    on_street           = models.ForeignKey(StreetName, help_text="The street with the count", related_name="mc_on_street+")
-    on_dir              = models.CharField(max_length=5, choices=Directions, help_text="Direction of count")
-    from_street         = models.ForeignKey(StreetName, help_text="Cross street before count", related_name="mc_from_street+")
-    from_int            = models.ForeignKey(Node, help_text="Intersection ID for that Cross street before count", related_name="mc_from_intid+")
-    to_street           = models.ForeignKey(StreetName, help_text="Cross street after count", related_name="mc_to_street+")
-    to_int              = models.ForeignKey(Node, help_text="Intersection for that Cross street after count", related_name="mc_to_intid+")
-    reference_position  = models.FloatField(help_text="How far along the link the count was actually taken; use -1 for unknown.  Units?")
     sourcefile          = models.CharField(max_length=500, help_text="For tracking where this count came from")
     project             = models.CharField(max_length=100, help_text="For tracking if this count was collected for a specific project")
 
     def __unicode__(self):
-        return "%3d-minute Mainline count on %s %s (from %s to %s)" % \
-                (self.period_minutes, self.on_street, self.on_dir, self.from_street, self.to_street)
+        return "%3d-minute at %s at location %s" % \
+            (self.period_minutes, self.start_time, self.location)
+
+class MainlineCountLocation(models.Model):
+    on_street           = models.ForeignKey(StreetName, help_text="The street with the count", related_name="mc_on_street")
+    on_dir              = models.CharField(max_length=5, choices=Directions, help_text="Direction of count")
+    from_street         = models.ForeignKey(StreetName, help_text="Cross street before count", related_name="mc_from_street")
+    from_int            = models.ForeignKey(Node, help_text="Intersection ID for that Cross street before count", related_name="mc_from_intid")
+    to_street           = models.ForeignKey(StreetName, help_text="Cross street after count", related_name="mc_to_street")
+    to_int              = models.ForeignKey(Node, help_text="Intersection for that Cross street after count", related_name="mc_to_intid")
+
+    class Meta:
+        unique_together = (('on_street', 'on_dir', 'from_int', 'to_int'))
+        
+    def __unicode__(self):
+        return "%s %s (from %s to %s)" % \
+                (self.on_street, self.on_dir, self.from_street, self.to_street)
+   
+# Mainline counts for an intersection
+class MainlineCount(models.Model):
+    location            = models.ForeignKey(MainlineCountLocation, related_name="mainlinecount")
+    
+    count               = models.IntegerField()
+    start_time          = models.DateTimeField(help_text="Start time for the count")
+    period_minutes      = models.IntegerField("Period the count was taken (minutes)")
+    vehicle_type        = models.IntegerField(choices=VehicleTypes)
+    sourcefile          = models.CharField(max_length=500, help_text="For tracking where this count came from")
+    project             = models.CharField(max_length=100, help_text="For tracking if this count was collected for a specific project")
+    reference_position  = models.FloatField(help_text="How far along the link the count was actually taken; use -1 for unknown.  Units?")
+
+    def __unicode__(self):
+        return "%3d-minute at %s at location %s" % \
+            (self.period_minutes, self.start_time, self.location)
+

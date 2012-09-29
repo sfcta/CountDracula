@@ -6,17 +6,21 @@ Created on Jul 25, 2011
 This script reads PEMS counts from Excel workbooks and inserts the info into the CountDracula dataabase.
 """
 
-import datetime, getopt, logging, os, sys, time, traceback, xlrd
+import datetime, getopt, logging, os, sys, time, traceback
+import pytz
+import xlrd
 
 libdir = os.path.realpath(os.path.join(os.path.split(__file__)[0], "..", "geodjango"))
 sys.path.append(libdir)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'geodjango.settings'
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import setup_environ
 from geodjango import settings
 
-import countdracula.models
+from countdracula.models import Node, StreetName, MainlineCountLocation, MainlineCount
 
+TIMEZONE = pytz.timezone('America/Los_Angeles')
 USAGE = """
 
  python insertSanFranciscoPeMSCounts.py [-v pems_vds_datfile] [-c pems_census_dir] PeMS_to_NetworkNodes.xls
@@ -92,7 +96,7 @@ def getIntersectionStreetnamesForPemsKey(mapping, pems_key):
     model_node_B_num    = mapping[pems_key][5]
     
     try:
-        model_node_A    = countdracula.models.Node.objects.get(id=model_node_A_num)
+        model_node_A    = Node.objects.get(id=model_node_A_num)
     except:
         raise Exception("Couldn't find node %6d in countdracula. Skipping %s" %
                         (model_node_A_num, loc_desc))
@@ -105,7 +109,7 @@ def getIntersectionStreetnamesForPemsKey(mapping, pems_key):
     # logger.debug("model_node_A = %s  streets_A_set = %s" % (model_node_A, streets_A_set))
     
     try:
-        model_node_B    = countdracula.models.Node.objects.get(id=model_node_B_num)
+        model_node_B    = Node.objects.get(id=model_node_B_num)
     except:
         raise Exception("Couldn't find node %6d in countdracula. Skipping %s" %
                         (model_node_B_num, loc_desc))    
@@ -235,7 +239,22 @@ def readVDSCounts(mapping, vds_datfilename):
         elif pems_dir == "N": pems_dir = "NB"
         elif pems_dir == "E": pems_dir = "EB"
         elif pems_dir == "W": pems_dir = "WB"
-        
+
+        # look for the mainline count location
+        try:
+            mainline_count_location = MainlineCountLocation.objects.get(from_int    = pemsid_to_cdlocation[pems_key][2],
+                                                                        to_int      = pemsid_to_cdlocation[pems_key][4],
+                                                                        on_street   = pemsid_to_cdlocation[pems_key][0],
+                                                                        on_dir      = pems_dir)
+        except ObjectDoesNotExist:
+            mainline_count_location = MainlineCountLocation(on_street           = pemsid_to_cdlocation[pems_key][0],
+                                                            on_dir              = pems_dir,
+                                                            from_street         = pemsid_to_cdlocation[pems_key][1],
+                                                            from_int            = pemsid_to_cdlocation[pems_key][2],
+                                                            to_street           = pemsid_to_cdlocation[pems_key][3],
+                                                            to_int              = pemsid_to_cdlocation[pems_key][4])
+            mainline_count_location.save()
+                    
         # required fields for insertMainlineCounts: count, starttime, period, vtype, 
         #      onstreet, ondir, fromstreet, tostreet, refpos, sourcefile, project
 
@@ -246,22 +265,20 @@ def readVDSCounts(mapping, vds_datfilename):
                                       day=int(pems_date_fields[1]),
                                       hour=int(pems_time_fields[0]),
                                       minute=int(pems_time_fields[1]),
-                                      second=int(pems_time_fields[2]))
+                                      second=int(pems_time_fields[2]),
+                                      tzinfo=TIMEZONE)
         project_str = "PeMS VDS %s - %s" % (pems_id, mapping[pems_key][3])
-                
-        mainline_count = countdracula.models.MainlineCount(count                = pems_flow,
-                                                           start_time           = starttime,
-                                                           period_minutes       = 60,
-                                                           vehicle_type         = 0, # ALL
-                                                           on_street            = pemsid_to_cdlocation[pems_key][0],
-                                                           on_dir               = pems_dir,
-                                                           from_street          = pemsid_to_cdlocation[pems_key][1],
-                                                           from_int             = pemsid_to_cdlocation[pems_key][2],
-                                                           to_street            = pemsid_to_cdlocation[pems_key][3],
-                                                           to_int               = pemsid_to_cdlocation[pems_key][4],
-                                                           reference_position   = -1,
-                                                           sourcefile           = vds_datfilename_abspath,
-                                                           project              = project_str)
+
+
+            
+        mainline_count = MainlineCount(location             = mainline_count_location,
+                                       count                = pems_flow,
+                                       start_time           = starttime,
+                                       period_minutes       = 60,
+                                       vehicle_type         = 0, # ALL                                                           
+                                       reference_position   = -1,
+                                       sourcefile           = vds_datfilename_abspath,
+                                       project              = project_str)
         mainline_count.save()
         counts_saved += 1
 
@@ -301,6 +318,21 @@ def readCensusCounts(mapping, census_dirname):
             logger.error(e)
             continue
 
+        # look for the mainline count location in countdracula
+        try:
+            mainline_count_location = MainlineCountLocation.objects.get(from_int    = intersection[2],
+                                                                        to_int      = intersection[4],
+                                                                        on_street   = intersection[0],
+                                                                        on_dir      = pems_dir)
+        except ObjectDoesNotExist:
+            mainline_count_location = MainlineCountLocation(on_street           = intersection[0],
+                                                            on_dir              = pems_dir,
+                                                            from_street         = intersection[1],
+                                                            from_int            = intersection[2],
+                                                            to_street           = intersection[3],
+                                                            to_int              = intersection[4])
+            mainline_count_location.save()
+
         workbook_filename = os.path.join(census_dirname, filename)
         book = xlrd.open_workbook(workbook_filename)
     
@@ -317,32 +349,28 @@ def readCensusCounts(mapping, census_dirname):
             for row in range(1, len(datasheet.col(0))):
                 pems_time = xlrd.xldate_as_tuple(datasheet.cell_value(row, 0), book.datemode)
                 
-                starttime = datetime.datetime(year=int(pems_date[0]), 
-                                              month=int(pems_date[1]), 
-                                              day=int(pems_date[2]),
-                                              hour=int(pems_time[3]),
-                                              minute=int(pems_time[4]),
-                                              second=0)
+                starttime = datetime.datetime(year  = int(pems_date[0]), 
+                                              month = int(pems_date[1]), 
+                                              day   = int(pems_date[2]),
+                                              hour  = int(pems_time[3]),
+                                              minute= int(pems_time[4]),
+                                              second= 0,
+                                              tzinfo=TIMEZONE)
                 
                 count = datasheet.cell_value(row,col)
                 if count == "": continue  # skip blanks
                 if count == 0.0: continue # skip zeros, they aren't real zero counts                
                 project_str = "PeMS Census %s - %s" % (pems_id, mapping[pems_key][3])
-        
-                # read the counts
-                mainline_count = countdracula.models.MainlineCount(count                = count,
-                                                                   start_time           = starttime,
-                                                                   period_minutes       = 60,
-                                                                   vehicle_type         = 0, # ALL
-                                                                   on_street            = intersection[0],
-                                                                   on_dir               = pems_dir,
-                                                                   from_street          = intersection[1],
-                                                                   from_int             = intersection[2],
-                                                                   to_street            = intersection[3],
-                                                                   to_int               = intersection[4],
-                                                                   reference_position   = -1,
-                                                                   sourcefile           = workbook_filename,
-                                                                   project              = project_str)
+
+                # read the counts                    
+                mainline_count = MainlineCount(location             = mainline_count_location,
+                                               count                = count,
+                                               start_time           = starttime,
+                                               period_minutes       = 60,
+                                               vehicle_type         = 0, # ALL
+                                               reference_position   = -1,
+                                               sourcefile           = workbook_filename,
+                                               project              = project_str)
                 mainline_count.save()
                 counts_saved += 1
         

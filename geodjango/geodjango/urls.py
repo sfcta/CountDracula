@@ -16,6 +16,9 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     
     # google maps view
-    url(r'^gmap/', 'countdracula.views.gmapview'),
+    url(r'^map/', 'countdracula.views.mapview'),
+    
+    # for google maps to fetch count information for a location
+    url(r'^counts_for_location/$', 'countdracula.views.counts_for_location')
 
 )

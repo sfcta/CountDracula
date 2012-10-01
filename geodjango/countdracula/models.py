@@ -111,8 +111,9 @@ class TurnCount(models.Model):
     location            = models.ForeignKey(TurnCountLocation, related_name="turncount")
     
     count               = models.IntegerField()
-    start_time          = models.DateTimeField(help_text="Start time for the count")
-    period_minutes      = models.IntegerField("Period the count was taken (minutes)")
+    count_date          = models.DateField(help_text="Date the count was collected")
+    start_time          = models.TimeField(help_text="Start time for the count")
+    period_minutes      = models.IntegerField("Period (minutes)")
     vehicle_type        = models.IntegerField(choices=VehicleTypes)
     sourcefile          = models.CharField(max_length=500, help_text="For tracking where this count came from")
     project             = models.CharField(max_length=100, help_text="For tracking if this count was collected for a specific project")
@@ -141,8 +142,9 @@ class MainlineCount(models.Model):
     location            = models.ForeignKey(MainlineCountLocation, related_name="mainlinecount")
     
     count               = models.IntegerField()
-    start_time          = models.DateTimeField(help_text="Start time for the count")
-    period_minutes      = models.IntegerField("Period the count was taken (minutes)")
+    count_date          = models.DateField(help_text="Date the count was collected")    
+    start_time          = models.TimeField(help_text="Start time for the count")
+    period_minutes      = models.IntegerField("Period (minutes)")
     vehicle_type        = models.IntegerField(choices=VehicleTypes)
     sourcefile          = models.CharField(max_length=500, help_text="For tracking where this count came from")
     project             = models.CharField(max_length=100, help_text="For tracking if this count was collected for a specific project")

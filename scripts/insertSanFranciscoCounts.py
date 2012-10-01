@@ -103,7 +103,7 @@ if __name__ == '__main__':
         if len(streetlist) == 3:           
             mainline_attempted_files += 1
             
-            processed = xl_parser.readAndInsertMainlineCounts(os.path.join(dir, file), streetlist[0], streetlist[1], streetlist[2], logger, TIMEZONE)
+            processed = xl_parser.readAndInsertMainlineCounts(os.path.join(dir, file), streetlist[0], streetlist[1], streetlist[2], logger)
 
             mainline_processed_counts += processed
             mainline_processed_files += (1 if processed >= 0 else 0)
@@ -111,7 +111,7 @@ if __name__ == '__main__':
         elif len(streetlist) == 2:
             turns_attempted_files += 1
 
-            processed = xl_parser.readAndInsertTurnCounts(os.path.join(dir, file), streetlist[0], streetlist[1], logger, TIMEZONE)
+            processed = xl_parser.readAndInsertTurnCounts(os.path.join(dir, file), streetlist[0], streetlist[1], logger)
             
             turns_processed_counts += processed
             turns_processed_files += (1 if processed >= 0 else 0)

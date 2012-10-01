@@ -28,25 +28,26 @@ class CountsWorkbookParser():
         '''
         pass
       
-    def createtimestamp (self, date_yyyy_mm_dd, time_period_str, tzinfo):
+    def createtimestamp (self, time_period_str, tzinfo):
         """
-        Interprets date and time period string
+        Interprets time period string
         
-        * *date_yyyy_mm_dd*: the date string in "yyyy-mm-dd" format. E.g. `2011-09-26`.
         * *time_period_str*: can be one of `AMPKHOUR`, `PMPKHOUR`, `ADT`, or a range in military time, such as `1600-1615`.
 
         
-        Returns tuple -> (starttime, period_minutes) where startime is a datetime object and period_minutes is a integer representing number of minutes
-        """    
+        Returns tuple -> (starttime, period_minutes) where 
+         starttime is datetime.time instance,
+         and period_minutes is a integer representing number of minutes
+        """        
         special_times = {'AMPKHOUR':[time( 8,00,00,100801),time( 9,00,00,100801)],
                          'PMPKHOUR':[time(17,00,00,101701),time(18,00,00,101701)],
                          'ADT'     :[time( 0,00,00,102424),time(23,30,00,102424)]}  # ???  what the deuce are the microseconds
         
         if time_period_str == 'ADT':
-            return (datetime.combine(date_yyyy_mm_dd, special_times[time_period_str][0]),  24*60)
+            return (special_times[time_period_str][0],  24*60)
         
         elif time_period_str in special_times:            
-            return (datetime.combine(date_yyyy_mm_dd, special_times[time_period_str][0]), 60)
+            return (special_times[time_period_str][0], 60)
 
         
         (start, end) = time_period_str.split("-")    
@@ -54,7 +55,7 @@ class CountsWorkbookParser():
         starttime = timedelta(hours=int(start[:2]), minutes=int(start[2:]))
         endtime   = timedelta(hours=int(  end[:2]), minutes=int(  end[2:]))
             
-        return (datetime.combine(date_yyyy_mm_dd, time(hour=int(start[:2]),minute=int(start[2:]), tzinfo=tzinfo) ), 
+        return (time(hour=int(start[:2]),minute=int(start[2:]), tzinfo=tzinfo), 
                 int((endtime - starttime).seconds/60))
 
 
@@ -229,10 +230,11 @@ class CountsWorkbookParser():
                         count = activesheet.cell_value(row,column) 
                         if count == "" : continue
                         
-                        (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0), tzinfo=tzinfo)     
+                        (starttime, period) = self.createtimestamp(activesheet.cell_value(row,0), tzinfo=tzinfo)     
         
                         mainline_count = MainlineCount(location             = mainline_count_location,
                                                        count                = count,
+                                                       count_date           = date_yyyy_mm_dd,
                                                        start_time           = starttime,
                                                        period_minutes       = period,
                                                        vehicle_type         = vtype,
@@ -415,10 +417,11 @@ class CountsWorkbookParser():
                         count = activesheet.cell_value(row,column) 
                         if count == "" : continue
                         
-                        (starttime, period) = self.createtimestamp(date_yyyy_mm_dd,activesheet.cell_value(row,0), tzinfo=tzinfo)     
+                        (starttime, period) = self.createtimestamp(activesheet.cell_value(row,0), tzinfo=tzinfo)     
                         
                         turn_count = TurnCount(location         = turn_count_location,
                                                count            = count,
+                                               count_date       = date_yyyy_mm_dd,
                                                start_time       = starttime,
                                                period_minutes   = period,
                                                vehicle_type     = vtype,

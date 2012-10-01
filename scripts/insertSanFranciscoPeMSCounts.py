@@ -260,19 +260,20 @@ def readVDSCounts(mapping, vds_datfilename):
 
         pems_date_fields = pems_date.split(r"/")
         pems_time_fields = pems_time.split(r":")
-        starttime = datetime.datetime(year=int(pems_date_fields[2]), 
-                                      month=int(pems_date_fields[0]), 
-                                      day=int(pems_date_fields[1]),
-                                      hour=int(pems_time_fields[0]),
-                                      minute=int(pems_time_fields[1]),
-                                      second=int(pems_time_fields[2]),
-                                      tzinfo=TIMEZONE)
+        count_date = datetime.date(year=int(pems_date_fields[2]), 
+                                   month=int(pems_date_fields[0]), 
+                                   day=int(pems_date_fields[1]))
+        starttime = datetime.time( hour=int(pems_time_fields[0]),
+                                   minute=int(pems_time_fields[1]),
+                                   second=int(pems_time_fields[2]))
+                                   # tzinfo=TIMEZONE)
         project_str = "PeMS VDS %s - %s" % (pems_id, mapping[pems_key][3])
 
 
             
         mainline_count = MainlineCount(location             = mainline_count_location,
                                        count                = pems_flow,
+                                       count_date           = count_date,
                                        start_time           = starttime,
                                        period_minutes       = 60,
                                        vehicle_type         = 0, # ALL                                                           
@@ -349,13 +350,13 @@ def readCensusCounts(mapping, census_dirname):
             for row in range(1, len(datasheet.col(0))):
                 pems_time = xlrd.xldate_as_tuple(datasheet.cell_value(row, 0), book.datemode)
                 
-                starttime = datetime.datetime(year  = int(pems_date[0]), 
-                                              month = int(pems_date[1]), 
-                                              day   = int(pems_date[2]),
-                                              hour  = int(pems_time[3]),
-                                              minute= int(pems_time[4]),
-                                              second= 0,
-                                              tzinfo=TIMEZONE)
+                count_date = datetime.date(year  = int(pems_date[0]), 
+                                           month = int(pems_date[1]), 
+                                           day   = int(pems_date[2]))
+                starttime = datetime.time( hour  = int(pems_time[3]),
+                                           minute= int(pems_time[4]),
+                                           second= 0)
+                                           # tzinfo=TIMEZONE)
                 
                 count = datasheet.cell_value(row,col)
                 if count == "": continue  # skip blanks
@@ -365,6 +366,7 @@ def readCensusCounts(mapping, census_dirname):
                 # read the counts                    
                 mainline_count = MainlineCount(location             = mainline_count_location,
                                                count                = count,
+                                               count_date           = count_date,
                                                start_time           = starttime,
                                                period_minutes       = 60,
                                                vehicle_type         = 0, # ALL

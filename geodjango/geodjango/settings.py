@@ -3,6 +3,7 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+# set this!
 ADMINS = (
     ('Lisa Zorn', 'lisa.zorn@sfcta.org'),
 )
@@ -11,15 +12,16 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'countdracula_geodjango',                   # Or path to database file if using sqlite3.
-        'USER': 'countdracula',              # Not used with sqlite3.
-        'PASSWORD': 'carscookiesbikes',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE':   'django.contrib.gis.db.backends.postgis',
+        'NAME':     'countdracula_geodjango',   # set this!
+        'USER':     'countdracula',             # set this!
+        'PASSWORD': 'carscookiesbikes',         # set this!
+        'HOST': '',                             # Set to empty string for localhost.
+        'PORT': '',                             # Set to empty string for default.
     }
 }
 
+# comment this out if you don't want to bother with Caching
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
@@ -52,7 +54,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = 'C:\Users\lisa\CountDracula\media'
+MEDIA_ROOT = 'C:\CountDracula\media'  # set this!
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -63,7 +65,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = 'C:\Users\lisa\CountDracula\static'
+STATIC_ROOT = 'C:\CountDracula\static' # set this!
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"

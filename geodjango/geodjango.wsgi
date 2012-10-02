@@ -4,7 +4,7 @@ import sys
 os.environ['DJANGO_SETTINGS_MODULE'] = 'geodjango.settings'
 print sys.path
 
-project_path=r"C:\Users\lisa\CountDracula\geodjango"
+project_path=r"C:\CountDracula\geodjango"
 if project_path not in sys.path:
 	sys.path.append(project_path)
 geo_path=r"C:\OSGeo4W\bin"

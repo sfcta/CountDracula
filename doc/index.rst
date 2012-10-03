@@ -10,7 +10,6 @@ CountDracula is a counts database framework for storing street traffic counts.
 .. toctree::
 
    setup
-   tables
 
 CountDracula API
 ================
@@ -19,19 +18,16 @@ CountDracula API
    :nosignatures:
    :toctree: _generated
    
-   countdracula.CountsDatabaseReader   
-   countdracula.CountsDatabaseWriter
-   countdracula.CountsWorkbookParser
+   countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser
+   countdracula.models.Node
+   countdracula.models.VehicleTypes
+   countdracula.models.Directions
+   countdracula.models.StreetName
+   countdracula.models.TurnCountLocation
+   countdracula.models.TurnCount
+   countdracula.models.MainlineCountLocation
+   countdracula.models.MainlineCount
 
-Example: Parsing San Francisco Excel Workbooks and Inserting Into CountDracula
-==============================================================================
-.. literalinclude:: ..\scripts\insertSanFranciscoCounts.py
-   :linenos:
-   
-Example: Querying San Francisco Counts for Data TimeSlices
-==========================================================
-.. literalinclude:: ..\scripts\querySanFranciscoCounts.py
-   :linenos:
 
 Indices and tables
 ==================

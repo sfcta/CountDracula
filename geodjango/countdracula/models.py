@@ -10,9 +10,13 @@ class Node(gis_models.Model):
     objects = gis_models.GeoManager()
 
     def long_x(self):
+        """ Returns the longitude of this node.
+        """
         return self.point[0]
         
     def lat_y(self):
+        """ Returns the latitude of this node.
+        """
         return self.point[1]
         
     # Returns the string representation of the model.
@@ -46,6 +50,7 @@ VehicleTypes = \
   )
 )
 
+# Direction options
 Directions = \
 ( ('NB',    'Northbound'),
   ('SB',    'Southbound'),
@@ -140,7 +145,7 @@ class MainlineCountLocation(models.Model):
 # Mainline counts for an intersection
 class MainlineCount(models.Model):
     location            = models.ForeignKey(MainlineCountLocation, related_name="mainlinecount")
-    
+
     count               = models.IntegerField()
     count_date          = models.DateField(help_text="Date the count was collected")    
     start_time          = models.TimeField(help_text="Start time for the count")

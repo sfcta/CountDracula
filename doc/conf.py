@@ -11,8 +11,15 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os, countdracula
-from countdracula import CountsDatabaseWriter
+import sys, os
+
+libdir = os.path.realpath(os.path.join(os.path.split(__file__)[0], "..", "geodjango"))
+sys.path.append(libdir)
+    
+os.environ['DJANGO_SETTINGS_MODULE'] = 'geodjango.settings'
+from django.core.management import setup_environ
+from geodjango import settings
+import countdracula.models
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -225,3 +232,48 @@ autoclass_content = 'both'
 autosummary_generate = True
 
 todo_include_todos = True
+
+# This is from http://djangosnippets.org/snippets/2533/
+import inspect
+from geodjango import settings
+from django.core.management import setup_environ
+from django.utils.html import strip_tags
+from django.utils.encoding import force_unicode
+
+setup_environ(settings)
+
+def process_docstring(app, what, name, obj, options, lines):
+    # This causes import errors if left outside the function
+    from django.db import models
+    
+    # Only look at objects that inherit from Django's base model class
+    if inspect.isclass(obj) and issubclass(obj, models.Model):
+        # Grab the field list from the meta class
+        fields = obj._meta._fields()
+    
+        for field in fields:
+            # Decode and strip any html out of the field's help text
+            help_text = strip_tags(force_unicode(field.help_text))
+            
+            # Decode and capitalize the verbose name, for use if there isn't
+            # any help text
+            verbose_name = force_unicode(field.verbose_name).capitalize()
+            
+            if help_text:
+                # Add the model field to the end of the docstring as a param
+                # using the help text as the description
+                lines.append(u':param %s: %s' % (field.attname, help_text))
+            else:
+                # Add the model field to the end of the docstring as a param
+                # using the verbose name as the description
+                lines.append(u':param %s: %s' % (field.attname, verbose_name))
+                
+            # Add the field's type to the docstring
+            lines.append(u':type %s: %s' % (field.attname, type(field).__name__))
+    
+    # Return the extended docstring
+    return lines  
+  
+def setup(app):
+    # Register the docstring processor with sphinx
+    app.connect('autodoc-process-docstring', process_docstring) 

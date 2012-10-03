@@ -1,9 +1,3 @@
-'''
-Created on Jul 25, 2011
-
-@author: varun
-'''
-
 import xlrd, sys, traceback
 from datetime import datetime,date, time, timedelta
 from types import FloatType

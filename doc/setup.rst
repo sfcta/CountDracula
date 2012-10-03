@@ -4,18 +4,30 @@ CountDracula Setup
 Requirements
 ------------
 
-To setup a CountDracula database, you'll need to install the following:
+CountDracula runs on `Geodjango <http://geodjango.org/>`_, a GIS-based extension to 
+`Django <https://www.djangoproject.com/>`_, which is a high-level python web framework.
 
-* `postgreSQL <http://www.postgresql.org>`_, an open source object-relational database system.
-  *Tested with postgreSQL 9.0.3 on windows and ? on Linux*
+To setup a CountDracula database, you should first install `Geodjango <http://geodjango.org/>`_
+The best way to do this is to follow the Geodjango `Platform-specific instructions <https://docs.djangoproject.com/en/1.4/ref/contrib/gis/install/#platform-specific-instructions>`_.
+
+
+The following were used to develop and test CountDracula:
+
+* Windows 7 64-bit
+* `postgreSQL <http://www.postgresql.org>`_, an open source object-relational database system.  
+  *Tested with postgreSQL 9.0.10*
 * `postGIS <http://postgis.refractions.net>`_, an open source add-on that "spatially enables" postgreSQL 
-  with GIS functionality.  *Tested with postGIS 9.0.3 on windows*
-* `python <http://www.python.org/>`_, the programming language in which CountDracula is implemented. 
-  *Tested with python 2.6*  The following python modules are also used:
+  with GIS functionality. *Tested with postGIS 1.5*
+* `Apache <http://www.apache.org/>`_, the webserver.  *Tested with Apache 2.2* 
+* `Python 2.7.3 32-bit <http://www.python.org/download/releases/2.7.3/>`_
+* `modwsgi <http://code.google.com/p/modwsgi/>`_, a Python WSGI adaptor module for Apache.  This doesn't seem to have a version.
+  The following python modules are also used:
   
-  * `psycopg <http://www.initd.org/psycopg/>`_, an PostgreSQL adapter for Python.  *Tested with psycopg 2.4.2*
+  * `psycopg <http://www.initd.org/psycopg/>`_, an PostgreSQL adapter for Python.  *Tested with psycopg 2.4.5*
   * `xlrd <http://pypi.python.org/pypi/xlrd>`_, a python library for reading Microsoft Excel files.  
     *Tested with xlrd 0.7.1*
+  * `python-memcached <http://pypi.python.org/pypi/python-memcached/>`_ This is a memory-based caching
+    framework that can help with performance.  Optional. *Tested with python-memcached 1.48*.
 
 Installation Instructions
 -------------------------
@@ -28,52 +40,74 @@ on your database.  For example, if your database is setup on a publicly accessib
 restrict the hosts which can connect to the database to be only localhost, or only the machine from which you'll
 run theses scripts.
 
-Database Setup
---------------
-During the postgreSQL installation, a user was likely created for you called `postgres`. 
-You can now create the CountDracula postgreSQL database, its users, and initialize its tables 
-(noting that the location of the postgres executables should be in your path)::
+Django/GeoDjango Setup for CountDracula
+---------------------------------------
+Download the CountDracula code from `CountDracula on GitHub <https://github.com/sfcta/CountDracula>`_.
+This should be downloaded to a location that can be served by Apache, or the same local drive.
+In our setup, we'll download into ``C:\CountDracula``.  From here forward, ``%COUNT_DRACULA_ROOT%`` refers
+to the root directory of the code.
 
-  X:\lmz\util\CountDracula>psql --username postgres --file=countdracula\initializeCountDraculaDatabase.sql
+Update the CountDracula settings file, ``%COUNT_DRACULA_ROOT%\geodjango\geodjango\settings.py``
+You should confirm/set the following:
 
-You'll get prompted for your postgreSQL password again, and you should see a bunch of output like the following::
+* Admins: A name and email address.  (What's this used for?  I'm not sure...)
+* The Database information: choose the name of your countdracula database, the postgres user that
+  will access it, and a password for that user.  
+* The ``MEDIA_ROOT`` and ``STATIC_ROOT`` directories are wher media (currently none) and static files (js, css)
+  files will be put.  We put them in ``%COUNT_DRACULA_ROOT%/media`` and ``%COUNT_DRACULA_ROOT%/static``,
+  respectively.
+* Comment out ``CACHES`` if you don't want to deal with `Memcache or Caching <https://docs.djangoproject.com/en/dev/topics/cache/>`_ 
+  (or if you want to deal with it later).
+* Set the ``TIME_ZONE`` to the right time zone for you.
 
-  CREATE DATABASE
-  CREATE ROLE
-  GRANT
-  CREATE ROLE
-  GRANT
-  WARNING: Console code page (437) differs from Windows code page (1252)
-           8-bit characters might not work correctly. See psql reference
-           page "Notes for Windows users" for details.
-  You are now connected to database "countdracula".
-  psql:countdracula/initializeCountDraculaDatabase.sql:22: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "vtype_pkey" for table "vtype"
+Then run the following setup commands - we recommend doing each on by hand to start with.
 
-  CREATE TABLE
-  INSERT 0 17
-  psql:countdracula/initializeCountDraculaDatabase.sql:50: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "directions_pkey" for table "directions"
-  CREATE TABLE
-  INSERT 0 4
-  psql:countdracula/initializeCountDraculaDatabase.sql:62: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "street_names_pkey" for table "street_names"
-  CREATE TABLE
-  CREATE TABLE
-  psql:countdracula/initializeCountDraculaDatabase.sql:74: NOTICE:  ALTER TABLE / ADD UNIQUE will create implicit index "intersection_ids_street1_street2_key" for table "intersection_ids"
-  ALTER TABLE
-  psql:countdracula/initializeCountDraculaDatabase.sql:80: NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "nodes_pkey" for table "nodes"
+.. literalinclude:: ..\scripts\setupSanFranciscoCountDracula.bat
+   :linenos:
+   :language: bat
+   :end-before: setup_complete
 
-  CREATE TABLE
-  ALTER TABLE
-  CREATE TABLE
-  psql:countdracula/initializeCountDraculaDatabase.sql:100: NOTICE:  ALTER TABLE / ADD UNIQUE will create implicit index "counts_ml_count_starttime_vtype_period_onstreet_ondir_froms_key" for table "counts_ml"
-  ALTER TABLE
-  CREATE TABLE
-  psql:countdracula/initializeCountDraculaDatabase.sql:120: NOTICE:  ALTER TABLE / ADD UNIQUE will create implicit index "counts_turns_count_starttime_vtype_period_fromstreet_fromdi_key" for table "counts_turns"
-  ALTER TABLE
-  GRANT
-  GRANT
-  GRANT
-  GRANT
-  GRANT
-  GRANT
-  GRANT
+Now your CountDracula instance is setup!  One last thing - you'll need to setup Apache to serve the CountDracula web interface.
 
+Apache Setup
+------------
+
+First, install `modwsgi <http://code.google.com/p/modwsgi/>`_, a python WSGI adapter module for Apache.  We followed
+the `Windows installation instructions <http://code.google.com/p/modwsgi/wiki/InstallationOnWindows>`_.
+
+Install the following Apache configuration file into the Apache configuration directory; the installation typically includes
+an *extra* subdir in the configuration directory.
+
+In our Windows installation, this file is saved as ``C:\Program Files (x86)\Apache Software Foundation\Apache2.2\conf\extra\httpd-countdracula.conf``.
+Note you may have to act as root or the System Administrator to edit Apache configuration.
+
+.. literalinclude:: ..\httpd-countdracula.conf
+
+Add a line into the main Apache configuration file to make sure this file is included.  I typically do this where other configuration files are also included::
+
+  LoadModule wsgi_module modules/mod_wsgi.so
+
+  # CountDracula
+  Include conf/extra/httpd-countdracula.conf
+
+
+Restart Apache.  That's it!  Hopefully everything worked out and you can now open a browser window
+and navigate to http://[your_hostname]/countdracula/admin for the admin interface, and http://[your_hostname]/countdracula/map for the
+map view.
+
+Now you can start to put counts in!  More on this later.
+
+.. literalinclude:: ..\scripts\setupSanFranciscoCountDracula.bat
+   :linenos:
+   :language: bat
+   :start-after: setup_complete
+   
+Troubleshooting
+---------------
+Some issues we ran into:
+
+* When installing `OSGeo4W <http://trac.osgeo.org/osgeo4w/>`_, make sure you include the libraries GDAL18, Geos, zlib, proj, openssl, libjpeg12.
+* I had some dynamic library loading errors associated with loading gdal.  I found it useful to try to load it from the command line following
+  `these instructions <https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#can-t-find-gdal-library>`_ until it was successful.
+  For each error I encountered, I would run the OSGeo4W installer again and choose Advanced Install, and pick the libraries that appeared to
+  be relevant.  I also  had to rename ``C:\OSGeo4W\bin\proj.dll`` to ``C:\OSGeo4W\bin\proj_fw.dll``.

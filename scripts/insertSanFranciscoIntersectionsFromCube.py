@@ -15,7 +15,7 @@ USAGE = r"""
 
 """
 
-import logging, os, shutil, subprocess, sys, tempfile, traceback
+import logging, os, shutil, socket, subprocess, sys, tempfile, traceback
 
 libdir = os.path.realpath(os.path.join(os.path.split(__file__)[0], "..", "geodjango"))
 sys.path.append(libdir)
@@ -45,7 +45,7 @@ def readCubeNetwork(cube_network, logger):
      {(a,b) -> (streetname, type)})
     """
     # export the cube network
-    tempdir = tempfile.mkdtemp()
+    tempdir = tempfile.mkdtemp(dir=r"X:\temp")
     scriptFilename = os.path.join(tempdir, EXPORT_SCRIPTNAME)
     
     logger.info("Writing export script to %s" % scriptFilename)
@@ -54,12 +54,19 @@ def readCubeNetwork(cube_network, logger):
     scriptFile.close()
     
     # run the script file
-    logger.info("Running %s" % scriptFilename)
     cmd = "runtpp " + scriptFilename
+    env = dict(os.environ)
+    hostname = socket.gethostname().lower()
+    if hostname not in ['berry']:
+        cmd = r'Y:\champ\util\bin\dispatch-one.bat "%s"' % cmd
+        env['MACHINES'] = 'taraval'
+
+    logger.info("Running %s" % cmd)           
     proc = subprocess.Popen( cmd, 
                              cwd = tempdir, 
                              stdout=subprocess.PIPE, 
-                             stderr=subprocess.PIPE )
+                             stderr=subprocess.PIPE,
+                             env=env)
     for line in proc.stdout:
         line = line.strip('\r\n')
         logger.info("  stdout: " + line)

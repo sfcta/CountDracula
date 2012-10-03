@@ -10,7 +10,6 @@ import logging, os, sys, time, traceback
 import pytz
 
 libdir = os.path.realpath(os.path.join(os.path.split(__file__)[0], "..", "geodjango"))
-print libdir
 sys.path.append(libdir)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'geodjango.settings'
 

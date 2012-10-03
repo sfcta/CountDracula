@@ -13,16 +13,21 @@ psql -U postgres -c "drop database countdracula_geodjango"
 
 ::
 :: create the countdracula user (if you haven't already)
+:: This should match the settings.py file
+:: 
+:: This will prompt for the the password of the new user (role), followed by that of the super postgres user (postgres).
 ::
 createuser -SDR --username postgres -P countdracula
 
 ::
 :: create the postgis database
+:: This will prompt for the password of the super postgres user (postgres).
 ::
 createdb --username postgres --owner=countdracula -T template_postgis countdracula_geodjango
 
 ::
 :: change the user for the two tables to countdracula
+:: This will prompt for the password of the super postgres user (postgres).
 ::
 psql -U postgres -d countdracula_geodjango -c "ALTER TABLE spatial_ref_sys OWNER to countdracula;"
 psql -U postgres -d countdracula_geodjango -c "ALTER TABLE geometry_columns OWNER to countdracula;"
@@ -37,19 +42,21 @@ cd geodjango
 
 ::
 :: Verify the countdracula model is AOK
-::
+:: This should output a bunch of SQL
 python manage.py sqlall countdracula
 
 ::
-:: Setup the database -- you'll need to setup the django superuser
-::
+:: Setup the database -- you'll need to setup the django superuser (not to be confused with the postgres super user
+:: or the postgres countdracula user).
 python manage.py syncdb
 
 ::
-:: set up the static files into STATIC_ROOT
-::
+:: Setup the static files into STATIC_ROOT
+:: This will collect all the css and javascript files into the STATIC_ROOT.
 python manage.py collectstatic
 
+
+:: ======================================== setup_complete ===============================================
 ::
 :: get in place to run scripts
 ::

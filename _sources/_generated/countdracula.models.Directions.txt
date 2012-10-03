@@ -1,0 +1,6 @@
+countdracula.models.Directions
+==============================
+
+.. currentmodule:: countdracula.models
+
+.. autodata:: Directions

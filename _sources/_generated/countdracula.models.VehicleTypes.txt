@@ -1,0 +1,6 @@
+countdracula.models.VehicleTypes
+================================
+
+.. currentmodule:: countdracula.models
+
+.. autodata:: VehicleTypes

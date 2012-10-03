@@ -1,0 +1,227 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser &mdash; CountDracula .7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="CountDracula .7 documentation" href="../index.html" />
+    <link rel="next" title="countdracula.models.Node" href="countdracula.models.Node.html" />
+    <link rel="prev" title="countdracula.models.MainlineCount" href="countdracula.models.MainlineCount.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="countdracula.models.Node.html" title="countdracula.models.Node"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="countdracula.models.MainlineCount.html" title="countdracula.models.MainlineCount"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">CountDracula .7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="countdracula-parsers-countsworkbookparser-countsworkbookparser">
+<h1>countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser<a class="headerlink" href="#countdracula-parsers-countsworkbookparser-countsworkbookparser" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser">
+<em class="property">class </em><tt class="descname">CountsWorkbookParser</tt><a class="headerlink" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in and parses in Excel workbooks in certain standardized formats, returning tuples to be used by
+<tt class="xref py py-class docutils literal"><span class="pre">CountsDatabaseWriter</span></tt> to insert into the Counts Database.</p>
+<p>Initialize the counts workbook parser.</p>
+<dl class="method">
+<dt id="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the counts workbook parser.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.__init__" title="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>()</td>
+<td>Initialize the counts workbook parser.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.createtimestamp" title="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.createtimestamp"><tt class="xref py py-obj docutils literal"><span class="pre">createtimestamp</span></tt></a>(time_period_str,&nbsp;tzinfo)</td>
+<td>Interprets time period string</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readAndInsertMainlineCounts" title="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readAndInsertMainlineCounts"><tt class="xref py py-obj docutils literal"><span class="pre">readAndInsertMainlineCounts</span></tt></a>(file,&nbsp;...[,&nbsp;tzinfo])</td>
+<td>Parses the given excel file representing mainline counts and inserts those counts into the countdracula database.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readAndInsertTurnCounts" title="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readAndInsertTurnCounts"><tt class="xref py py-obj docutils literal"><span class="pre">readAndInsertTurnCounts</span></tt></a>(file,&nbsp;street1,&nbsp;...)</td>
+<td>Parses the given excel file representing turn counts and inserts them into the countdracula database.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readIntersectionIds" title="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readIntersectionIds"><tt class="xref py py-obj docutils literal"><span class="pre">readIntersectionIds</span></tt></a>(file)</td>
+<td>Reads an excel workbook with intersection information (see exampledataintersections.xls) and returns</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readSourcefile" title="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readSourcefile"><tt class="xref py py-obj docutils literal"><span class="pre">readSourcefile</span></tt></a>(book)</td>
+<td>Extracts sourcefiles names from &#8220;book&#8221;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readStreetNames" title="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readStreetNames"><tt class="xref py py-obj docutils literal"><span class="pre">readStreetNames</span></tt></a>(file)</td>
+<td>Reads an excel workbook with street names (see exampledatastreets.xls) and returns</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.createtimestamp">
+<tt class="descname">createtimestamp</tt><big>(</big><em>time_period_str</em>, <em>tzinfo</em><big>)</big><a class="headerlink" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.createtimestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interprets time period string</p>
+<ul class="simple">
+<li><em>time_period_str</em>: can be one of <cite>AMPKHOUR</cite>, <cite>PMPKHOUR</cite>, <cite>ADT</cite>, or a range in military time, such as <cite>1600-1615</cite>.</li>
+</ul>
+<dl class="docutils">
+<dt>Returns tuple -&gt; (starttime, period_minutes) where </dt>
+<dd>starttime is datetime.time instance,
+and period_minutes is a integer representing number of minutes</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readAndInsertMainlineCounts">
+<tt class="descname">readAndInsertMainlineCounts</tt><big>(</big><em>file</em>, <em>primary_street</em>, <em>cross_street1</em>, <em>cross_street2</em>, <em>logger</em>, <em>tzinfo=None</em><big>)</big><a class="headerlink" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readAndInsertMainlineCounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the given excel file representing mainline counts and inserts those counts into the countdracula database.</p>
+<ul class="simple">
+<li><em>file</em> is the Excel workbook file name</li>
+<li><em>primary_street</em> is the street on which the counts were taken</li>
+<li><em>cross_street1</em> and <em>cross_street2</em> are the bounding cross streets</li>
+<li><em>logger</em> is a logging instance</li>
+</ul>
+<p>On success, returns number of successful counts inserted.</p>
+<p>On failure, removes all counts from this workbook so it can be fixed and inserted again, and returns -1.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readAndInsertTurnCounts">
+<tt class="descname">readAndInsertTurnCounts</tt><big>(</big><em>file</em>, <em>street1</em>, <em>street2</em>, <em>logger</em>, <em>tzinfo=None</em><big>)</big><a class="headerlink" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readAndInsertTurnCounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the given excel file representing turn counts and inserts them into the countdracula database.</p>
+<ul class="simple">
+<li><em>file</em> is the Excel workbook file</li>
+<li><em>street1</em> is the name of the NS-oriented street</li>
+<li><em>street2</em> is the name of the EW-oriented street</li>
+<li><em>logger</em> is a logging instance</li>
+</ul>
+<p>On success, returns number of successful counts inserted.</p>
+<p>On failure, removes all counts from this workbook so it can be fixed and inserted again, and returns -1.</p>
+<p>Note that this method is a little counter-intuitive because the arguments determine the way the movements are stored in
+the database.  For example, suppose you have an intersection where the street changes names from &#8220;SouthOne Street&#8221; to 
+&#8220;SouthTwo Street&#8221; as it passes through an intersection with &#8220;EastWest Street&#8221;.  This method would be called with
+street1=&#8221;SouthOne Street&#8221; and street2=&#8221;EastWest Street&#8221; and the through movement would be stored with
+from_street=&#8221;SouthOne Street&#8221; fromdir=&#8221;SB&#8221;, tostreet=&#8221;SouthOne Street&#8221; todir=&#8221;SB&#8221; even though &#8220;SouthOne Street&#8221;
+doesn&#8217;t have a southbound link from the intersection, since it&#8217;s really &#8220;SouthTwo Street&#8221;.  Thus, using this
+implementation, the fromstreet and tostreet define the intersection only, and not the movement.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readIntersectionIds">
+<tt class="descname">readIntersectionIds</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readIntersectionIds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads an excel workbook with intersection information (see exampledataintersections.xls) and returns
+the rows, for use with <tt class="xref py py-meth docutils literal"><span class="pre">CountsDatabaseWriter.insertIntersectionIds()</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readSourcefile">
+<tt class="descname">readSourcefile</tt><big>(</big><em>book</em><big>)</big><a class="headerlink" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readSourcefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts sourcefiles names from &#8220;book&#8221;</p>
+<p>Our convention is to include any strings in the first column of the worksheet called &#8220;source&#8221;;
+Source strings are each enclosed in parentheses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readStreetNames">
+<tt class="descname">readStreetNames</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.readStreetNames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads an excel workbook with street names (see exampledatastreets.xls) and returns
+the rows, for use with <tt class="xref py py-meth docutils literal"><span class="pre">CountsDatabaseWriter.insertStreetNames()</span></tt></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="countdracula.models.MainlineCount.html"
+                        title="previous chapter">countdracula.models.MainlineCount</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="countdracula.models.Node.html"
+                        title="next chapter">countdracula.models.Node</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/_generated/countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="countdracula.models.Node.html" title="countdracula.models.Node"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="countdracula.models.MainlineCount.html" title="countdracula.models.MainlineCount"
+             >previous</a> |</li>
+        <li><a href="../index.html">CountDracula .7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, SFCTA Modeling team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

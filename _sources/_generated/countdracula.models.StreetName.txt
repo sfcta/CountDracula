@@ -1,0 +1,48 @@
+countdracula.models.StreetName
+==============================
+
+.. currentmodule:: countdracula.models
+
+.. autoclass:: StreetName
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StreetName.__init__
+      ~StreetName.clean
+      ~StreetName.clean_fields
+      ~StreetName.date_error_message
+      ~StreetName.delete
+      ~StreetName.full_clean
+      ~StreetName.getPossibleStreetNames
+      ~StreetName.prepare_database_save
+      ~StreetName.save
+      ~StreetName.save_base
+      ~StreetName.serializable_value
+      ~StreetName.unique_error_message
+      ~StreetName.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~StreetName.mc_from_street
+      ~StreetName.mc_on_street
+      ~StreetName.mc_to_street
+      ~StreetName.nodes
+      ~StreetName.objects
+      ~StreetName.pk
+      ~StreetName.tc_int_street
+      ~StreetName.tc_to_street
+      ~StreetName.turncountlocation_set
+   
+   

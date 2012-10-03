@@ -1,7 +1,7 @@
-countdracula.CountsWorkbookParser
-=================================
+countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser
+==============================================================
 
-.. currentmodule:: countdracula
+.. currentmodule:: countdracula.parsers.CountsWorkbookParser
 
 .. autoclass:: CountsWorkbookParser
 
@@ -15,11 +15,11 @@ countdracula.CountsWorkbookParser
    
       ~CountsWorkbookParser.__init__
       ~CountsWorkbookParser.createtimestamp
+      ~CountsWorkbookParser.readAndInsertMainlineCounts
+      ~CountsWorkbookParser.readAndInsertTurnCounts
       ~CountsWorkbookParser.readIntersectionIds
-      ~CountsWorkbookParser.readMainlineCounts
       ~CountsWorkbookParser.readSourcefile
       ~CountsWorkbookParser.readStreetNames
-      ~CountsWorkbookParser.readTurnCounts
    
    
 

@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>countdracula.models.TurnCount &mdash; CountDracula .7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="CountDracula .7 documentation" href="../index.html" />
+    <link rel="next" title="countdracula.models.MainlineCountLocation" href="countdracula.models.MainlineCountLocation.html" />
+    <link rel="prev" title="countdracula.models.TurnCountLocation" href="countdracula.models.TurnCountLocation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="countdracula.models.MainlineCountLocation.html" title="countdracula.models.MainlineCountLocation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="countdracula.models.TurnCountLocation.html" title="countdracula.models.TurnCountLocation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">CountDracula .7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="countdracula-models-turncount">
+<h1>countdracula.models.TurnCount<a class="headerlink" href="#countdracula-models-turncount" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="countdracula.models.TurnCount">
+<em class="property">class </em><tt class="descname">TurnCount</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#countdracula.models.TurnCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>TurnCount(id, location_id, count, count_date, start_time, period_minutes, vehicle_type, sourcefile, project)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>location_id</strong> (<em>ForeignKey</em>) &#8211; Location</li>
+<li><strong>count</strong> (<em>IntegerField</em>) &#8211; Count</li>
+<li><strong>count_date</strong> (<em>DateField</em>) &#8211; Date the count was collected</li>
+<li><strong>start_time</strong> (<em>TimeField</em>) &#8211; Start time for the count</li>
+<li><strong>period_minutes</strong> (<em>IntegerField</em>) &#8211; Period (minutes)</li>
+<li><strong>vehicle_type</strong> (<em>IntegerField</em>) &#8211; Vehicle type</li>
+<li><strong>sourcefile</strong> (<em>CharField</em>) &#8211; For tracking where this count came from</li>
+<li><strong>project</strong> (<em>CharField</em>) &#8211; For tracking if this count was collected for a specific project</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="countdracula.models.TurnCount.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#countdracula.models.TurnCount.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.models.TurnCount.__init__" title="countdracula.models.TurnCount.__init__"><tt class="xref py py-obj docutils literal"><span class="pre">__init__</span></tt></a>(*args,&nbsp;**kwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#countdracula.models.TurnCount.clean" title="countdracula.models.TurnCount.clean"><tt class="xref py py-obj docutils literal"><span class="pre">clean</span></tt></a>()</td>
+<td>Hook for doing any extra model-wide validation after clean() has been called on every field by self.clean_fields.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.models.TurnCount.clean_fields" title="countdracula.models.TurnCount.clean_fields"><tt class="xref py py-obj docutils literal"><span class="pre">clean_fields</span></tt></a>([exclude])</td>
+<td>Cleans all fields and raises a ValidationError containing message_dict</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">date_error_message</span></tt>(lookup_type,&nbsp;field,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">delete</span></tt>([using])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#countdracula.models.TurnCount.full_clean" title="countdracula.models.TurnCount.full_clean"><tt class="xref py py-obj docutils literal"><span class="pre">full_clean</span></tt></a>([exclude])</td>
+<td>Calls clean_fields, clean, and validate_unique, on the model,</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_next_by_count_date</span></tt>(*moreargs,&nbsp;**morekwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_previous_by_count_date</span></tt>(*moreargs,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_vehicle_type_display</span></tt>(*moreargs,&nbsp;**morekwargs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">prepare_database_save</span></tt>(unused)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.models.TurnCount.save" title="countdracula.models.TurnCount.save"><tt class="xref py py-obj docutils literal"><span class="pre">save</span></tt></a>([force_insert,&nbsp;force_update,&nbsp;using])</td>
+<td>Saves the current instance.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#countdracula.models.TurnCount.save_base" title="countdracula.models.TurnCount.save_base"><tt class="xref py py-obj docutils literal"><span class="pre">save_base</span></tt></a>([raw,&nbsp;cls,&nbsp;origin,&nbsp;force_insert,&nbsp;...])</td>
+<td>Does the heavy-lifting involved in saving.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.models.TurnCount.serializable_value" title="countdracula.models.TurnCount.serializable_value"><tt class="xref py py-obj docutils literal"><span class="pre">serializable_value</span></tt></a>(field_name)</td>
+<td>Returns the value of the field name for this instance.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">unique_error_message</span></tt>(model_class,&nbsp;unique_check)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.models.TurnCount.validate_unique" title="countdracula.models.TurnCount.validate_unique"><tt class="xref py py-obj docutils literal"><span class="pre">validate_unique</span></tt></a>([exclude])</td>
+<td>Checks unique constraints on the model and raises <tt class="docutils literal"><span class="pre">ValidationError</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">location</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">objects</span></tt></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">pk</span></tt></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="countdracula.models.TurnCount.clean">
+<tt class="descname">clean</tt><big>(</big><big>)</big><a class="headerlink" href="#countdracula.models.TurnCount.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for doing any extra model-wide validation after clean() has been
+called on every field by self.clean_fields. Any ValidationError raised
+by this method will not be associated with a particular field; it will
+have a special-case association with the field defined by NON_FIELD_ERRORS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.models.TurnCount.clean_fields">
+<tt class="descname">clean_fields</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#countdracula.models.TurnCount.clean_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans all fields and raises a ValidationError containing message_dict
+of all validation errors if any occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.models.TurnCount.full_clean">
+<tt class="descname">full_clean</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#countdracula.models.TurnCount.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls clean_fields, clean, and validate_unique, on the model,
+and raises a <tt class="docutils literal"><span class="pre">ValidationError</span></tt> for any errors that occured.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.models.TurnCount.save">
+<tt class="descname">save</tt><big>(</big><em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#countdracula.models.TurnCount.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The &#8216;force_insert&#8217; and &#8216;force_update&#8217; parameters can be used to insist
+that the &#8220;save&#8221; must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.models.TurnCount.save_base">
+<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#countdracula.models.TurnCount.save_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
+override this method. It&#8217;s separate from save() in order to hide the
+need for overrides of save() to pass around internal-only parameters
+(&#8216;raw&#8217;, &#8216;cls&#8217;, and &#8216;origin&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.models.TurnCount.serializable_value">
+<tt class="descname">serializable_value</tt><big>(</big><em>field_name</em><big>)</big><a class="headerlink" href="#countdracula.models.TurnCount.serializable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the field name for this instance. If the field is
+a foreign key, returns the id value, instead of the object. If there&#8217;s
+no Field object with this name on the model, the model attribute&#8217;s
+value is returned directly.</p>
+<p>Used to serialize a field&#8217;s value (in the serializer, or form output,
+for example). Normally, you would just access the attribute directly
+and not use this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="countdracula.models.TurnCount.validate_unique">
+<tt class="descname">validate_unique</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#countdracula.models.TurnCount.validate_unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks unique constraints on the model and raises <tt class="docutils literal"><span class="pre">ValidationError</span></tt>
+if any failed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="countdracula.models.TurnCountLocation.html"
+                        title="previous chapter">countdracula.models.TurnCountLocation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="countdracula.models.MainlineCountLocation.html"
+                        title="next chapter">countdracula.models.MainlineCountLocation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/_generated/countdracula.models.TurnCount.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="countdracula.models.MainlineCountLocation.html" title="countdracula.models.MainlineCountLocation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="countdracula.models.TurnCountLocation.html" title="countdracula.models.TurnCountLocation"
+             >previous</a> |</li>
+        <li><a href="../index.html">CountDracula .7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, SFCTA Modeling team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

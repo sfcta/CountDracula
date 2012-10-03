@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to CountDracula’s documentation! &mdash; CountDracula v.7 documentation</title>
+    <title>Welcome to CountDracula’s documentation! &mdash; CountDracula .7 documentation</title>
+    
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
@@ -22,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="CountDracula v.7 documentation" href="#" />
+    <link rel="top" title="CountDracula .7 documentation" href="#" />
     <link rel="next" title="CountDracula Setup" href="setup.html" /> 
   </head>
   <body>
@@ -35,7 +38,7 @@
         <li class="right" >
           <a href="setup.html" title="CountDracula Setup"
              accesskey="N">next</a> |</li>
-        <li><a href="#">CountDracula v.7 documentation</a> &raquo;</li> 
+        <li><a href="#">CountDracula .7 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -52,17 +55,9 @@
 <li class="toctree-l1"><a class="reference internal" href="setup.html">CountDracula Setup</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="setup.html#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html#installation-instructions">Installation Instructions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html#database-setup">Database Setup</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tables.html">CountDracula Tables</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tables.html#vtype-table">vtype Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tables.html#directions-table">directions Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tables.html#street-names-table">street_names Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tables.html#nodes-table">nodes Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tables.html#node-streets-table">node_streets Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tables.html#counts-turns-table">counts_turns Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tables.html#counts-ml-table">counts_ml Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#django-geodjango-setup-for-countdracula">Django/GeoDjango Setup for CountDracula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#apache-setup">Apache Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 </ul>
@@ -70,373 +65,41 @@
 </div>
 <div class="section" id="countdracula-api">
 <h1>CountDracula API<a class="headerlink" href="#countdracula-api" title="Permalink to this headline">¶</a></h1>
-<table border="1" class="docutils">
+<table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr><td><a class="reference internal" href="_generated/countdracula.CountsDatabaseReader.html#countdracula.CountsDatabaseReader" title="countdracula.CountsDatabaseReader"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.CountsDatabaseReader</span></tt></a></td>
-<td>Class to handle read operations to the Counts database</td>
-</tr>
-<tr><td><a class="reference internal" href="_generated/countdracula.CountsDatabaseWriter.html#countdracula.CountsDatabaseWriter" title="countdracula.CountsDatabaseWriter"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.CountsDatabaseWriter</span></tt></a></td>
-<td>Class to handle write operations to the Counts database</td>
-</tr>
-<tr><td><a class="reference internal" href="_generated/countdracula.CountsWorkbookParser.html#countdracula.CountsWorkbookParser" title="countdracula.CountsWorkbookParser"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.CountsWorkbookParser</span></tt></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="_generated/countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser.html#countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser" title="countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.parsers.CountsWorkbookParser.CountsWorkbookParser</span></tt></a></td>
 <td>Reads in and parses in Excel workbooks in certain standardized formats, returning tuples to be used by</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="_generated/countdracula.models.Node.html#countdracula.models.Node" title="countdracula.models.Node"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.models.Node</span></tt></a></td>
+<td>Node(id, point)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="_generated/countdracula.models.VehicleTypes.html#countdracula.models.VehicleTypes" title="countdracula.models.VehicleTypes"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.models.VehicleTypes</span></tt></a></td>
+<td>tuple() -&gt; empty tuple</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="_generated/countdracula.models.Directions.html#countdracula.models.Directions" title="countdracula.models.Directions"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.models.Directions</span></tt></a></td>
+<td>tuple() -&gt; empty tuple</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="_generated/countdracula.models.StreetName.html#countdracula.models.StreetName" title="countdracula.models.StreetName"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.models.StreetName</span></tt></a></td>
+<td>StreetName(street_name, nospace_name, short_name, suffix)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="_generated/countdracula.models.TurnCountLocation.html#countdracula.models.TurnCountLocation" title="countdracula.models.TurnCountLocation"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.models.TurnCountLocation</span></tt></a></td>
+<td>TurnCountLocation(id, from_street_id, from_dir, to_street_id, to_dir, intersection_street_id, intersection_id)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="_generated/countdracula.models.TurnCount.html#countdracula.models.TurnCount" title="countdracula.models.TurnCount"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.models.TurnCount</span></tt></a></td>
+<td>TurnCount(id, location_id, count, count_date, start_time, period_minutes, vehicle_type, sourcefile, project)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="_generated/countdracula.models.MainlineCountLocation.html#countdracula.models.MainlineCountLocation" title="countdracula.models.MainlineCountLocation"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.models.MainlineCountLocation</span></tt></a></td>
+<td>MainlineCountLocation(id, on_street_id, on_dir, from_street_id, from_int_id, to_street_id, to_int_id)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="_generated/countdracula.models.MainlineCount.html#countdracula.models.MainlineCount" title="countdracula.models.MainlineCount"><tt class="xref py py-obj docutils literal"><span class="pre">countdracula.models.MainlineCount</span></tt></a></td>
+<td>MainlineCount(id, location_id, count, count_date, start_time, period_minutes, vehicle_type, sourcefile, project, reference_position)</td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="example-parsing-san-francisco-excel-workbooks-and-inserting-into-countdracula">
-<h1>Example: Parsing San Francisco Excel Workbooks and Inserting Into CountDracula<a class="headerlink" href="#example-parsing-san-francisco-excel-workbooks-and-inserting-into-countdracula" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
- 10
- 11
- 12
- 13
- 14
- 15
- 16
- 17
- 18
- 19
- 20
- 21
- 22
- 23
- 24
- 25
- 26
- 27
- 28
- 29
- 30
- 31
- 32
- 33
- 34
- 35
- 36
- 37
- 38
- 39
- 40
- 41
- 42
- 43
- 44
- 45
- 46
- 47
- 48
- 49
- 50
- 51
- 52
- 53
- 54
- 55
- 56
- 57
- 58
- 59
- 60
- 61
- 62
- 63
- 64
- 65
- 66
- 67
- 68
- 69
- 70
- 71
- 72
- 73
- 74
- 75
- 76
- 77
- 78
- 79
- 80
- 81
- 82
- 83
- 84
- 85
- 86
- 87
- 88
- 89
- 90
- 91
- 92
- 93
- 94
- 95
- 96
- 97
- 98
- 99
-100
-101
-102</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Created on Jul 25, 2011</span>
-
-<span class="sd">@author: lmz</span>
-<span class="sd">&#39;&#39;&#39;</span>
-
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This script reads counts data from input Excel workbooks and inserts the info into the CountDracula dataabase.</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">import</span> <span class="nn">countdracula</span>
-<span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">traceback</span>
-
-<span class="n">USAGE</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
-
-<span class="s"> python insertSanFranciscoCounts.py countsWorkbookFile.xls|countsWorkbookDirectory</span>
-
-<span class="s"> If a workbook file is passed, reads that workbook into the CountDracula database.</span>
-<span class="s"> If a directory is passed, reads all the workbook files in the given directory into the CountDracula database.</span>
-<span class="s"> </span>
-<span class="s"> example: python insertSanFranciscoCounts.py &quot;Q:\Roadway Observed Data\Counts\_Standardized_chs&quot;</span>
-<span class="s"> </span>
-<span class="s">&quot;&quot;&quot;</span>
-
-
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">print</span> <span class="n">USAGE</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-    
-    <span class="n">counts_input</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;countdracula&#39;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-    
-    <span class="n">consolehandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
-    <span class="n">consolehandler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-    <span class="n">consolehandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(name)-12s</span><span class="s">: </span><span class="si">%(levelname)-8s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">))</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">consolehandler</span><span class="p">)</span>        
-    
-    <span class="n">debugFilename</span> <span class="o">=</span> <span class="s">&quot;insertSanFranciscoCounts_</span><span class="si">%s</span><span class="s">.DEBUG.log&quot;</span> <span class="o">%</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%Y%b</span><span class="si">%d</span><span class="s">.%H%M%S&quot;</span><span class="p">)</span>
-    <span class="n">debugloghandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">debugFilename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">))</span>
-    <span class="n">debugloghandler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-    <span class="n">debugloghandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> </span><span class="si">%(levelname)s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M&#39;</span><span class="p">))</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">debugloghandler</span><span class="p">)</span>
-        
-    
-    <span class="n">cd_writer</span> <span class="o">=</span> <span class="n">countdracula</span><span class="o">.</span><span class="n">CountsDatabaseWriter</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s">&quot;CDadmin&quot;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
-    <span class="n">cd_reader</span> <span class="o">=</span> <span class="n">countdracula</span><span class="o">.</span><span class="n">CountsDatabaseReader</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s">&quot;ReadOnly&quot;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
-    <span class="n">xl_parser</span> <span class="o">=</span> <span class="n">countdracula</span><span class="o">.</span><span class="n">CountsWorkbookParser</span><span class="p">()</span>
-   
-    <span class="c"># Read the counts.  These reference the above streets and intersections.</span>
-    <span class="n">mainline_processed</span>  <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">mainline_attempted</span>  <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">turns_processed</span>     <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">turns_attempted</span>     <span class="o">=</span> <span class="mi">0</span>
-    
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">counts_input</span><span class="p">):</span>
-        <span class="nb">dir</span> <span class="o">=</span> <span class="n">counts_input</span>
-        <span class="n">files_to_process</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">counts_input</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="p">(</span><span class="nb">dir</span><span class="p">,</span><span class="nb">file</span><span class="p">)</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">counts_input</span><span class="p">)</span>
-        <span class="n">files_to_process</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">file</span> <span class="p">]</span>
-        
-    <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">files_to_process</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">file</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">!=</span><span class="s">&#39;.xls&#39;</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;File suffix is not .xls: </span><span class="si">%s</span><span class="s"> -- skipping&quot;</span> <span class="o">%</span> <span class="nb">file</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span>
-            <span class="k">continue</span>
-        
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Processing file </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">file</span><span class="p">)</span>
-        <span class="c"># commandsgenerator.setFileName(file)</span>
-        <span class="c"># parse the streets from the filename</span>
-        <span class="n">streets</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;.xls&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">delimiters</span> <span class="o">=</span> <span class="s">&quot;_-.&quot;</span>
-            
-        <span class="k">for</span> <span class="n">delim</span> <span class="ow">in</span> <span class="n">delimiters</span><span class="p">:</span> <span class="n">streets</span> <span class="o">=</span> <span class="n">streets</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">delim</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">)</span>
-        <span class="n">streetlist</span> <span class="o">=</span> <span class="n">streets</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-        
-        <span class="k">try</span><span class="p">:</span>
-            
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">streetlist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">mainline_attempted</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">mainlineCountList</span> <span class="o">=</span> <span class="n">xl_parser</span><span class="o">.</span><span class="n">readMainlineCounts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="nb">file</span><span class="p">),</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cd_reader</span><span class="p">)</span>
-                <span class="n">cd_writer</span><span class="o">.</span><span class="n">insertMainlineCounts</span><span class="p">(</span><span class="n">mainlineCountList</span><span class="p">)</span>
-                <span class="n">mainline_processed</span> <span class="o">+=</span> <span class="mi">1</span>
-                                           
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">streetlist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">turns_attempted</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">turnCountList</span> <span class="o">=</span> <span class="n">xl_parser</span><span class="o">.</span><span class="n">readTurnCounts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="nb">file</span><span class="p">),</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">streetlist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cd_reader</span><span class="p">)</span>
-                <span class="n">cd_writer</span><span class="o">.</span><span class="n">insertTurnCounts</span><span class="p">(</span><span class="n">turnCountList</span><span class="p">)</span>
-                <span class="n">turns_processed</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
-
-    
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Mainline counts: </span><span class="si">%4d</span><span class="s"> processed out of </span><span class="si">%4d</span><span class="s"> attempts&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mainline_processed</span><span class="p">,</span> <span class="n">mainline_attempted</span><span class="p">))</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Turn     counts: </span><span class="si">%4d</span><span class="s"> processed out of </span><span class="si">%4d</span><span class="s"> attempts&quot;</span> <span class="o">%</span> <span class="p">(</span>   <span class="n">turns_processed</span><span class="p">,</span>    <span class="n">turns_attempted</span><span class="p">))</span>
-</pre></div>
-</td></tr></table></div>
-</div>
-<div class="section" id="example-querying-san-francisco-counts-for-data-timeslices">
-<h1>Example: Querying San Francisco Counts for Data TimeSlices<a class="headerlink" href="#example-querying-san-francisco-counts-for-data-timeslices" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on April 3, 2012</span>
-<span class="sd">@author: lmz</span>
-
-<span class="sd">Quick script to print out a tally of the most popular time slices for counts in the database.</span>
-<span class="sd">&quot;&quot;&quot;</span> 
-
-<span class="kn">import</span> <span class="nn">countdracula</span>
-<span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
-
-<span class="k">def</span> <span class="nf">ignoreDates</span><span class="p">(</span><span class="n">count_counts</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Assuming counts is a dictionary of (datetime.datetime, datetime.timedelta) -&gt; counts</span>
-<span class="sd">    </span>
-<span class="sd">    Returns the equivalent but with the datetime.datetime objects converted to datetime.time objects (so summing across dates).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># but we&#39;re actually interested in just the times, not the dates -&gt; aggregate</span>
-    <span class="n">time_counts</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">timeslice</span><span class="p">,</span><span class="n">count</span><span class="p">)</span> <span class="ow">in</span> <span class="n">count_counts</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-        <span class="n">newkey</span> <span class="o">=</span> <span class="p">(</span><span class="n">timeslice</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="n">timeslice</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">newkey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">time_counts</span><span class="p">:</span> <span class="n">time_counts</span><span class="p">[</span><span class="n">newkey</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">time_counts</span><span class="p">[</span><span class="n">newkey</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count</span>
-    <span class="k">return</span> <span class="n">time_counts</span>
-
-        
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;countdracula&#39;</span><span class="p">)</span>
-    <span class="n">consolehandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
-    <span class="n">consolehandler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-    <span class="n">consolehandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(name)-12s</span><span class="s">: </span><span class="si">%(levelname)-8s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">))</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">consolehandler</span><span class="p">)</span>        
-    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-    
-    <span class="n">cd_reader</span> <span class="o">=</span> <span class="n">countdracula</span><span class="o">.</span><span class="n">CountsDatabaseReader</span><span class="p">(</span><span class="n">pw</span><span class="o">=</span><span class="s">&quot;ReadOnly&quot;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
-
-
-    <span class="n">count_counts</span> <span class="o">=</span> <span class="n">cd_reader</span><span class="o">.</span><span class="n">countCounts</span><span class="p">(</span><span class="n">turning</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">mainline</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-    <span class="n">time_counts</span> <span class="o">=</span> <span class="n">ignoreDates</span><span class="p">(</span><span class="n">count_counts</span><span class="p">)</span>
-
-    <span class="k">print</span> <span class="s">&quot;Most Frequent Timeslices for Turn Counts&quot;</span>
-    <span class="k">print</span> <span class="s">&quot; </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="s">&quot;duration(min)&quot;</span><span class="p">,</span> <span class="s">&quot;#counts&quot;</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="n">timeslice</span><span class="p">,</span><span class="n">count</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">time_counts</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="k">print</span> <span class="s">&quot; </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10d</span><span class="s"> </span><span class="si">%10d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timeslice</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">timeslice</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
-    
-    <span class="k">print</span>
-    <span class="k">print</span> <span class="s">&quot;Sequential Timeslices for Turn Counts&quot;</span>
-    <span class="k">print</span> <span class="s">&quot; </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="s">&quot;duration(min)&quot;</span><span class="p">,</span> <span class="s">&quot;#counts&quot;</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">timeslice</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">time_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
-        <span class="k">print</span> <span class="s">&quot; </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10d</span><span class="s"> </span><span class="si">%10d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timeslice</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">timeslice</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">time_counts</span><span class="p">[</span><span class="n">timeslice</span><span class="p">])</span>
-            
-    <span class="n">count_counts</span> <span class="o">=</span> <span class="n">cd_reader</span><span class="o">.</span><span class="n">countCounts</span><span class="p">(</span><span class="n">turning</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">mainline</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="n">time_counts</span> <span class="o">=</span> <span class="n">ignoreDates</span><span class="p">(</span><span class="n">count_counts</span><span class="p">)</span>
-
-    <span class="k">print</span>
-    <span class="k">print</span> <span class="s">&quot;Most Frequent Timeslices for Mainline Counts&quot;</span>
-    <span class="k">print</span> <span class="s">&quot; </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="s">&quot;duration(min)&quot;</span><span class="p">,</span> <span class="s">&quot;#counts&quot;</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="n">timeslice</span><span class="p">,</span><span class="n">count</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">time_counts</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="k">print</span> <span class="s">&quot; </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10d</span><span class="s"> </span><span class="si">%10d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timeslice</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">timeslice</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>    
-
-    <span class="k">print</span>
-    <span class="k">print</span> <span class="s">&quot;Sequential Timeslices for Mainline Counts&quot;</span>
-    <span class="k">print</span> <span class="s">&quot; </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="s">&quot;duration(min)&quot;</span><span class="p">,</span> <span class="s">&quot;#counts&quot;</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">timeslice</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">time_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
-        <span class="k">print</span> <span class="s">&quot; </span><span class="si">%10s</span><span class="s"> </span><span class="si">%10d</span><span class="s"> </span><span class="si">%10d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timeslice</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">timeslice</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">seconds</span><span class="o">/</span><span class="mf">60.0</span><span class="p">,</span> <span class="n">time_counts</span><span class="p">[</span><span class="n">timeslice</span><span class="p">])</span>
-</pre></div>
-</td></tr></table></div>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -448,36 +111,6 @@
 </div>
 <div class="section" id="todo-list">
 <h1>TODO List<a class="headerlink" href="#todo-list" title="Permalink to this headline">¶</a></h1>
-<div class="admonition-todo admonition " id="index-0">
-<p class="first admonition-title">Todo</p>
-<p class="last">handle Vehicle types</p>
-</div>
-<p class="todo-source">(The <a class="reference internal" href="_generated/countdracula.CountsDatabaseReader.html#index-0"><em>original entry</em></a> is located in  _generated\countdracula.CountsDatabaseReader.rst, line 65.)</p>
-<div class="admonition-todo admonition " id="index-1">
-<p class="first admonition-title">Todo</p>
-<p class="last">Isn&#8217;t <em>from_angle</em> and <em>to_angle</em> something we can calculate here?</p>
-</div>
-<p class="todo-source">(The <a class="reference internal" href="_generated/countdracula.CountsDatabaseReader.html#index-1"><em>original entry</em></a> is located in  _generated\countdracula.CountsDatabaseReader.rst, line 135.)</p>
-<div class="admonition-todo admonition " id="index-0">
-<p class="first admonition-title">Todo</p>
-<p class="last">This table of streetnames is for ...?</p>
-</div>
-<p class="todo-source">(The <a class="reference internal" href="tables.html#index-0"><em>original entry</em></a> is located in  tables.rst, line 57.)</p>
-<div class="admonition-todo admonition " id="index-1">
-<p class="first admonition-title">Todo</p>
-<p class="last">is nospace_name = short_name + suffix with spaces removed?</p>
-</div>
-<p class="todo-source">(The <a class="reference internal" href="tables.html#index-1"><em>original entry</em></a> is located in  tables.rst, line 58.)</p>
-<div class="admonition-todo admonition " id="index-2">
-<p class="first admonition-title">Todo</p>
-<p class="last">is street_name = short_name + &#8221; &#8221; + suffix?</p>
-</div>
-<p class="todo-source">(The <a class="reference internal" href="tables.html#index-2"><em>original entry</em></a> is located in  tables.rst, line 59.)</p>
-<div class="admonition-todo admonition " id="index-3">
-<p class="first admonition-title">Todo</p>
-<p class="last">what about alternative names?</p>
-</div>
-<p class="todo-source">(The <a class="reference internal" href="tables.html#index-3"><em>original entry</em></a> is located in  tables.rst, line 60.)</p>
 </div>
 
 
@@ -494,8 +127,6 @@
 <li><a class="reference internal" href="#countdracula-api">CountDracula API</a><ul>
 </ul>
 </li>
-<li><a class="reference internal" href="#example-parsing-san-francisco-excel-workbooks-and-inserting-into-countdracula">Example: Parsing San Francisco Excel Workbooks and Inserting Into CountDracula</a></li>
-<li><a class="reference internal" href="#example-querying-san-francisco-counts-for-data-timeslices">Example: Querying San Francisco Counts for Data TimeSlices</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 <li><a class="reference internal" href="#todo-list">TODO List</a></li>
 </ul>
@@ -511,7 +142,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -534,12 +165,12 @@
         <li class="right" >
           <a href="setup.html" title="CountDracula Setup"
              >next</a> |</li>
-        <li><a href="#">CountDracula v.7 documentation</a> &raquo;</li> 
+        <li><a href="#">CountDracula .7 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2011, SFCTA Modeling team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

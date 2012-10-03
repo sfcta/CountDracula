@@ -19,14 +19,14 @@ admin.site.register(MainlineCountLocation, MainlineCountLocationAdmin)
 class TurnCountAdmin(admin.ModelAdmin):
     # let users search by sourcefile
     search_fields = ['sourcefile']
-    list_display = ('location', 'period_minutes', 'count_date', 'start_time')
+    list_display = ('location', 'period_minutes', 'count_date', 'start_time', 'count')
         
 admin.site.register(TurnCount, TurnCountAdmin)
 
 class MainlineCountAdmin(admin.ModelAdmin):
     # let users search by sourcefile
     search_fields = ['sourcefile']
-    list_display = ('location', 'period_minutes', 'count_date', 'start_time')
+    list_display = ('location', 'period_minutes', 'count_date', 'start_time', 'count')
 
 admin.site.register(MainlineCount, MainlineCountAdmin)
 

@@ -319,6 +319,7 @@ class CountsWorkbookParser():
             final_NSstreet  = intersections.keys()[0][0]
             final_EWstreet  = intersections.keys()[0][1]
             final_intid     = intersections[(final_NSstreet,final_EWstreet)][0]
+            # logger.debug("final_NSstreet=[%s], final_EWstreet=[%s]" % (final_NSstreet, final_EWstreet))
             
             # go through the sheets and read the data        
             book                = xlrd.open_workbook(file)       
@@ -353,7 +354,7 @@ class CountsWorkbookParser():
                         raise CountsWorkbookParserException("readTurnCounts: Could not parse column header of %s!%s; expect movement to start with direction.  Movement=[%s] Column=%d Type=%d" %
                                                             (file, sheetnames[sheet_idx], movement, column, activesheet.cell_type(0,column)))
     
-                    # First determines direction
+                    # First determine direction
                     compass = ['N','E','S','W']                
                     if turntype == "TH":    # through
                         t_todir = t_fromdir
@@ -389,17 +390,19 @@ class CountsWorkbookParser():
                             t_fromstreet    = final_EWstreet
                             t_tostreet      = final_NSstreet
                             t_intstreet     = final_NSstreet
+                    # logger.debug("movement [%s] from %s %s to %s %s" % (movement, t_fromstreet, t_fromdir, t_tostreet, t_todir))
+
 
                     # look for the turn count location in countdracula
                     try:
                         turn_count_location = TurnCountLocation.objects.get(from_street    = t_fromstreet,
-                                                                            from_dir       = t_todir,
+                                                                            from_dir       = t_fromdir,
                                                                             to_street      = t_tostreet,
                                                                             to_dir         = t_todir,
                                                                             intersection   = final_intid)
                     except ObjectDoesNotExist:
                         turn_count_location = TurnCountLocation(from_street    = t_fromstreet,
-                                                                from_dir       = t_todir,
+                                                                from_dir       = t_fromdir,
                                                                 to_street      = t_tostreet,
                                                                 to_dir         = t_todir,
                                                                 intersection_street = t_intstreet,

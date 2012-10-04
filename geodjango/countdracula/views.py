@@ -47,9 +47,8 @@ def counts_for_location(request):
      
         for count in counts:
             # find earliest and last dates
-            date = count.start_time.date()
-            if results['date_min'] > date: results['date_min'] = date
-            if results['date_max'] < date: results['date_max'] = date
+            if results['date_min'] > count.count_date: results['date_min'] = count.count_date
+            if results['date_max'] < count.count_date: results['date_max'] = count.count_date
             
             # tally counts by period_minutes
             results['period_minutes'][str(count.period_minutes)] += 1

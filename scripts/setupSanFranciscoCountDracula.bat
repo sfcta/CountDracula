@@ -10,6 +10,7 @@ set PATH=C:\Python27;C:\Python27\Scripts;C:\OSGeo4W\bin;C:\Program Files (x86)\P
 :: clear out what's in there already
 ::
 psql -U postgres -c "drop database countdracula_geodjango"
+if ERRORLEVEL 1 goto done
 
 ::
 :: create the countdracula user (if you haven't already)
@@ -17,12 +18,17 @@ psql -U postgres -c "drop database countdracula_geodjango"
 :: 
 :: This will prompt for the the password of the new user (role), followed by that of the super postgres user (postgres).
 ::
-createuser -SDR --username postgres -P countdracula
+psql -U postgres -c "select * from pg_user where usename='countdracula'" | findstr countdracula
+:: ERRORLEVEL will be 0 if it already exists
+if %ERRORLEVEL%  GTR 0 (
+  createuser -SDR --username postgres -P countdracula
+)
 
 ::
 :: create the postgis database
 :: This will prompt for the password of the super postgres user (postgres).
 ::
+
 createdb --username postgres --owner=countdracula -T template_postgis countdracula_geodjango
 
 ::
@@ -71,6 +77,11 @@ python insertSanFranciscoIntersectionsFromCube.py Y:\networks\Roads2010\FREEFLOW
 :: insert PeMS counts
 ::
 python insertSanFranciscoPeMSCounts.py -v "Q:\Roadway Observed Data\PeMS\D4_Data_2010\pems_dist4_2010_fullyr.dat" -c "Q:\Roadway Observed Data\PeMS\D4_Data_2010\PeMS_Census" "Q:\Roadway Observed Data\PeMS\PeMs_to_NetworkNodes.xls"
+
+::
+:: insert MTC counts
+::
+python insertSanFranciscoMTCCounts.py "Q:\Roadway Observed Data\MTC\all_MTC_Counts.xls"
 
 ::
 :: insert other counts

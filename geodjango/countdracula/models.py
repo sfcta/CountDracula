@@ -115,8 +115,10 @@ class TurnCountLocation(models.Model):
 class TurnCount(models.Model):
     location            = models.ForeignKey(TurnCountLocation, related_name="turncount")
     
-    count               = models.IntegerField()
-    count_date          = models.DateField(help_text="Date the count was collected")
+    count               = models.DecimalField(max_digits=10,decimal_places=2) # decimal because it could be an average
+    count_date          = models.DateField(help_text="Date the count was collected", blank=True, null=True)
+    count_year          = models.IntegerField(help_text="Year the count was collected.  Will populate from Count Date automatically if provided.", editable=False)
+    
     start_time          = models.TimeField(help_text="Start time for the count")
     period_minutes      = models.IntegerField(help_text="Period (minutes)")
     vehicle_type        = models.IntegerField(choices=VehicleTypes)
@@ -126,6 +128,12 @@ class TurnCount(models.Model):
     def __unicode__(self):
         return "%3d-minute at %s at location %s" % \
             (self.period_minutes, self.start_time, self.location)
+    
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        # populate the count_year from the count_date automatically
+        if self.count_date is not None:
+            self.count_year = self.count_date.year
 
 class MainlineCountLocation(models.Model):
     on_street           = models.ForeignKey(StreetName, help_text="The street with the count", related_name="mc_on_street")
@@ -146,8 +154,10 @@ class MainlineCountLocation(models.Model):
 class MainlineCount(models.Model):
     location            = models.ForeignKey(MainlineCountLocation, related_name="mainlinecount")
 
-    count               = models.IntegerField()
-    count_date          = models.DateField(help_text="Date the count was collected")    
+    count               = models.DecimalField(max_digits=10,decimal_places=2) # decimal because it could be an average
+    count_date          = models.DateField(help_text="Date the count was collected", blank=True, null=True)
+    count_year          = models.IntegerField(help_text="Year the count was collected.  Will populate from Count Date automatically if provided.", editable=False)
+
     start_time          = models.TimeField(help_text="Start time for the count")
     period_minutes      = models.IntegerField(help_text="Period (minutes)")
     vehicle_type        = models.IntegerField(choices=VehicleTypes)
@@ -159,3 +169,8 @@ class MainlineCount(models.Model):
         return "%3d-minute at %s at location %s" % \
             (self.period_minutes, self.start_time, self.location)
 
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        # populate the count_year from the count_date automatically
+        if self.count_date is not None:
+            self.count_year = self.count_date.year

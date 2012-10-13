@@ -235,6 +235,7 @@ class CountsWorkbookParser():
                                                        reference_position   = -1, # reference position unknown, it's not in the workbook
                                                        sourcefile           = file,
                                                        project              = "")
+                        mainline_count.clean()
                         mainline_count.save()
                         counts_saved += 1
                                 
@@ -424,6 +425,7 @@ class CountsWorkbookParser():
                                                vehicle_type     = vtype,
                                                sourcefile       = file,
                                                project          = "")
+                        turn_count.clean()
                         turn_count.save()
                         counts_saved += 1
                         

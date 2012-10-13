@@ -280,6 +280,7 @@ def readVDSCounts(mapping, vds_datfilename):
                                        reference_position   = -1,
                                        sourcefile           = vds_datfilename_abspath,
                                        project              = project_str)
+        mainline_count.clean()
         mainline_count.save()
         counts_saved += 1
 
@@ -373,6 +374,7 @@ def readCensusCounts(mapping, census_dirname):
                                                reference_position   = -1,
                                                sourcefile           = workbook_filename,
                                                project              = project_str)
+                mainline_count.clean()
                 mainline_count.save()
                 counts_saved += 1
         

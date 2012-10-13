@@ -3,7 +3,7 @@
 ::
 :: set PATH to have Python, psql, runtpp, geo (for libraries), git
 ::
-set PATH=C:\Python27;C:\Python27\Scripts;C:\OSGeo4W\bin;C:\Program Files (x86)\PostgreSQL\9.0\bin;C:\Program Files (x86)\Citilabs\CubeVoyager;C:\Program Files (x86)\Git\bin
+set PATH=C:\Python27;C:\Python27\Scripts;C:\OSGeo4W\bin;C:\Program Files (x86)\PostgreSQL\9.0\bin;C:\Program Files (x86)\Citilabs\CubeVoyager;C:\Program Files (x86)\Git\bin;C:\Windows\System32
 
 :: the following assumes "postgres" is the name of your postgres superuser
 ::

@@ -6,11 +6,21 @@
 <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script src="{{ STATIC_URL }}jquery-1.8.2.js"></script>
 <script>
+{% load jsonify %}
+
+var turn_count_locs       = {{ turn_count_locs|jsonify }};
+var mainline_count_locs   = {{ mainline_count_locs|jsonify }};
+var nodes                 = {{ nodes|jsonify }};
+var count_years           = {{ count_years|jsonify }};
+var turnlocs_to_years     = {{ turnlocs_to_years|jsonify }};
+var mainlinelocs_to_years = {{ mainlinelocs_to_years|jsonify }};
+
+
 var map, infowindow = {};
-var markers = new Object();
+var movement_markers = new Object();
+var mainline_markers = new Object();
 
 function initialize() {
-
   // start out with the checkboxes checked
   $(":checkbox").prop("checked", true);
 
@@ -26,51 +36,144 @@ function initialize() {
     
   var marker_image = new google.maps.MarkerImage("{{ STATIC_URL }}small_red.png");
 
-  {% for turn_count_loc in turn_count_locs %}
-  key = "turn_" + {{turn_count_loc.id}}
-  markers[key] = new google.maps.Marker({
-    map:map, icon:marker_image,
-    position:new google.maps.LatLng({{turn_count_loc.intersection.point.y}}, {{turn_count_loc.intersection.point.x}}),
-    title:"{{turn_count_loc}}"
-  });
-  google.maps.event.addListener(markers[key], 'click', function() { getCountsInfo("turn", {{turn_count_loc.id}}); });
-  {% endfor %}
+  /* Create the movement markers */
+  for (var idx = 0; idx < turn_count_locs.length; idx++) {
+    var id = turn_count_locs[idx].pk;
+    var node_id = turn_count_locs[idx].fields.intersection;
+     
+    movement_markers[id] = new Object();
+    movement_markers[id].marker =  new google.maps.Marker({
+      map:map,
+      icon:marker_image,
+      position:new google.maps.LatLng(nodes[node_id][1], nodes[node_id][0]),
+      title:id.toString()
+    });
+    (function(i){
+      google.maps.event.addListener(movement_markers[id].marker, 'click', function() { getCountsInfo("turn",i); });
+    })(idx);
+  }
   
-  {% for mainline_count_loc in mainline_count_locs %}
-  key = "mainline_" + {{mainline_count_loc.id}}
-  markers[key] = new google.maps.Polyline({
-    map:map,
-    path:[new google.maps.LatLng({{mainline_count_loc.from_int.point.y}}, {{mainline_count_loc.from_int.point.x}}),
-          new google.maps.LatLng({{mainline_count_loc.to_int.point.y}}  , {{mainline_count_loc.to_int.point.x}}  )
-          ],
-    strokeColor:"#FF0000", strokeOpacity:0.8, strokeWeight:3,
-    // title:"{{mainline_count_loc}}"
-  });
-  google.maps.event.addListener(markers[key], 'click', function() { getCountsInfo("mainline", {{mainline_count_loc.id}}); });  
-  {% endfor %}
+  /* Create mainline markers */
+  for (var idx = 0; idx < mainline_count_locs.length; idx++) {
+    var id = mainline_count_locs[idx].pk;
+    var node_id_1 = mainline_count_locs[idx].fields.from_int;
+    var node_id_2 = mainline_count_locs[idx].fields.to_int;
+    mainline_markers[id] = new Object();
+    mainline_markers[id].marker = new google.maps.Polyline({
+      map:map,
+      path:[new google.maps.LatLng(nodes[node_id_1][1], nodes[node_id_1][0]),
+            new google.maps.LatLng(nodes[node_id_2][1], nodes[node_id_2][0])
+           ],
+      strokeColor:"#FF0000", strokeOpacity:0.8, strokeWeight:3,
+      // title:"{{mainline_count_loc}}"
+    });
+    (function(i){
+      google.maps.event.addListener(mainline_markers[id].marker, 'click', function() { getCountsInfo("mainline", i); });
+    })(idx);  
+  }
+
+  /* Update display on GUI events */
+  $(':input').change(function(){  updateDisplay(); });    
 }
 
+/* Gets called when an UI element changes.
+ */
+function updateDisplay() {
+  console.log("updateDisplay");
+  
+  show_movement_locations = $("#movement").is(":checked");
+  show_mainline_locations = $("#mainline").is(":checked");
+  
+  checked_years = [];
+  for (var idx = 0; idx < count_years.length; idx++) {
+    if ($("#year"+count_years[idx]).is(":checked")) {
+      checked_years.push(count_years[idx]);
+    }
+  }
+  console.log(checked_years);
+    
+  /*************** mainline **************************/
+  var mainline_count_num = 0;
+  for (var id in mainline_markers) {
+    if (show_mainline_locations == false) {
+      mainline_markers[id].marker.setMap(null);
+      continue;
+    }
+    
+    var year_qualifies = false;
+    for (var idx=0; idx<mainlinelocs_to_years[id].length; idx++) {      
+      if (jQuery.inArray(mainlinelocs_to_years[id][idx], checked_years) >= 0) {
+        year_qualifies = true;
+        break;
+      }
+    }
+    if (year_qualifies) {
+      mainline_markers[id].marker.setMap(map);
+      mainline_count_num += 1;
+    } else {
+      mainline_markers[id].marker.setMap(null);
+    }
+  }  
+  $("span#mainline_count_num").html(mainline_count_num);
+  
+  /*************** movement **************************/
+  var movement_count_num = 0;
+  for (var id in movement_markers) {
+    if (show_movement_locations == false) {
+      movement_markers[id].marker.setMap(null);
+      continue;
+    }
+    
+    var year_qualifies = false;
+    for (var idx=0; idx<turnlocs_to_years[id].length; idx++) {      
+      if (jQuery.inArray(turnlocs_to_years[id][idx], checked_years) >= 0) {
+        year_qualifies = true;
+        break;
+      }
+    }
+    if (year_qualifies) {
+      movement_markers[id].marker.setMap(map);
+      movement_count_num += 1;
+    } else {
+      movement_markers[id].marker.setMap(null);
+    }
+  }  
+  $("span#movement_count_num").html(movement_count_num);
+}
+
+/* Gets called when the information for a marker or a polyline comes back from the server,
+ * and we need to display it in an info window.
+ */
 function showInfoWindow(json) {
-  console.log(json);
+  // console.log(json);
   
   var content_str = '<div class="content">';
   for (var period_str in json.period_minutes) {
     content_str   += json.period_minutes[period_str] + ' ' + period_str + '-minute counts<br />';
   }
-  content_str     += "collected between " + json.date_min + " and " + json.date_max;  
+  if (json.date_min == json.date_max) {
+    content_str   += "collected in " + json.date_min;
+  }
+  else {
+    content_str   += "collected between " + json.date_min + " and " + json.date_max;
+  }  
   content_str     += '</div>';
   infowindow.setContent(content_str);
   
-  var key = json.count_type + "_" + json.loc_id;
   if (json.count_type == 'turn') {
-    infowindow.open(map, markers[json.count_type + "_" + json.loc_id ]);
+    infowindow.open(map, movement_markers[json.loc_id].marker);
   } else {
-    infowindow.position = google.maps.geometry.spherical.interpolate(markers[key].getPath().getAt(0), markers[key].getPath().getAt(1), 0.5);
+    infowindow.position = google.maps.geometry.spherical.interpolate(mainline_markers[json.loc_id].marker.getPath().getAt(0), 
+                                                                     mainline_markers[json.loc_id].marker.getPath().getAt(1), 0.5);
     infowindow.open(map);
   }
 }
 
+/* Gets called when a polyline or a marker is clicked; initiates a call to the server for
+ * more information about that particular count location.
+ */
 function getCountsInfo(type, id) {
+  // console.log("getCountsInfo(" + type + "," + id + ")");
   // request information on the counts available here  
   $.getJSON("/countdracula/counts_for_location/", { count_type:type, loc_id:id }, showInfoWindow );
 }
@@ -85,14 +188,20 @@ $(document).ready(function () {});
    <table id='filters'>
    <tr><th>Count Types</th>
        <td id="count-type">
-       <input type="checkbox" id="Movements" />Movements<br />
-       <input type="checkbox" id="Mainline" />Mainline<br />
+       <input type="checkbox" id="movement" />Movement<br />
+       <input type="checkbox" id="mainline" />Mainline<br />
        </td>
-   </tr>       
+   </tr>
+   <tr><th>Count Years</th>
+       <td id="count-year">
+       {% for year in count_years %}
+       <input type="checkbox" id="year{{year}}">{{year}}<br />       
+       {% endfor %}
+       </td>
    </table>
    
-   <p>Movement locations: {{ turn_count_locs|length }}</p>
-   <p>Mainline locations: {{ mainline_count_locs|length }}</p>
+   <p>Movement locations: <span id="turn_count_num">{{ turn_count_locs|length }}</span></p>
+   <p>Mainline locations: <span id="mainline_count_num">{{ mainline_count_locs|length }}</span></p>
    
   </div>
   <div id="map"></div>

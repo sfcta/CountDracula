@@ -3,22 +3,57 @@ import datetime
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.template.loader import render_to_string
 from django.utils import simplejson
 
 from countdracula.models import Node, MainlineCountLocation, TurnCountLocation, MainlineCount, TurnCount
 
 def mapview(request):
+    print "mapview starting: " + str(datetime.datetime.now())
+
     # get all the TurnCountLocation objects
-    turn_count_locs   = TurnCountLocation.objects.all()
+    turn_count_locs = TurnCountLocation.objects.all()
+    print len(turn_count_locs)
 
     # get all the MainlineCountLocation objects
-    mainline_count_locs   = MainlineCountLocation.objects.all()        
+    mainline_count_locs = MainlineCountLocation.objects.all()
+    print len(mainline_count_locs)
     
-    return render_to_response('countdracula/gmap.html', 
-                              {'turn_count_locs':turn_count_locs,
-                               'mainline_count_locs':mainline_count_locs}, 
+    # and the nodes
+    nodes = {}
+    for node in Node.objects.all():
+        nodes[node.id] = (node.point.x, node.point.y)
+    
+    # get all the count years
+    ml_years = MainlineCount.objects.values_list('count_year',flat=True).distinct();
+    turn_years = TurnCount.objects.values_list('count_year',flat=True).distinct();
+    count_years = sorted(set(ml_years).union(set(turn_years)))
+    
+    # get a mapping of loc_id -> [ years ]
+    turnlocs_to_years = {}
+    tcqs = TurnCountLocation.objects.values('id','turncount__count_year').distinct()
+    for row in tcqs:
+        if row['id'] not in turnlocs_to_years: turnlocs_to_years[row['id']] = []
+        turnlocs_to_years[row['id']].append(row['turncount__count_year'])
+    
+    mainlinelocs_to_years = {}
+    mlqs = MainlineCountLocation.objects.values('id','mainlinecount__count_year').distinct()
+    for row in mlqs:
+        if row['id'] not in mainlinelocs_to_years: mainlinelocs_to_years[row['id']] = []
+        mainlinelocs_to_years[row['id']].append(row['mainlinecount__count_year'])
+    
+    
+    print "mapview queries done: " + str(datetime.datetime.now())
+    
+    x= render_to_response('countdracula/gmap.html', 
+                              {'turn_count_locs'        :turn_count_locs,
+                               'mainline_count_locs'    :mainline_count_locs,
+                               'nodes'                  :nodes,
+                               'count_years'            :count_years,
+                               'turnlocs_to_years'      :turnlocs_to_years,
+                               'mainlinelocs_to_years'  :mainlinelocs_to_years}, 
                               context_instance=RequestContext(request))
+    print "mapview render done: " + str(datetime.datetime.now())
+    return x
     
 def counts_for_location(request):
     """
@@ -27,8 +62,8 @@ def counts_for_location(request):
     results = {
       'success':False,
       'period_minutes':defaultdict(int),  # period_minutes -> number of counts
-      'date_min':datetime.date.max,  # earliest date for qualifying count
-      'date_max':datetime.date.min   # latest date for qualifying count
+      'date_min':3000,  # earliest date for qualifying count
+      'date_max':0      # latest date for qualifying count
     } 
     try:
         count_type  = request.GET[u'count_type']
@@ -47,8 +82,8 @@ def counts_for_location(request):
      
         for count in counts:
             # find earliest and last dates
-            if results['date_min'] > count.count_date: results['date_min'] = count.count_date
-            if results['date_max'] < count.count_date: results['date_max'] = count.count_date
+            if results['date_min'] > count.count_year: results['date_min'] = count.count_year
+            if results['date_max'] < count.count_year: results['date_max'] = count.count_year
             
             # tally counts by period_minutes
             results['period_minutes'][str(count.period_minutes)] += 1

@@ -17,15 +17,18 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'geodjango.settings'
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import setup_environ
 from geodjango import settings
+from django.contrib.auth.models import User
 
 from countdracula.models import Node, StreetName, MainlineCountLocation, MainlineCount
 
 TIMEZONE = pytz.timezone('America/Los_Angeles')
 USAGE = """
 
- python insertSanFranciscoPeMSCounts.py [-v pems_vds_datfile] [-c pems_census_dir] PeMS_to_NetworkNodes.xls
+ python insertSanFranciscoPeMSCounts.py [-v pems_vds_datfile] [-c pems_census_dir] user PeMS_to_NetworkNodes.xls
 
- e.g. python scripts\insertSanFranciscoPeMSCounts.py -v "Q:\Roadway Observed Data\PeMS\D4_Data_2010\pems_dist4_2010_fullyr.dat" -c "Q:\Roadway Observed Data\PeMS\D4_Data_2010\PeMS_Census" "Q:\Roadway Observed Data\PeMS\PeMs_to_NetworkNodes.xls"
+ e.g. python scripts\insertSanFranciscoPeMSCounts.py -v "Q:\Roadway Observed Data\PeMS\D4_Data_2010\pems_dist4_2010_fullyr.dat" 
+                                                     -c "Q:\Roadway Observed Data\PeMS\D4_Data_2010\PeMS_Census" 
+                                                     lisa "Q:\Roadway Observed Data\PeMS\PeMs_to_NetworkNodes.xls"
  
  PeMS_to_NetworkNodes.xls is a workbook that tells us how to associate PeMS data with the network.
  
@@ -159,7 +162,7 @@ def getIntersectionStreetnamesForPemsKey(mapping, pems_key):
     
     return (on_street, from_street, model_node_A, to_street, model_node_B)
 
-def readVDSCounts(mapping, vds_datfilename):
+def readVDSCounts(mapping, vds_datfilename, user):
     """
     Read the VDS (Vehicle Detector Station) data from the given *vds_datafilename*, and insert the mainline
     counts into countdracula.
@@ -279,7 +282,8 @@ def readVDSCounts(mapping, vds_datfilename):
                                        vehicle_type         = 0, # ALL                                                           
                                        reference_position   = -1,
                                        sourcefile           = vds_datfilename_abspath,
-                                       project              = project_str)
+                                       project              = project_str,
+                                       upload_user          = user)
         mainline_count.clean()
         mainline_count.save()
         counts_saved += 1
@@ -287,7 +291,7 @@ def readVDSCounts(mapping, vds_datfilename):
     logger.info("Saved %d PeMS VDS counts into countdracula" % counts_saved)
     vds_datfile.close()
 
-def readCensusCounts(mapping, census_dirname):
+def readCensusCounts(mapping, census_dirname, user):
     """
     Reads the census station count workbooks and inputs those counts into the Count Dracula database.
     """
@@ -373,7 +377,8 @@ def readCensusCounts(mapping, census_dirname):
                                                vehicle_type         = 0, # ALL
                                                reference_position   = -1,
                                                sourcefile           = workbook_filename,
-                                               project              = project_str)
+                                               project              = project_str,
+                                               upload_user          = user)
                 mainline_count.clean()
                 mainline_count.save()
                 counts_saved += 1
@@ -384,7 +389,7 @@ def readCensusCounts(mapping, census_dirname):
 if __name__ == '__main__':
 
     opts, args = getopt.getopt(sys.argv[1:], 'c:v:')
-    if len(args) != 1:
+    if len(args) != 2:
         print USAGE
         sys.exit(2)
         
@@ -392,8 +397,11 @@ if __name__ == '__main__':
         print "No PeMS data specified for processing"
         print USAGE
         sys.exit(2)
-    
-    MAPPING_FILE = args[0]
+        
+    USERNAME     = args[0]    
+    MAPPING_FILE = args[1]
+
+    user = User.objects.get(username__exact=USERNAME)
         
     logger = logging.getLogger('countdracula')
     logger.setLevel(logging.DEBUG)
@@ -413,6 +421,6 @@ if __name__ == '__main__':
     
     for (opttype, optarg) in opts:
         if opttype == "-v":
-            readVDSCounts(mapping, optarg)
+            readVDSCounts(mapping, optarg, user)
         if opttype == "-c":
-            readCensusCounts(mapping, optarg)
+            readCensusCounts(mapping, optarg, user)

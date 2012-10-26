@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.db import models
 import math
@@ -71,6 +72,10 @@ class StreetName(models.Model):
     def __unicode__(self):
         return self.street_name
 
+    # sort by this in the admin UI
+    class Meta:
+        ordering = ['street_name']
+
     @staticmethod
     def getPossibleStreetNames(name):
         """
@@ -125,6 +130,8 @@ class TurnCount(models.Model):
     sourcefile          = models.CharField(max_length=500, help_text="For tracking where this count came from")
     project             = models.CharField(max_length=100, help_text="For tracking if this count was collected for a specific project")
 
+    upload_user         = models.ForeignKey(settings.AUTH_USER_MODEL, help_text="User that uploaded this Count data")
+
     def __unicode__(self):
         return "%3d-minute at %s at location %s" % \
             (self.period_minutes, self.start_time, self.location)
@@ -164,6 +171,8 @@ class MainlineCount(models.Model):
     sourcefile          = models.CharField(max_length=500, help_text="For tracking where this count came from")
     project             = models.CharField(max_length=100, help_text="For tracking if this count was collected for a specific project")
     reference_position  = models.FloatField(help_text="How far along the link the count was actually taken; use -1 for unknown.  Units?")
+
+    upload_user         = models.ForeignKey(settings.AUTH_USER_MODEL, help_text="User that uploaded this Count data")
 
     def __unicode__(self):
         return "%3d-minute at %s at location %s" % \

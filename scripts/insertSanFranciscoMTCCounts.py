@@ -17,16 +17,19 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'geodjango.settings'
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import setup_environ
 from geodjango import settings
+from django.contrib.auth.models import User
 from django.contrib.gis.gdal import SpatialReference, CoordTransform
 
 from countdracula.models import Node, StreetName, MainlineCountLocation, MainlineCount
 
 USAGE = """
 
- python insertSanFranciscoMTCCounts.py mtc_counts.xls
+ python insertSanFranciscoMTCCounts.py user mtc_counts.xls
 
- e.g. python insertSanFranciscoMTCCounts.py "Q:\Roadway Observed Data\MTC\all_MTC_Counts.xls"
+ e.g. python insertSanFranciscoMTCCounts.py lisa "Q:\Roadway Observed Data\MTC\all_MTC_Counts.xls"
  
+ The user should be the django user to attribute as the uploader.
+
  The worksheets in the workbook are assumed to have the following columns: A, B, EA_OBS, AM_OBS, MD_OBS, PM_OBS, EV_OBS, TOT_OBS
  
  Excludes workbook counts2005 because counts2005_hovdummy is duplicative.  (?)
@@ -53,12 +56,15 @@ OBS_COL_TO_STARTTIME = {
 if __name__ == '__main__':
 
     opts, args = getopt.getopt(sys.argv[1:], '')
-    if len(args) != 1:
+    if len(args) != 2:
         print USAGE
         sys.exit(2)
     
-    MTC_COUNTS_FILE = args[0]
+    USERNAME        = args[0]
+    MTC_COUNTS_FILE = args[1]
     MTC_COUNTS_FILE_FULLNAME = os.path.abspath(MTC_COUNTS_FILE)
+
+    user = User.objects.get(username__exact=USERNAME)
         
     logger = logging.getLogger('countdracula')
     logger.setLevel(logging.DEBUG)
@@ -203,7 +209,8 @@ if __name__ == '__main__':
                                                vehicle_type     = 0,
                                                sourcefile       = MTC_COUNTS_FILE_FULLNAME,
                                                project          = "mtc",
-                                               reference_position = -1)
+                                               reference_position = -1,
+                                               upload_user      = user)
                 mainline_count.save()
             saved_rows += 1
         

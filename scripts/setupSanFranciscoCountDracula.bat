@@ -76,16 +76,16 @@ python insertSanFranciscoIntersectionsFromCube.py Y:\networks\Roads2010\FREEFLOW
 ::
 :: insert PeMS counts
 ::
-python insertSanFranciscoPeMSCounts.py -v "Q:\Roadway Observed Data\PeMS\D4_Data_2010\pems_dist4_2010_fullyr.dat" -c "Q:\Roadway Observed Data\PeMS\D4_Data_2010\PeMS_Census" "Q:\Roadway Observed Data\PeMS\PeMs_to_NetworkNodes.xls"
+python insertSanFranciscoPeMSCounts.py -v "Q:\Roadway Observed Data\PeMS\D4_Data_2010\pems_dist4_2010_fullyr.dat" -c "Q:\Roadway Observed Data\PeMS\D4_Data_2010\PeMS_Census" lisa "Q:\Roadway Observed Data\PeMS\PeMs_to_NetworkNodes.xls"
 
 ::
 :: insert MTC counts
 ::
-python insertSanFranciscoMTCCounts.py "Q:\Roadway Observed Data\MTC\all_MTC_Counts.xls"
+python insertSanFranciscoMTCCounts.py lisa "Q:\Roadway Observed Data\MTC\all_MTC_Counts.xls"
 
 ::
 :: insert other counts
 ::
-python insertSanFranciscoCounts.py "Q:\Roadway Observed Data\Counts\Standard\v1.0"
+python insertSanFranciscoCounts.py -f "Q:\Roadway Observed Data\Counts\Standard\v1.0\CountDraculaFailed" -s "Q:\Roadway Observed Data\Counts\Standard\v1.0\CountDraculaSuccess" lisa "Q:\Roadway Observed Data\Counts\Standard\v1.0\CountDraculaToProcess"
 
 :done

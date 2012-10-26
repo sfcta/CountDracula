@@ -74,13 +74,14 @@ class CountsWorkbookParser():
         return sourcefile
           
         
-    def readAndInsertMainlineCounts(self, file, primary_street, cross_street1, cross_street2, logger, tzinfo=None):  
+    def readAndInsertMainlineCounts(self, file, primary_street, cross_street1, cross_street2, user, logger, tzinfo=None):  
         """
         Parses the given excel file representing mainline counts and inserts those counts into the countdracula database.
  
         * *file* is the Excel workbook file name
         * *primary_street* is the street on which the counts were taken
         * *cross_street1* and *cross_street2* are the bounding cross streets
+        * *user* is the django User to associate with the count
         * *logger* is a logging instance
         
         On success, returns number of successful counts inserted.
@@ -234,7 +235,8 @@ class CountsWorkbookParser():
                                                        vehicle_type         = vtype,
                                                        reference_position   = -1, # reference position unknown, it's not in the workbook
                                                        sourcefile           = file,
-                                                       project              = "")
+                                                       project              = "",
+                                                       upload_user          = user)
                         mainline_count.clean()
                         mainline_count.save()
                         counts_saved += 1
@@ -259,13 +261,14 @@ class CountsWorkbookParser():
                 
             return -1
     
-    def readAndInsertTurnCounts(self, file, street1, street2, logger, tzinfo=None):
+    def readAndInsertTurnCounts(self, file, street1, street2, user, logger, tzinfo=None):
         """
         Parses the given excel file representing turn counts and inserts them into the countdracula database.
         
         * *file* is the Excel workbook file
         * *street1* is the name of the NS-oriented street
         * *street2* is the name of the EW-oriented street
+        * *user* is the django User to associate with the count
         * *logger* is a logging instance
         
         On success, returns number of successful counts inserted.
@@ -424,7 +427,8 @@ class CountsWorkbookParser():
                                                period_minutes   = period,
                                                vehicle_type     = vtype,
                                                sourcefile       = file,
-                                               project          = "")
+                                               project          = "",
+                                               upload_user      = user)
                         turn_count.clean()
                         turn_count.save()
                         counts_saved += 1
@@ -503,41 +507,3 @@ class CountsWorkbookParser():
                     
         return streetname_tuples
     
-    
-    
-    #===========================================================================
-    # 
-    # def read_alt_streets(self,file): 
-    #    """
-    #    creates commands list for street suffixes to send to py2psql
-    #    """
-    # 
-    # 
-    #    #---------Variables used-----------------------------------
-    #    commands = []
-    #    street = ""
-    #    suffix = ""
-    #    #-------------------------- open the .xls file------------------------------
-    #    
-    #    book = xlrd.open_workbook(file)
-    #    
-    #    #----------Loop through counts and Create SQL Commandslist with parameters-------------    
-    #    sheetnames =  book.sheet_names() 
-    #    totalsheets_ids = range(len(sheetnames))  #create sheet id list
-    #    
-    #    for sheet in totalsheets_ids :
-    #       
-    #        activesheet = book.sheet_by_name(sheetnames[sheet])
-    #        row_ids = range(0,len(activesheet.col(0))) #find rows to process for column
-    #            
-    #        for row in row_ids:
-    #                
-    #            street = activesheet.cell_value(row,0)
-    #            suffix = activesheet.cell_value(row,1)
-    #            if (street != "" and suffix != ""): #if all inputs exist
-    #                #-------Create time in time format !!!----------------- 
-    #                commands.append([street,suffix])
-    #                
-    #    return commands
-    # 
-    #===========================================================================

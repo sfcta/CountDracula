@@ -7,7 +7,11 @@ from django.utils import simplejson
 
 from countdracula.models import Node, MainlineCountLocation, TurnCountLocation, MainlineCount, TurnCount
 
+
 def mapview(request):
+    """
+    The mapview shows all the counts on one map.
+    """
     print "mapview starting: " + str(datetime.datetime.now())
 
     # get all the TurnCountLocation objects
@@ -57,7 +61,7 @@ def mapview(request):
     
 def counts_for_location(request):
     """
-    This enables the gmapview to fetch count information for a location.
+    This enables the mapview to fetch count information for a location.
     """
     results = {
       'success':False,
@@ -89,7 +93,8 @@ def counts_for_location(request):
             results['period_minutes'][str(count.period_minutes)] += 1
 
         results['count_type']   = count_type
-        results['loc_id']       = loc_id            
+        results['loc_id']       = loc_id
+        results['where_str']    = str(count_loc)
         results['success']      = True
         
     except Exception as inst:
@@ -99,4 +104,3 @@ def counts_for_location(request):
     if 'date_min' in results: results['date_min'] = str(results['date_min'])
     if 'date_max' in results: results['date_max'] = str(results['date_max'])
     return HttpResponse(simplejson.dumps(results), mimetype='application/json')
-            

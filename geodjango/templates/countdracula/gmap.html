@@ -50,7 +50,7 @@ function initialize() {
     });
     (function(i){
       google.maps.event.addListener(movement_markers[id].marker, 'click', function() { getCountsInfo("turn",i); });
-    })(idx);
+    })(id);
   }
   
   /* Create mainline markers */
@@ -69,7 +69,7 @@ function initialize() {
     });
     (function(i){
       google.maps.event.addListener(mainline_markers[id].marker, 'click', function() { getCountsInfo("mainline", i); });
-    })(idx);  
+    })(id);  
   }
 
   /* Update display on GUI events */
@@ -148,6 +148,7 @@ function showInfoWindow(json) {
   // console.log(json);
   
   var content_str = '<div class="content">';
+  content_str     += json.where_str + '<br />';
   for (var period_str in json.period_minutes) {
     content_str   += json.period_minutes[period_str] + ' ' + period_str + '-minute counts<br />';
   }
@@ -173,7 +174,7 @@ function showInfoWindow(json) {
  * more information about that particular count location.
  */
 function getCountsInfo(type, id) {
-  // console.log("getCountsInfo(" + type + "," + id + ")");
+  console.log("getCountsInfo(" + type + "," + id + ")");
   // request information on the counts available here  
   $.getJSON("/countdracula/counts_for_location/", { count_type:type, loc_id:id }, showInfoWindow );
 }

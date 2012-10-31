@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -20,3 +21,12 @@ from django.contrib.gis import gdal
 
 import django.core.handlers.wsgi
 application = django.core.handlers.wsgi.WSGIHandler()
+
+# log errors to the error log
+logger = logging.getLogger('')
+logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler(sys.stderr)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)-8s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)

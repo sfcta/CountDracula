@@ -126,13 +126,8 @@ if __name__ == '__main__':
         if SUCCESS_DIR:
             full_file_path = os.path.join(SUCCESS_DIR, file) 
             shutil.move(os.path.join(dir,file), full_file_path)
-
-        streets = file.replace(".xls","")
-        delimiters = "_-."
-            
-        for delim in delimiters: streets = streets.replace(delim, " ")
-        streetlist = streets.split()
         
+        streetlist = CountsWorkbookParser.parseFilename(file)
                 
         if len(streetlist) == 3:           
             mainline_attempted_files += 1

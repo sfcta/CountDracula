@@ -15,6 +15,21 @@ class CountsWorkbookParser():
     :py:class:`CountsDatabaseWriter` to insert into the Counts Database.
     """
 
+    @classmethod
+    def parseFilename(cls, filename):
+        """
+        Parse the filename into the component streets and returns them as a list.
+        
+        Delimiters are `_`, `-`, `.` and ` `.
+        """
+        streets = filename.replace(".xls","")
+        delimiters = "_-."
+        
+        # convert them all to spaces
+        for delim in delimiters: streets = streets.replace(delim, " ")
+        
+        return streets.split()
+                
 
     def __init__(self):
         '''        

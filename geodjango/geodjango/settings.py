@@ -168,3 +168,6 @@ LOGGING = {
 }
 
 AUTH_USER_MODEL = 'auth.User'
+
+# The upload interface will save processed workbooks into this directory
+UPLOAD_DIR = r"C:\CountDracula\uploads"

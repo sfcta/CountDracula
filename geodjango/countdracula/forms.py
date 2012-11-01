@@ -7,7 +7,7 @@ import StringIO
 import traceback
 
 
-class TurnCountForm(forms.Form):
+class UploadCountForm(forms.Form):
 
     sourcefile  = forms.FileField(max_length=150, help_text="Upload a count file to process.")
     xl_parser   = CountsWorkbookParser()
@@ -31,8 +31,8 @@ class TurnCountForm(forms.Form):
         # set streetnames
         self.cleaned_data['streetnames'] = CountsWorkbookParser.parseFilename(sourcefile_name)
 
-        if len(self.cleaned_data['streetnames']) != 2:
-            raise forms.ValidationError("Sourcefile name should be of the format streetname1_streetname2.xls.  Invalid value: %s" % sourcefile_name)
+        if len(self.cleaned_data['streetnames']) not in [2,3]:
+            raise forms.ValidationError("Sourcefile name should be of the format streetname1_streetname2.xls or streetname_fromstreetname.tostreetname.xls.  Invalid value: %s" % sourcefile_name)
         
         return self.cleaned_data['sourcefile']
         
@@ -53,14 +53,32 @@ class TurnCountForm(forms.Form):
         logHandler.setLevel(logging.INFO)
         logging.getLogger().addHandler(logHandler)
         
-        processed = self.xl_parser.readAndInsertTurnCounts(os.path.join(settings.UPLOAD_DIR, file.name), 
-                                                           self.cleaned_data['streetnames'][0], 
-                                                           self.cleaned_data['streetnames'][1], 
-                                                           request.user,
-                                                           logging.getLogger(''))       
+        if len(self.cleaned_data['streetnames']) == 2:
+            # turn counts
+            processed = self.xl_parser.readAndInsertTurnCounts(os.path.join(settings.UPLOAD_DIR, file.name), 
+                                                               self.cleaned_data['streetnames'][0], 
+                                                               self.cleaned_data['streetnames'][1], 
+                                                               request.user,
+                                                               logging.getLogger())
+        else:
+            # mainline counts
+            processed = self.xl_parser.readAndInsertMainlineCounts(os.path.join(settings.UPLOAD_DIR, file.name), 
+                                                                   self.cleaned_data['streetnames'][0], 
+                                                                   self.cleaned_data['streetnames'][1],
+                                                                   self.cleaned_data['streetnames'][2],
+                                                                   request.user, 
+                                                                   logging.getLogger())  
+
         # stop catching logs
         logging.getLogger().removeHandler(logHandler)
         logHandler.flush()
         buffer.flush()
-        
-        return (processed, buffer.getvalue())
+        return_str = buffer.getvalue()
+
+        # remove file on failure
+        if processed < 0:
+            os.remove(os.path.join(settings.UPLOAD_DIR, file.name))
+            return_str += "Removed %s" % os.path.join(settings.UPLOAD_DIR, file.name)
+
+        return_str = return_str.replace("\n","<br />")
+        return (processed, return_str)

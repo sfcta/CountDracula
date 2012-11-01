@@ -3,14 +3,19 @@
 {% block content %}
 <div id="content-main">
 
-<pre id="upload_errors">
-{{ upload_errors }}
-</pre>
+{% if upload_errors %}
+ 
+ <div id="upload_errors"><strong>An error occurred:</strong><br />
+ <div style="font-family: Lucidatypewriter, monospace">{{ upload_errors|safe }}</div>
+ </div>
+{% else %}
+ <p id="success">
+ {{ success_msg }}
+ </p>
+{% endif %}
 
-<p id="success">
-{{ success_msg }}
-</p>
 
+<p>Choose an excel workbook with counts to upload below.</p>
 <form enctype="multipart/form-data" action="." method="post">
 {% csrf_token %}
     {# Include the visible fields #}

@@ -2,3 +2,10 @@
 input#id_sourcefile {
   width:600px;
 }
+
+div#upload_errors {
+  color:red;
+  border: 1px dotted red;
+  padding: 20px;
+  margin: 20px;
+}

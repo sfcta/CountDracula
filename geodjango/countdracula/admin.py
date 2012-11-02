@@ -27,12 +27,13 @@ class CountDraculaAdminSite(admin.sites.AdminSite):
         if request.method == 'POST':
             form = UploadCountForm(request.POST, request.FILES)
             if form.is_valid():
-                (num_processed, string_error) = form.read_sourcefile_and_insert_counts(request, request.FILES['sourcefile'])
+                (num_processed, log_string) = form.read_sourcefile_and_insert_counts(request, request.FILES['sourcefile'])
                 if num_processed < 0:
-                    context_dict['upload_errors'] = string_error
+                    context_dict['upload_errors'] = log_string
                 else:
                     # success!
                     context_dict['success_msg'] = "Successfully uploaded %d counts from %s!" % (num_processed, form.cleaned_data['sourcefile'])
+                    context_dict['success_detail'] = log_string
                     form = UploadCountForm()
         else:
             # form is not bound to data
@@ -43,7 +44,12 @@ class CountDraculaAdminSite(admin.sites.AdminSite):
         
 
 countdracula_admin = CountDraculaAdminSite(name='countdracula')
-countdracula_admin.register(StreetName)
+
+class StreetNameAdmin(admin.ModelAdmin):
+    search_fields = ['street_name']
+    
+countdracula_admin.register(StreetName, StreetNameAdmin)
+
 countdracula_admin.register(TurnCountLocation)
 
 class MainlineCountLocationAdmin(admin.ModelAdmin):
@@ -54,14 +60,16 @@ countdracula_admin.register(MainlineCountLocation, MainlineCountLocationAdmin)
 class TurnCountAdmin(admin.ModelAdmin):
     # let users search by sourcefile
     search_fields = ['sourcefile']
-    list_display = ('location', 'period_minutes', 'count_date', 'count_year', 'start_time', 'count')
+    list_filter   = ('vehicle_type',)
+    list_display  = ('location', 'period_minutes', 'count_date', 'count_year', 'start_time', 'vehicle_type', 'count')
     
 countdracula_admin.register(TurnCount, TurnCountAdmin)
 
 class MainlineCountAdmin(admin.ModelAdmin):
     # let users search by sourcefile
     search_fields = ['sourcefile']
-    list_display = ('location', 'period_minutes', 'count_date', 'count_year', 'start_time', 'count')
+    list_filter   = ('vehicle_type',)
+    list_display  = ('location', 'period_minutes', 'count_date', 'count_year', 'start_time', 'vehicle_type', 'count')
 
 countdracula_admin.register(MainlineCount, MainlineCountAdmin)
 

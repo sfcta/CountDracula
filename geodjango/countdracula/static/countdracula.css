@@ -9,3 +9,10 @@ div#upload_errors {
   padding: 20px;
   margin: 20px;
 }
+
+div#success {
+  color:gray;
+  border: 1px dotted gray;
+  padding: 20px;
+  margin: 20px;
+}

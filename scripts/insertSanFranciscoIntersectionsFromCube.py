@@ -186,7 +186,7 @@ if __name__ == '__main__':
     
     # then the streets {(a,b) -> (streetname, type)})
     for street_tuple in streetnames:
-        combined = street_tuple[0]+" "+street_tuple[1]
+        combined = street_tuple[0]+((" " +street_tuple[1]) if len(street_tuple[1])>0 else "")
         streetname = countdracula.models.StreetName(street_name=combined,
                                                     nospace_name=combined.replace(" ",""),
                                                     short_name=street_tuple[0],
@@ -198,7 +198,8 @@ if __name__ == '__main__':
     for nodeid,streetset in node_to_streets.iteritems():
         node = countdracula.models.Node.objects.get(id=nodeid)
         for street_tuple in streetset:
-            street_name = countdracula.models.StreetName.objects.get(street_name=street_tuple[0]+" "+street_tuple[1])
+            combined = street_tuple[0]+((" " +street_tuple[1]) if len(street_tuple[1])>0 else "")
+            street_name = countdracula.models.StreetName.objects.get(street_name=combined)
             
             # add the association
             street_name.nodes.add(node)    

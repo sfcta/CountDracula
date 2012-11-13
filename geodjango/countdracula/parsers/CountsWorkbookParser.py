@@ -1,8 +1,7 @@
-import xlrd, sys, traceback
+import xlrd, sys, traceback, types
 from datetime import datetime,date, time, timedelta
-from types import FloatType
 
-from countdracula.models import Node, StreetName, MainlineCountLocation, MainlineCount, TurnCountLocation, TurnCount
+from countdracula.models import Node, StreetName, MainlineCountLocation, MainlineCount, TurnCountLocation, TurnCount, VehicleTypes
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -88,6 +87,116 @@ class CountsWorkbookParser():
 
         return sourcefile
           
+    def readGeo(self, book):
+        """
+        Reads optional worksheet called "geo" and returns the resulting data ( {inlinks_designation_car:inlink}, {outlinks_designation_char:outlink} ) where
+        each link is a list: [streetname, dir]
+        """
+        inlinks     = {}
+        outlinks    = {}
+        if "geo" not in book.sheet_names():
+            return (inlinks, outlinks)
+        
+        geosheet = book.sheet_by_name("geo")
+        for row_num in range(geosheet.nrows):
+            if geosheet.cell_value(row_num,0) == "" or geosheet.cell_value(row_num,0) == 'Streetname': continue
+            
+            streetname  = geosheet.cell_value(row_num,0).encode('ascii')
+            inout       = geosheet.cell_value(row_num,1).encode('ascii')
+            dir         = geosheet.cell_value(row_num,2).encode('ascii')
+            designation = geosheet.cell_value(row_num,3).encode('ascii')
+            
+            # checking
+            if inout.upper() not in ["IN", "OUT"]:
+                raise CountsWorkbookParserException("Invalid geo worksheet: In/Out is invalid: %s" % inout)
+            
+            if dir not in ["NB","SB","WB","EB"]:
+                raise CountsWorkbookParserException("Invalid geo worksheet: Invalid link dir: %s" % dir)
+            
+            if len(designation) != 1:
+                    raise CountsWorkbookParserException("Invalid geo worksheet: Invalid designation (len != 1): %s" % designation)
+
+            notallowed = "NSEWTHRLU2 -"
+            if notallowed.find(designation) != -1:
+                raise CountsWorkbookParserException("Invalid geo worksheet: Invalid designation (char not allowed): %s" % designation)
+                
+            if inout.upper() == "IN":
+                inlinks[designation] = [streetname, dir]
+            else:
+                outlinks[designation] = [streetname, dir]
+            
+        return (inlinks, outlinks)
+                
+        
+    
+    def findSectionStarts(self, worksheet):
+        """
+        Simple method to iterate through the rows in the workbook and find sections, where a section is defined as a
+        set of contiguous non-blank rows.
+        
+        Returns a list of tuples: [(startrownum1,endrownum1), (startrownum2,endrownum2), ... ]
+        """
+        sections            = []
+        current_startrow    = -1
+        current_endrow      = -1
+        for rownum in range(worksheet.nrows):
+            blank = True
+            
+            # check if the row is blank
+            for colnum in range(worksheet.ncols):
+                if worksheet.cell_type(rownum, colnum) not in [xlrd.XL_CELL_BLANK, xlrd.XL_CELL_EMPTY]:
+                    blank = False
+                    break
+            # blank -- end section
+            if blank and current_startrow != -1:
+                current_endrow = rownum-1
+                sections.append( (current_startrow, current_endrow) )
+                current_startrow    = -1
+                current_endrow      = -1
+            
+            # not blank -- start section
+            if not blank and current_startrow == -1:
+                current_startrow = rownum
+        
+        # are we in a section?
+        if current_startrow != -1:
+            current_endrow = rownum
+            sections.append( (current_startrow, current_endrow) )
+            
+        return sections
+
+    def numNonBlankColumns(self, worksheet, rownum):
+        """
+        Counts the number of non-blank columns for the given row.
+        """
+        for colnum in range(worksheet.ncols):
+            if worksheet.cell_type(rownum, colnum) in [xlrd.XL_CELL_BLANK, xlrd.XL_CELL_EMPTY]: return colnum
+        
+        return worksheet.ncols            
+    
+    def vehicleTypeForString(self, vehicletype_str):
+        """
+        Returns the vehicle type code given the vehicle type string. (e.g. 0 for "All", 1 for "Pedestrian", etc.)
+        """
+        if type(vehicletype_str) == types.UnicodeType:
+            vehicletype_str = vehicletype_str.encode('ascii')
+            
+        for tuple1 in VehicleTypes:
+            
+            # check if the strings match
+            if type(tuple1[1]) == types.StringType and tuple1[1].upper() == vehicletype_str.upper():
+                return tuple1[0]
+            
+            # second level of tuples
+            if type(tuple1[1]) == types.TupleType:
+                
+                for tuple2 in tuple1[1]:
+
+                    if type(tuple2[1]) == types.StringType and tuple2[1].upper() == vehicletype_str.upper():
+                        return tuple2[0]
+                    
+        return self.vehicleTypeForString("Unknown")
+                
         
     def readAndInsertMainlineCounts(self, file, primary_street, cross_street1, cross_street2, user, logger, tzinfo=None):  
         """
@@ -103,7 +212,7 @@ class CountsWorkbookParser():
         
         On failure, removes all counts from this workbook so it can be fixed and inserted again, and returns -1.
         """
-        
+        # logger.info("primary_street=[%s], cross_street1=[%s] cross_street2=[%s]" % (primary_street, cross_street1, cross_street2))
         mainline_counts = MainlineCount.objects.filter(sourcefile=file)
         if len(mainline_counts) > 0:
             logger.error("  readAndInsertMainlineCounts() called on %s, but %d mainline counts already "\
@@ -137,15 +246,15 @@ class CountsWorkbookParser():
                 
                 for cross_street1_name in cross_street1_list:
                     
-                    intersections1[primary_street_name][cross_street1_name] = Node.objects.filter(streetname__street_name=primary_street_name.street_name) \
-                                                                                          .filter(streetname__street_name=cross_street1_name.street_name)                
+                    intersections1[primary_street_name][cross_street1_name] = Node.objects.filter(street_to_node__street_name=primary_street_name) \
+                                                                                          .filter(street_to_node__street_name=cross_street1_name)                
                     # don't bother if it's an empty set
                     if len(intersections1[primary_street_name][cross_street1_name]) == 0:
                         del intersections1[primary_street_name][cross_street1_name]
     
                 for cross_street2_name in cross_street2_list:
-                    intersections2[primary_street_name][cross_street2_name] = Node.objects.filter(streetname__street_name=primary_street_name) \
-                                                                                          .filter(streetname__street_name=cross_street2_name)
+                    intersections2[primary_street_name][cross_street2_name] = Node.objects.filter(street_to_node__street_name=primary_street_name) \
+                                                                                          .filter(street_to_node__street_name=cross_street2_name)
                     # don't bother if it's an empty set
                     if len(intersections2[primary_street_name][cross_street2_name]) == 0:
                         del intersections2[primary_street_name][cross_street2_name]
@@ -182,6 +291,7 @@ class CountsWorkbookParser():
             book                = xlrd.open_workbook(file)
             sheetnames          = book.sheet_names()     
             counts_saved        = 0
+            
             for sheet_idx in range(len(sheetnames)) :
                
                 if sheetnames[sheet_idx]=="source": continue
@@ -190,71 +300,88 @@ class CountsWorkbookParser():
                 # Create date from sheetname in date format 
                 tmp_date = sheetnames[sheet_idx].split('.')
                 date_yyyy_mm_dd = date(int(tmp_date[0]),int(tmp_date[1]),int(tmp_date[2]) )
-                if len(tmp_date) > 3 and (tmp_date[3].upper()=="TRUCK" or tmp_date[3].upper()=="PEDESTRIAN"):
-                    continue
+
+                project  = ""
+                sections = self.findSectionStarts(activesheet)
+                # loop through the different sections in the workbook
+                for section in sections:
                 
-                for column in range(1,len(activesheet.row(0))):
+                    # project section?
+                    if activesheet.cell_value(section[0],0).upper() == "PROJECT":
+                        project = activesheet.cell_value(section[0]+1,0)
+                        continue
                     
-                    vehicle = activesheet.cell_value(1,column)
-                    if type(vehicle) is FloatType and vehicle in range(-1,16):
+                    # figure out the vehicle type and row with the column labels
+                    assert(activesheet.cell_value(section[0]+1,0).upper() == "MAINLINE")
+                    label_row = section[0]+1
+                   
+                    # figure out the vehicle type code
+                    vehicle = activesheet.cell_value(section[0], 0)
+                    if type(vehicle) in [types.FloatType, types.IntType] and vehicle in range(16):
                         vtype = vehicle
+                    elif type(vehicle) in [types.StringType, types.UnicodeType]:
+                        vtype = self.vehicleTypeForString(vehicle)
                     else:
-                        vtype = 0 # self._vtype
-                    
-                    #For the column, set direction and to from streets
-                    ml_ondir_temp = activesheet.cell_value(0,column)
-                    ml_ondir = ml_ondir_temp[:2] 
-                    direction = ml_ondir[0]
-                    
-                    # The convention is that cross street 1 is always north or west of cross street 2
-                    # so use this cue to determine the origin/destination of the movement
-                    if (direction == 'S' or direction == 'E'):
-                        ml_fromstreet = cross_street1_name_final
-                        ml_fromint    = intersections1[primary_street_name_final][ml_fromstreet][0]
-                        ml_tostreet   = cross_street2_name_final
-                        ml_toint      = intersections2[primary_street_name_final][ml_tostreet][0]
-                    else:
-                        ml_fromstreet = cross_street2_name_final
-                        ml_fromint    = intersections2[primary_street_name_final][ml_fromstreet][0]
-                        ml_tostreet   = cross_street1_name_final
-                        ml_toint      = intersections1[primary_street_name_final][ml_tostreet][0]
-    
-                    # look for the mainline count location in countdracula
-                    try:
-                        mainline_count_location = MainlineCountLocation.objects.get(from_int    = ml_fromint,
-                                                                                    to_int      = ml_toint,
-                                                                                    on_street   = primary_street_name_final,
-                                                                                    on_dir      = ml_ondir)
-                    except ObjectDoesNotExist:
-                        mainline_count_location = MainlineCountLocation(on_street           = primary_street_name_final,
-                                                                        on_dir              = ml_ondir,
-                                                                        from_street         = ml_fromstreet,
-                                                                        from_int            = ml_fromint,
-                                                                        to_street           = ml_tostreet,
-                                                                        to_int              = ml_toint)
-                        mainline_count_location.save()
-    
-                    # process the rows                    
-                    for row in range(2,len(activesheet.col(column))) :
+                        vtype = 0 #TODO: fix
+                    logger.info("  Worksheet %20s Vehicle=%s" % (sheetnames[sheet_idx], vehicle))
+                                                            
+
+                    for column in range(1,self.numNonBlankColumns(activesheet, label_row)):
                         
-                        count = activesheet.cell_value(row,column) 
-                        if count == "" : continue
+                        # Read the label header
+                        ml_ondir_temp   = activesheet.cell_value(label_row,column)
+                        ml_ondir        = ml_ondir_temp[:2] 
+                        direction       = ml_ondir[0]
                         
-                        (starttime, period) = self.createtimestamp(activesheet.cell_value(row,0), tzinfo=tzinfo)     
+                        # The convention is that cross street 1 is always north or west of cross street 2
+                        # so use this cue to determine the origin/destination of the movement
+                        if (direction == 'S' or direction == 'E'):
+                            ml_fromstreet = cross_street1_name_final
+                            ml_fromint    = intersections1[primary_street_name_final][ml_fromstreet][0]
+                            ml_tostreet   = cross_street2_name_final
+                            ml_toint      = intersections2[primary_street_name_final][ml_tostreet][0]
+                        else:
+                            ml_fromstreet = cross_street2_name_final
+                            ml_fromint    = intersections2[primary_street_name_final][ml_fromstreet][0]
+                            ml_tostreet   = cross_street1_name_final
+                            ml_toint      = intersections1[primary_street_name_final][ml_tostreet][0]
         
-                        mainline_count = MainlineCount(location             = mainline_count_location,
-                                                       count                = count,
-                                                       count_date           = date_yyyy_mm_dd,
-                                                       start_time           = starttime,
-                                                       period_minutes       = period,
-                                                       vehicle_type         = vtype,
-                                                       reference_position   = -1, # reference position unknown, it's not in the workbook
-                                                       sourcefile           = file,
-                                                       project              = "",
-                                                       upload_user          = user)
-                        mainline_count.clean()
-                        mainline_count.save()
-                        counts_saved += 1
+                        # look for the mainline count location in countdracula
+                        try:
+                            mainline_count_location = MainlineCountLocation.objects.get(from_int    = ml_fromint,
+                                                                                        to_int      = ml_toint,
+                                                                                        on_street   = primary_street_name_final,
+                                                                                        on_dir      = ml_ondir)
+                        except ObjectDoesNotExist:
+                            mainline_count_location = MainlineCountLocation(on_street           = primary_street_name_final,
+                                                                            on_dir              = ml_ondir,
+                                                                            from_street         = ml_fromstreet,
+                                                                            from_int            = ml_fromint,
+                                                                            to_street           = ml_tostreet,
+                                                                            to_int              = ml_toint)
+                            mainline_count_location.save()
+        
+                        # process the rows                    
+                        for row in range(section[0]+2, section[1]+1):
+                            
+                            count = activesheet.cell_value(row,column) 
+                            if count == "" : continue
+                            
+                            (starttime, period) = self.createtimestamp(activesheet.cell_value(row,0), tzinfo=tzinfo)     
+            
+                            mainline_count = MainlineCount(location             = mainline_count_location,
+                                                           count                = count,
+                                                           count_date           = date_yyyy_mm_dd,
+                                                           start_time           = starttime,
+                                                           period_minutes       = period,
+                                                           vehicle_type         = vtype,
+                                                           reference_position   = -1, # reference position unknown, it's not in the workbook
+                                                           sourcefile           = file,
+                                                           project              = project,
+                                                           upload_user          = user)
+                            mainline_count.clean()
+                            mainline_count.save()
+                            counts_saved += 1
                                 
             logger.info("  Processed %s into countdracula" % file)
             logger.info("  Successfully saved %4d mainline counts" % counts_saved)
@@ -304,7 +431,7 @@ class CountsWorkbookParser():
                         "exist with that sourcefile.  Skipping." % (file, len(turn_counts)))
             return -1
         
-        try:  
+        try:
             
             NSstreetslist = StreetName.getPossibleStreetNames(street1)
             if len(NSstreetslist) == 0:
@@ -319,8 +446,8 @@ class CountsWorkbookParser():
             intersections = {}
             for NSstreet in NSstreetslist:
                 for EWstreet in EWstreetslist:
-                    intersection_ids = Node.objects.filter(streetname__street_name=NSstreet.street_name) \
-                                                   .filter(streetname__street_name=EWstreet.street_name)
+                    intersection_ids = Node.objects.filter(street_to_node__street_name=NSstreet) \
+                                                   .filter(street_to_node__street_name=EWstreet)
                     
                     if len(intersection_ids) > 0:
                         intersections[(NSstreet, EWstreet)] = intersection_ids
@@ -338,115 +465,166 @@ class CountsWorkbookParser():
             final_NSstreet  = intersections.keys()[0][0]
             final_EWstreet  = intersections.keys()[0][1]
             final_intid     = intersections[(final_NSstreet,final_EWstreet)][0]
+            logger.info("intersection id = %d" % final_intid.id)
             # logger.debug("final_NSstreet=[%s], final_EWstreet=[%s]" % (final_NSstreet, final_EWstreet))
             
             # go through the sheets and read the data        
             book                = xlrd.open_workbook(file)       
             sheetnames          = book.sheet_names()
             counts_saved        = 0
-                    
+            # read any other link info from geo worksheet
+            (adtl_inlinks, adtl_outlinks) = self.readGeo(book)
+
+            # add the StreetName objs to the adtl_links
+            for street in StreetName.objects.filter(nodes=final_intid):
+                for designation,list in adtl_inlinks.iteritems():
+                    if list[0].upper() == street.street_name: adtl_inlinks[designation].append(street)
+                for designation,list in adtl_outlinks.iteritems():
+                    if list[0].upper() == street.street_name: adtl_outlinks[designation].append(street)
+            logger.info("adtl_inlinks = %s" % str(adtl_inlinks))
+            logger.info("adtl_outlinks = %s" % str(adtl_outlinks))                    
+
+            valid_fromdirs =  ["NB", "WB", "EB", "SB"]
+            for indesig in adtl_inlinks.keys(): 
+                if len(adtl_inlinks[indesig]) == 3: valid_fromdirs.append(indesig+"_")
+
             for sheet_idx in range(len(sheetnames)) :
                 
-                if sheetnames[sheet_idx]=="source": continue
+                if sheetnames[sheet_idx] in ["source","geo"]: continue
                 activesheet = book.sheet_by_name(sheetnames[sheet_idx])
                 
                 # create date from sheetname in date format 
                 tmp_date = sheetnames[sheet_idx].split('.')
                 date_yyyy_mm_dd = date(int(tmp_date[0]),int(tmp_date[1]),int(tmp_date[2]) )
-                if len(tmp_date) > 3 and (tmp_date[3].upper()=="TRUCK" or tmp_date[3].upper()=="PEDESTRIAN"):
-                    continue
-                                        
-                for column in range(1,len(activesheet.row(0))):
+
+                project  = ""
+                sections = self.findSectionStarts(activesheet)
+                
+                # loop through the different sections in the workbook
+                for section in sections:
+
+                    # project section?
+                    if activesheet.cell_value(section[0],0).upper() == "PROJECT":
+                        project = activesheet.cell_value(section[0]+1,0)
+                        continue
                     
-                    vehicle = activesheet.cell_value(1,column)
-                    if type(vehicle) is FloatType and vehicle in range(-1,16):
+                    # figure out the vehicle type and row with the column labels
+                    assert(activesheet.cell_value(section[0]+1,0).upper() == "TURNS")
+                    label_row = section[0]+1
+                   
+                    # figure out the vehicle type code
+                    vehicle = activesheet.cell_value(section[0], 0)
+                    if type(vehicle) in [types.FloatType, types.IntType] and vehicle in range(16):
                         vtype = vehicle
+                    elif type(vehicle) in [types.StringType, types.UnicodeType]:
+                        vtype = self.vehicleTypeForString(vehicle)
                     else:
                         vtype = 0 #TODO: fix
+                    logger.info("  Worksheet %20s Vehicle=%s" % (sheetnames[sheet_idx], vehicle))
+                    
+                    if vtype==1:
+                        logger.info("Pedestrian crossings are not handled yet -- skipping")
+                        continue
                         
-                    #For the column, set direction and to from streets
-                    movement = activesheet.cell_value(0,column)
-                    t_fromdir = movement[:2]
-                    turntype = movement[2:]
-                    
-                    if t_fromdir not in ["NB", "WB", "EB", "SB"]:
-                        raise CountsWorkbookParserException("readTurnCounts: Could not parse column header of %s!%s; expect movement to start with direction.  Movement=[%s] Column=%d Type=%d" %
-                                                            (file, sheetnames[sheet_idx], movement, column, activesheet.cell_type(0,column)))
-    
-                    # First determine direction
-                    compass = ['N','E','S','W']                
-                    if turntype == "TH":    # through
-                        t_todir = t_fromdir
-                    elif turntype in [' U-Turn','UT','U-Turn']:
-                        t_todir = compass[compass.index(t_fromdir[0])-2] + 'B'
-                    elif turntype == 'RT':  # right turn
-                        t_todir = compass[compass.index(t_fromdir[0])-3] + 'B'
-                    elif turntype == 'LT':  # left turn
-                        t_todir = compass[compass.index(t_fromdir[0])-1] + 'B'
-                    elif turntype == 'PD':  # through - pedestrian?
-                        t_todir = t_fromdir
-                        vtype = 1
-                    else:
-                        raise CountsWorkbookParserException("readTurnCounts: Could not parse column header of %s; turntype [%s] not understood." %
-                                                            (file, turntype)) 
-                    
-                    # Determine Street names and order
-                    if turntype in ['TH',' U-Turn','U-Turn','UT','PD']:
-                        if  t_fromdir == "NB" or t_fromdir == "SB":
+                    # iterate through the columns
+                    for column in range(1,self.numNonBlankColumns(activesheet, label_row)):
+                            
+                        # Read the label header
+                        movement = activesheet.cell_value(label_row,column)
+                        t_fromdir = movement[:2]
+                        turntype = movement[2:]
+                        
+                        if t_fromdir not in valid_fromdirs:
+                            raise CountsWorkbookParserException("readTurnCounts: Could not parse column header of %s!%s; expect movement to start with direction.  Movement=[%s] Column=%d Type=%d" %
+                                                                (file, sheetnames[sheet_idx], movement, column, activesheet.cell_type(label_row,column)))
+                        # todo: special inbound link
+                        
+                        if  t_fromdir in ["NB","SB"]:
                             t_fromstreet    = final_NSstreet
-                            t_tostreet      = final_NSstreet
-                            t_intstreet     = final_EWstreet
+                        elif t_fromdir in ["EB", "WB"]:
+                            t_fromstreet    = final_EWstreet
+                        elif t_fromdir[1] == "_":
+                            t_fromstreet    = adtl_inlinks[t_fromdir[0]][2]
+                            t_fromdir       = adtl_inlinks[t_fromdir[0]][1]
+                                    
+                        # determine direction of outbound link
+                        
+                        # special case
+                        if turntype[-2:-1]=="_" and turntype[-1:] in adtl_outlinks.keys():
+                            t_todir             = adtl_outlinks[turntype[-1:]][1]
+                            t_tostreet          = adtl_outlinks[turntype[-1:]][2]
+
+                        # regular case
                         else:
-                            t_fromstreet    = final_EWstreet
-                            t_tostreet      = final_EWstreet
-                            t_intstreet     = final_NSstreet
-                    else:   #turning movement and to and from streets are different
-                        if  t_fromdir == "NB" or t_fromdir == "SB":
-                            t_fromstreet    = final_NSstreet
-                            t_tostreet      = final_EWstreet
-                            t_intstreet     = final_EWstreet
-                        else:           #TODO added maybe by mistake !!!  (check it)
-                            t_fromstreet    = final_EWstreet
-                            t_tostreet      = final_NSstreet
-                            t_intstreet     = final_NSstreet
-                    # logger.debug("movement [%s] from %s %s to %s %s" % (movement, t_fromstreet, t_fromdir, t_tostreet, t_todir))
-
-
-                    # look for the turn count location in countdracula
-                    try:
-                        turn_count_location = TurnCountLocation.objects.get(from_street    = t_fromstreet,
-                                                                            from_dir       = t_fromdir,
-                                                                            to_street      = t_tostreet,
-                                                                            to_dir         = t_todir,
-                                                                            intersection   = final_intid)
-                    except ObjectDoesNotExist:
-                        turn_count_location = TurnCountLocation(from_street    = t_fromstreet,
-                                                                from_dir       = t_fromdir,
-                                                                to_street      = t_tostreet,
-                                                                to_dir         = t_todir,
-                                                                intersection_street = t_intstreet,
-                                                                intersection   = final_intid)
-                        turn_count_location.save()
-                                                
-                    for row in range(2,len(activesheet.col(column))):
+                            compass = ['N','E','S','W']               
+                            if turntype == "TH":    # through
+                                t_todir = t_fromdir
+                            elif turntype in [' U-Turn','UT','U-Turn']:
+                                t_todir = compass[compass.index(t_fromdir[0])-2] + 'B'
+                            elif turntype == 'RT':  # right turn
+                                t_todir = compass[compass.index(t_fromdir[0])-3] + 'B'
+                            elif turntype == 'LT':  # left turn
+                                t_todir = compass[compass.index(t_fromdir[0])-1] + 'B'
+                            elif turntype == 'PD':  # through - pedestrian?
+                                t_todir = t_fromdir
+                                vtype = 1
+                            else:
+                                raise CountsWorkbookParserException("readTurnCounts: Could not parse column header of %s; turntype [%s] not understood." %
+                                                                    (file, turntype)) 
                         
-                        count = activesheet.cell_value(row,column) 
-                        if count == "" : continue
-                        
-                        (starttime, period) = self.createtimestamp(activesheet.cell_value(row,0), tzinfo=tzinfo)     
-                        
-                        turn_count = TurnCount(location         = turn_count_location,
-                                               count            = count,
-                                               count_date       = date_yyyy_mm_dd,
-                                               start_time       = starttime,
-                                               period_minutes   = period,
-                                               vehicle_type     = vtype,
-                                               sourcefile       = file,
-                                               project          = "",
-                                               upload_user      = user)
-                        turn_count.clean()
-                        turn_count.save()
-                        counts_saved += 1
+                            # Determine Street names and order
+                            if turntype in ['TH',' U-Turn','U-Turn','UT','PD']:
+                                if  t_fromdir in ["NB","SB"]:
+                                    t_tostreet      = final_NSstreet
+                                    t_intstreet     = final_EWstreet
+                                else:
+                                    t_tostreet      = final_EWstreet
+                                    t_intstreet     = final_NSstreet
+                            else:   #turning movement and to and from streets are different
+                                if  t_fromdir in ["NB","SB"]:
+                                    t_tostreet      = final_EWstreet
+                                    t_intstreet     = final_EWstreet
+                                else:           #TODO added maybe by mistake !!!  (check it)
+                                    t_tostreet      = final_NSstreet
+                                    t_intstreet     = final_NSstreet
+                        # logger.debug("movement [%s] from %s %s to %s %s" % (movement, t_fromstreet, t_fromdir, t_tostreet, t_todir))
+    
+    
+                        # look for the turn count location in countdracula
+                        try:
+                            turn_count_location = TurnCountLocation.objects.get(from_street    = t_fromstreet,
+                                                                                from_dir       = t_fromdir,
+                                                                                to_street      = t_tostreet,
+                                                                                to_dir         = t_todir,
+                                                                                intersection   = final_intid)
+                        except ObjectDoesNotExist:
+                            turn_count_location = TurnCountLocation(from_street    = t_fromstreet,
+                                                                    from_dir       = t_fromdir,
+                                                                    to_street      = t_tostreet,
+                                                                    to_dir         = t_todir,
+                                                                    intersection_street = t_intstreet,
+                                                                    intersection   = final_intid)
+                            turn_count_location.save()
+                                                    
+                        for row in range(section[0]+2, section[1]+1):
+                            
+                            count = activesheet.cell_value(row,column) 
+                            if count == "" : continue
+                            
+                            (starttime, period) = self.createtimestamp(activesheet.cell_value(row,0), tzinfo=tzinfo)     
+                            
+                            turn_count = TurnCount(location         = turn_count_location,
+                                                   count            = count,
+                                                   count_date       = date_yyyy_mm_dd,
+                                                   start_time       = starttime,
+                                                   period_minutes   = period,
+                                                   vehicle_type     = vtype,
+                                                   sourcefile       = file,
+                                                   project          = project,
+                                                   upload_user      = user)
+                            turn_count.clean()
+                            turn_count.save()
+                            counts_saved += 1
                         
             logger.info("  Processed %s into countdracula" % file)
             logger.info("  Successfully saved %4d turn counts" % counts_saved)

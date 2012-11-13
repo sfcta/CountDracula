@@ -23,6 +23,9 @@ class Node(gis_models.Model):
     # Returns the string representation of the model.
     def __unicode__(self):
         return "ID:%d long_x:%f lat_y:%f" % (self.id, self.long_x(), self.lat_y())
+    
+    class Meta:
+        ordering = ['id']
 
 # http://www.fhwa.dot.gov/policy/ohpi/vehclass.htm
 VehicleTypes = \
@@ -67,7 +70,7 @@ class StreetName(models.Model):
     suffix          = models.CharField(max_length=20,                       help_text="e.g. ST")
     
     # many to many relationship with the node
-    nodes           = models.ManyToManyField(Node)
+    nodes           = models.ManyToManyField(Node, related_name="street_to_node")
     
     def __unicode__(self):
         return self.street_name

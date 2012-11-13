@@ -80,5 +80,7 @@ class UploadCountForm(forms.Form):
             os.remove(os.path.join(settings.UPLOAD_DIR, file.name))
             return_str += "Removed %s" % os.path.join(settings.UPLOAD_DIR, file.name)
 
+        return_str = return_str.replace("<","&lt;")
+        return_str = return_str.replace(">","&gt;")
         return_str = return_str.replace("\n","<br />")
         return (processed, return_str)

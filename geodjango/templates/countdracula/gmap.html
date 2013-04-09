@@ -24,11 +24,16 @@ function initialize() {
   // start out with the checkboxes checked
   $(":checkbox").prop("checked", true);
 
+  var styles = [{"stylers": [{ "saturation": -50 }]}];
+  var styledMap = new google.maps.StyledMapType(styles, {name:"Styled Map"});
+
   map = new google.maps.Map(document.getElementById('map'), {
         zoom: 13,
         center: new google.maps.LatLng(37.76, -122.44),
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style'],
   });
+  map.mapTypes.set('map_style', styledMap);
+  map.setMapTypeId('map_style');
   
   infowindow = new google.maps.InfoWindow({
     content:'<div id="content">I miss Fury.</div>'
@@ -185,18 +190,18 @@ $(document).ready(function () {});
 </head>
 <body onload='initialize()'>
   <div id="header"><h1>Count Dracula</h1></div>
-  <div id="nav">
+  <div id="nav"><form name="download" action="/countdracula/download/" method="post">{% csrf_token %}
    <table id='filters'>
    <tr><th>Count Types</th>
        <td id="count-type">
-       <input type="checkbox" id="movement" />Movement<br />
-       <input type="checkbox" id="mainline" />Mainline<br />
+       <input type="checkbox" id="movement" name="count-type" value="movement" />Movement<br />
+       <input type="checkbox" id="mainline" name="count-type" value="mainline" />Mainline<br />
        </td>
    </tr>
    <tr><th>Count Years</th>
        <td id="count-year">
        {% for year in count_years %}
-       <input type="checkbox" id="year{{year}}">{{year}}<br />       
+       <input type="checkbox" id="year{{year}}" name="count-year" value="year{{year}}" >{{year}}<br />       
        {% endfor %}
        </td>
    </table>
@@ -204,7 +209,8 @@ $(document).ready(function () {});
    <p>Movement locations: <span id="turn_count_num">{{ turn_count_locs|length }}</span></p>
    <p>Mainline locations: <span id="mainline_count_num">{{ mainline_count_locs|length }}</span></p>
    
-  </div>
+   <input type="submit" value="Download">
+  </form></div>
   <div id="map"></div>
   <div id="footer">This page is brought to you by <a href="https://github.com/sfcta/CountDracula">CountDracula</a> and <a href="http://geodjango.org/">GeoDjango</a>.</div>
 </body>

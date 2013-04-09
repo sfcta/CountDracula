@@ -16,10 +16,13 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(countdracula_admin.urls)),
     
-    # google maps view
+    # map view
     url(r'^map/', 'countdracula.views.mapview'),
     
-    # for google maps to fetch count information for a location
-    url(r'^counts_for_location/$', 'countdracula.views.counts_for_location')
+    # for the map view to fetch count information for a location
+    url(r'^counts_for_location/$', 'countdracula.views.counts_for_location'),
+    
+    # download button from map
+    url(r'^download/', 'countdracula.views.download')
 
 )

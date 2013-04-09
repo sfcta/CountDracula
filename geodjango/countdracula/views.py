@@ -1,5 +1,6 @@
 from collections import defaultdict
-import datetime
+import csv, datetime
+from django.core.context_processors import csrf
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -104,3 +105,46 @@ def counts_for_location(request):
     if 'date_min' in results: results['date_min'] = str(results['date_min'])
     if 'date_max' in results: results['date_max'] = str(results['date_max'])
     return HttpResponse(simplejson.dumps(results), mimetype='application/json')
+
+def download(request):
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="CountDraculaDownload.csv"'
+    writer = csv.writer(response)
+
+    # print request.POST.getlist(u'count-type')
+    # print request.POST.getlist(u'count-year')
+    
+    # transform the count-year to a list
+    count_years = []
+    for arg in request.POST.getlist(u'count-year'):
+        count_years.append(int(arg[4:]))
+
+    if u'mainline' in request.POST.getlist(u'count-type'):
+        # fetch mainline data
+        mlqs = MainlineCount.objects.select_related().filter(count_year__in=count_years).order_by('location')
+    
+        # header row
+        writer.writerow(["LocationID", "Location OnStreet", "Location OnDir", "Location FromStreet", "Location FromNode", 
+                         "Location ToStreet", "Location ToNode",
+                         "Count", "Count Date", "Count Year", "Start Time", "Period Minutes", "Vehicle Type",
+                         "Source File", "Project", "Reference Position", "Upload User"])
+        for mcount in mlqs:
+            writer.writerow([mcount.location.id,
+                             mcount.location.on_street,
+                             mcount.location.on_dir,
+                             mcount.location.from_street,
+                             mcount.location.from_int,
+                             mcount.location.to_street,
+                             mcount.location.to_int,
+                             mcount.count,
+                             mcount.count_date,
+                             mcount.count_year,
+                             mcount.start_time,
+                             mcount.period_minutes,
+                             mcount.vehicle_type,
+                             mcount.sourcefile,
+                             mcount.project,
+                             mcount.reference_position,
+                             mcount.upload_user])
+    return response    

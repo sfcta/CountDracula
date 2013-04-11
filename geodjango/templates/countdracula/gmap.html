@@ -3,6 +3,7 @@
 <head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <title>Count Dracula Map</title>
+<link href="{{ STATIC_URL }}countdracula.css" rel="stylesheet" type="text/css">
 <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script src="{{ STATIC_URL }}jquery-1.8.2.js"></script>
 <script>
@@ -42,8 +43,10 @@ function initialize() {
   var marker_image = new google.maps.MarkerImage("{{ STATIC_URL }}small_red.png");
 
   /* Create the movement markers */
+  var movement_count_loc_ids = [];
   for (var idx = 0; idx < turn_count_locs.length; idx++) {
     var id = turn_count_locs[idx].pk;
+    movement_count_loc_ids.push(id);
     var node_id = turn_count_locs[idx].fields.intersection;
      
     movement_markers[id] = new Object();
@@ -57,10 +60,13 @@ function initialize() {
       google.maps.event.addListener(movement_markers[id].marker, 'click', function() { getCountsInfo("turn",i); });
     })(id);
   }
+  $("input[name=movement_loc_ids]").val(movement_count_loc_ids);
   
   /* Create mainline markers */
+  var mainline_count_loc_ids = [];
   for (var idx = 0; idx < mainline_count_locs.length; idx++) {
     var id = mainline_count_locs[idx].pk;
+    mainline_count_loc_ids.push(id);
     var node_id_1 = mainline_count_locs[idx].fields.from_int;
     var node_id_2 = mainline_count_locs[idx].fields.to_int;
     mainline_markers[id] = new Object();
@@ -76,6 +82,7 @@ function initialize() {
       google.maps.event.addListener(mainline_markers[id].marker, 'click', function() { getCountsInfo("mainline", i); });
     })(id);  
   }
+  $("input[name=mainline_loc_ids]").val(mainline_count_loc_ids);
 
   /* Update display on GUI events */
   $(':input').change(function(){  updateDisplay(); });    
@@ -89,16 +96,24 @@ function updateDisplay() {
   show_movement_locations = $("#movement").is(":checked");
   show_mainline_locations = $("#mainline").is(":checked");
   
-  checked_years = [];
+  var checked_years = [];
   for (var idx = 0; idx < count_years.length; idx++) {
     if ($("#year"+count_years[idx]).is(":checked")) {
-      checked_years.push(count_years[idx]);
+      checked_years.push(count_years[idx].toString());
     }
   }
   console.log(checked_years);
+  var checked_vtypes = 0;
+  for (var idx = 0; idx < 6; idx++) {
+    if ($("#vtype"+idx).is(":checked")) {
+      checked_vtypes = checked_vtypes | (1<<idx);
+    }
+  }
+  console.log(checked_vtypes);
     
   /*************** mainline **************************/
   var mainline_count_num = 0;
+  var mainline_count_loc_ids = [];  
   for (var id in mainline_markers) {
     if (show_mainline_locations == false) {
       mainline_markers[id].marker.setMap(null);
@@ -106,23 +121,28 @@ function updateDisplay() {
     }
     
     var year_qualifies = false;
-    for (var idx=0; idx<mainlinelocs_to_years[id].length; idx++) {      
-      if (jQuery.inArray(mainlinelocs_to_years[id][idx], checked_years) >= 0) {
+    var vtypes = 0; /* vtypes for the qualifying years */
+    for (var year in mainlinelocs_to_years[id]) {
+      if (jQuery.inArray(year, checked_years) >= 0) {
         year_qualifies = true;
-        break;
+        vtypes = vtypes | mainlinelocs_to_years[id][year];
       }
     }
-    if (year_qualifies) {
+
+    if (year_qualifies && (vtypes & checked_vtypes)) {
       mainline_markers[id].marker.setMap(map);
       mainline_count_num += 1;
+      mainline_count_loc_ids.push(id);
     } else {
       mainline_markers[id].marker.setMap(null);
     }
   }  
   $("span#mainline_count_num").html(mainline_count_num);
+  $("input[name=mainline_loc_ids]").val(mainline_count_loc_ids);
   
   /*************** movement **************************/
   var movement_count_num = 0;
+  var movement_count_loc_ids = [];  
   for (var id in movement_markers) {
     if (show_movement_locations == false) {
       movement_markers[id].marker.setMap(null);
@@ -130,20 +150,23 @@ function updateDisplay() {
     }
     
     var year_qualifies = false;
-    for (var idx=0; idx<turnlocs_to_years[id].length; idx++) {      
-      if (jQuery.inArray(turnlocs_to_years[id][idx], checked_years) >= 0) {
+    var vtypes = 0; /* vtypes for the qualifying years */
+    for (var year in turnlocs_to_years[id]) {
+      if (jQuery.inArray(year, checked_years) >= 0) {
         year_qualifies = true;
-        break;
+        vtypes = vtypes | turnlocs_to_years[id][year];
       }
     }
-    if (year_qualifies) {
+    if (year_qualifies && (vtypes & checked_vtypes)) {
       movement_markers[id].marker.setMap(map);
       movement_count_num += 1;
+      movement_count_loc_ids.push(id);
     } else {
       movement_markers[id].marker.setMap(null);
     }
   }  
   $("span#movement_count_num").html(movement_count_num);
+  $("input[name=movement_loc_ids]").val(movement_count_loc_ids);  
 }
 
 /* Gets called when the information for a marker or a polyline comes back from the server,
@@ -198,18 +221,37 @@ $(document).ready(function () {});
        <input type="checkbox" id="mainline" name="count-type" value="mainline" />Mainline<br />
        </td>
    </tr>
+   <tr><th>Vehicle Types</th>
+       <td id="vehicle-type">
+       <input type="checkbox" id="vtype0" name="vtype" value="0" />All<br />       
+       <input type="checkbox" id="vtype1" name="vtype" value="1" />Pedestrian<br />       
+       <input type="checkbox" id="vtype2" name="vtype" value="2" >Bike<br />       
+       <input type="checkbox" id="vtype3" name="vtype" value="3" >Truck<br />       
+       <input type="checkbox" id="vtype4" name="vtype" value="4" >Bus<br />       
+       <input type="checkbox" id="vtype5" name="vtype" value="5" >Car<br />       
+       </td>
+   </tr>
    <tr><th>Count Years</th>
        <td id="count-year">
        {% for year in count_years %}
        <input type="checkbox" id="year{{year}}" name="count-year" value="year{{year}}" >{{year}}<br />       
        {% endfor %}
        </td>
+   </tr>
    </table>
    
    <p>Movement locations: <span id="turn_count_num">{{ turn_count_locs|length }}</span></p>
    <p>Mainline locations: <span id="mainline_count_num">{{ mainline_count_locs|length }}</span></p>
    
-   <input type="submit" value="Download">
+   <input type="hidden" id="mainline_loc_ids" name="mainline_loc_ids" value="" />
+   <input type="hidden" id="movement_loc_ids" name="movement_loc_ids" value="" />
+   <input class="download" type="submit" name="download" value="Download" />
+   <select name="download-type">
+     <option value="mainlinelocs" title="Download all counts for the marked locations">All mainline counts</option>
+     <option value="mainlinefilt" title="Download counts filtered by Vehicle Type and Count Year for the marked locations">Filtered mainline counts</option>
+     <option value="movementlocs" title="Download all counts for the marked locations">All movement counts</option>
+     <option value="movementfilt" title="Download counts filtered by Vehicle Type and Count Year for the marked locations">Filtered movement counts</option>
+   </select>
   </form></div>
   <div id="map"></div>
   <div id="footer">This page is brought to you by <a href="https://github.com/sfcta/CountDracula">CountDracula</a> and <a href="http://geodjango.org/">GeoDjango</a>.</div>

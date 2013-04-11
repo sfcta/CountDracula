@@ -25,8 +25,8 @@ class UploadCountForm(forms.Form):
         if os.path.exists(os.path.join(settings.UPLOAD_DIR, sourcefile_name)):
             raise forms.ValidationError("Sourcefile %s already exists in uploads area." % sourcefile_name)
         
-        if sourcefile_name[-4:].lower() != ".xls":
-            raise forms.ValidationError("Sourcefile must be have a .xls suffix.  Invalid value: %s" % sourcefile_name)
+        if sourcefile_name[-4:].lower() != ".xls" and sourcefile_name[-5:].lower() != ".xlsx":
+            raise forms.ValidationError("Sourcefile must be have a .xls|.xlsx suffix.  Invalid value: %s" % sourcefile_name)
         
         # set streetnames
         self.cleaned_data['streetnames'] = CountsWorkbookParser.parseFilename(sourcefile_name)

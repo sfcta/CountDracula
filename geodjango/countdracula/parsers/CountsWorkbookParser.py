@@ -21,7 +21,8 @@ class CountsWorkbookParser():
         
         Delimiters are `_`, `-`, `.` and ` `.
         """
-        streets = filename.replace(".xls","")
+        # strip the suffix
+        streets = filename[:filename.rfind(".")]
         delimiters = "_-."
         
         # convert them all to spaces
@@ -180,7 +181,9 @@ class CountsWorkbookParser():
         """
         if type(vehicletype_str) == types.UnicodeType:
             vehicletype_str = vehicletype_str.encode('ascii')
-            
+        
+        if vehicletype_str.upper() == "BICYCLE": vehicletype_str = "Bike"
+        
         for tuple1 in VehicleTypes:
             
             # check if the strings match
@@ -323,7 +326,7 @@ class CountsWorkbookParser():
                         vtype = self.vehicleTypeForString(vehicle)
                     else:
                         vtype = 0 #TODO: fix
-                    logger.info("  Worksheet %20s Vehicle=%s" % (sheetnames[sheet_idx], vehicle))
+                    logger.info("  Worksheet %20s Vehicle=%2d %s" % (sheetnames[sheet_idx], vtype, vehicle))
                                                             
 
                     for column in range(1,self.numNonBlankColumns(activesheet, label_row)):
@@ -520,7 +523,7 @@ class CountsWorkbookParser():
                         vtype = self.vehicleTypeForString(vehicle)
                     else:
                         vtype = 0 #TODO: fix
-                    logger.info("  Worksheet %20s Vehicle=%s" % (sheetnames[sheet_idx], vehicle))
+                    logger.info("  Worksheet %20s Vehicle=%2d %s" % (sheetnames[sheet_idx], vtype, vehicle))
                     
                     if vtype==1:
                         logger.info("Pedestrian crossings are not handled yet -- skipping")

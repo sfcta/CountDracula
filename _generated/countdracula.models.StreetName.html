@@ -108,7 +108,7 @@
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">prepare_database_save</span></tt>(unused)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#countdracula.models.StreetName.save" title="countdracula.models.StreetName.save"><tt class="xref py py-obj docutils literal"><span class="pre">save</span></tt></a>([force_insert,&nbsp;force_update,&nbsp;using])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#countdracula.models.StreetName.save" title="countdracula.models.StreetName.save"><tt class="xref py py-obj docutils literal"><span class="pre">save</span></tt></a>([force_insert,&nbsp;force_update,&nbsp;using,&nbsp;...])</td>
 <td>Saves the current instance.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#countdracula.models.StreetName.save_base" title="countdracula.models.StreetName.save_base"><tt class="xref py py-obj docutils literal"><span class="pre">save_base</span></tt></a>([raw,&nbsp;cls,&nbsp;origin,&nbsp;force_insert,&nbsp;...])</td>
@@ -195,7 +195,7 @@ and returns a QuerySet of the possible <a class="reference internal" href="#coun
 
 <dl class="method">
 <dt id="countdracula.models.StreetName.save">
-<tt class="descname">save</tt><big>(</big><em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#countdracula.models.StreetName.save" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">save</tt><big>(</big><em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em>, <em>update_fields=None</em><big>)</big><a class="headerlink" href="#countdracula.models.StreetName.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves the current instance. Override this in a subclass if you want to
 control the saving process.</p>
 <p>The &#8216;force_insert&#8217; and &#8216;force_update&#8217; parameters can be used to insist
@@ -205,7 +205,7 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 
 <dl class="method">
 <dt id="countdracula.models.StreetName.save_base">
-<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#countdracula.models.StreetName.save_base" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em>, <em>update_fields=None</em><big>)</big><a class="headerlink" href="#countdracula.models.StreetName.save_base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
 override this method. It&#8217;s separate from save() in order to hide the
 need for overrides of save() to pass around internal-only parameters
@@ -285,7 +285,7 @@ if any failed.</p>
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2011, SFCTA Modeling team.
+        &copy; Copyright 2011-2013, SFCTA Modeling team.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

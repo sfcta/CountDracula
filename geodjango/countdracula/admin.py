@@ -48,13 +48,29 @@ countdracula_admin = CountDraculaAdminSite(name='countdracula')
 class StreetNameAdmin(admin.ModelAdmin):
     search_fields = ['street_name']
     
+    readonly_fields = ('nodes_map',)
+    
+    def nodes_map(self, instance):
+        return '<pre>' + (str(instance.nodes.all())) + "</pre>"
+    nodes_map.short_description = "Nodes Map"
+    nodes_map.allow_tags = True
 countdracula_admin.register(StreetName, StreetNameAdmin)
 
 countdracula_admin.register(TurnCountLocation)
 
+class MainlineCountInline(admin.TabularInline):
+    model = MainlineCount
+    
+    readonly_fields = ('count','count_date','count_year',
+                       'start_time','period_minutes','vehicle_type',
+                       'sourcefile','project','reference_position','upload_user',)
+    
+    
 class MainlineCountLocationAdmin(admin.ModelAdmin):
     list_display = ('on_street', 'from_street', 'to_street')
 
+    inlines = [ MainlineCountInline, ]
+    
 countdracula_admin.register(MainlineCountLocation, MainlineCountLocationAdmin)
     
 class TurnCountAdmin(admin.ModelAdmin):
@@ -73,8 +89,13 @@ class MainlineCountAdmin(admin.ModelAdmin):
 
 countdracula_admin.register(MainlineCount, MainlineCountAdmin)
 
-class GoogleAdmin(gis_admin.OSMGeoAdmin):
+class StreetnameInline(admin.TabularInline):
+    model = StreetName.nodes.through
+    
+class NodeAdmin(gis_admin.OSMGeoAdmin):
     extra_js = [GMAP.api_url + GMAP.key]
     map_template = 'gis/admin/googlemap.html'
     
-countdracula_admin.register(Node, GoogleAdmin)
+    inlines = [ StreetnameInline, ]
+    
+countdracula_admin.register(Node, NodeAdmin)

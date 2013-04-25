@@ -8,7 +8,7 @@ CountDracula runs on `Geodjango <http://geodjango.org/>`_, a GIS-based extension
 `Django <https://www.djangoproject.com/>`_, which is a high-level python web framework.
 
 To setup a CountDracula database, you should first install `Geodjango <http://geodjango.org/>`_
-The best way to do this is to follow the Geodjango `Platform-specific instructions <https://docs.djangoproject.com/en/1.4/ref/contrib/gis/install/#platform-specific-instructions>`_.
+The best way to do this is to follow the Geodjango `Platform-specific instructions <https://docs.djangoproject.com/en/1.5/ref/contrib/gis/install/#platform-specific-instructions>`_.
 
 
 The following were used to develop and test CountDracula:
@@ -28,6 +28,7 @@ The following were used to develop and test CountDracula:
     *Tested with xlrd 0.7.1*
   * `python-memcached <http://pypi.python.org/pypi/python-memcached/>`_ This is a memory-based caching
     framework that can help with performance.  Optional. *Tested with python-memcached 1.48*.
+  * `django <https://www.djangoproject.com/`>_  *Tested with django-1.5.1*
 
 Installation Instructions
 -------------------------

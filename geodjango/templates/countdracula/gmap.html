@@ -9,209 +9,301 @@
 <script>
 {% load jsonify %}
 
-var turn_count_locs       = {{ turn_count_locs|jsonify }};
-var mainline_count_locs   = {{ mainline_count_locs|jsonify }};
-var nodes                 = {{ nodes|jsonify }};
-var count_years           = {{ count_years|jsonify }};
-var turnlocs_to_years     = {{ turnlocs_to_years|jsonify }};
-var mainlinelocs_to_years = {{ mainlinelocs_to_years|jsonify }};
+var MapsLib = MapsLib || {};
+var MapsLib = {
 
+  turn_count_locs:      {{ turn_count_locs|jsonify }},
+  mainline_count_locs:  {{ mainline_count_locs|jsonify }},
+  nodes:                {{ nodes|jsonify }},
+  count_years:          {{ count_years|jsonify }},
+  turnlocs_to_years:    {{ turnlocs_to_years|jsonify }},
+  mainlinelocs_to_years:{{ mainlinelocs_to_years|jsonify }},
+  
+  pinpoint_turnlocs:    [],
+  pinpoint_mainlinelocs:[],
 
-var map, infowindow = {};
-var movement_markers = new Object();
-var mainline_markers = new Object();
+  map:                  {},
+  infowindow:           {},
+  movement_markers:     new Object(),
+  mainline_markers:     new Object(),
+  geocoder:             new google.maps.Geocoder(),
 
-function initialize() {
-  // start out with the checkboxes checked
-  $(":checkbox").prop("checked", true);
+  initialize: function() {
+    // start out with the checkboxes checked
+    $(":checkbox").prop("checked", true);
 
-  var styles = [{"stylers": [{ "saturation": -50 }]}];
-  var styledMap = new google.maps.StyledMapType(styles, {name:"Styled Map"});
+    var styles = [{"stylers": [{ "saturation": -50 }]}];
+    var styledMap = new google.maps.StyledMapType(styles, {name:"Styled Map"});
 
-  map = new google.maps.Map(document.getElementById('map'), {
+    MapsLib.map = new google.maps.Map(document.getElementById('map'), {
         zoom: 13,
         center: new google.maps.LatLng(37.76, -122.44),
         mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style'],
-  });
-  map.mapTypes.set('map_style', styledMap);
-  map.setMapTypeId('map_style');
-  
-  infowindow = new google.maps.InfoWindow({
-    content:'<div id="content">I miss Fury.</div>'
-  });
-    
-  var marker_image = new google.maps.MarkerImage("{{ STATIC_URL }}small_red.png");
-
-  /* Create the movement markers */
-  var movement_count_loc_ids = [];
-  for (var idx = 0; idx < turn_count_locs.length; idx++) {
-    var id = turn_count_locs[idx].pk;
-    movement_count_loc_ids.push(id);
-    var node_id = turn_count_locs[idx].fields.intersection;
-     
-    movement_markers[id] = new Object();
-    movement_markers[id].marker =  new google.maps.Marker({
-      map:map,
-      icon:marker_image,
-      position:new google.maps.LatLng(nodes[node_id][1], nodes[node_id][0]),
-      title:id.toString()
     });
-    (function(i){
-      google.maps.event.addListener(movement_markers[id].marker, 'click', function() { getCountsInfo("turn",i); });
-    })(id);
-  }
-  $("input[name=movement_loc_ids]").val(movement_count_loc_ids);
+    MapsLib.map.mapTypes.set('map_style', styledMap);
+    MapsLib.map.setMapTypeId('map_style');
   
-  /* Create mainline markers */
-  var mainline_count_loc_ids = [];
-  for (var idx = 0; idx < mainline_count_locs.length; idx++) {
-    var id = mainline_count_locs[idx].pk;
-    mainline_count_loc_ids.push(id);
-    var node_id_1 = mainline_count_locs[idx].fields.from_int;
-    var node_id_2 = mainline_count_locs[idx].fields.to_int;
-    mainline_markers[id] = new Object();
-    mainline_markers[id].marker = new google.maps.Polyline({
-      map:map,
-      path:[new google.maps.LatLng(nodes[node_id_1][1], nodes[node_id_1][0]),
-            new google.maps.LatLng(nodes[node_id_2][1], nodes[node_id_2][0])
-           ],
-      strokeColor:"#FF0000", strokeOpacity:0.8, strokeWeight:3,
-      // title:"{{mainline_count_loc}}"
-    });
-    (function(i){
-      google.maps.event.addListener(mainline_markers[id].marker, 'click', function() { getCountsInfo("mainline", i); });
-    })(id);  
-  }
-  $("input[name=mainline_loc_ids]").val(mainline_count_loc_ids);
-
-  /* Update display on GUI events */
-  $(':input').change(function(){  updateDisplay(); });    
-}
-
-/* Gets called when an UI element changes.
- */
-function updateDisplay() {
-  console.log("updateDisplay");
-  
-  show_movement_locations = $("#movement").is(":checked");
-  show_mainline_locations = $("#mainline").is(":checked");
-  
-  var checked_years = [];
-  for (var idx = 0; idx < count_years.length; idx++) {
-    if ($("#year"+count_years[idx]).is(":checked")) {
-      checked_years.push(count_years[idx].toString());
-    }
-  }
-  console.log(checked_years);
-  var checked_vtypes = 0;
-  for (var idx = 0; idx < 6; idx++) {
-    if ($("#vtype"+idx).is(":checked")) {
-      checked_vtypes = checked_vtypes | (1<<idx);
-    }
-  }
-  console.log(checked_vtypes);
+    MapsLib.infowindow = new google.maps.InfoWindow({ content:'<div id="content">I miss Fury.</div>' });
     
-  /*************** mainline **************************/
-  var mainline_count_num = 0;
-  var mainline_count_loc_ids = [];  
-  for (var id in mainline_markers) {
-    if (show_mainline_locations == false) {
-      mainline_markers[id].marker.setMap(null);
-      continue;
-    }
-    
-    var year_qualifies = false;
-    var vtypes = 0; /* vtypes for the qualifying years */
-    for (var year in mainlinelocs_to_years[id]) {
-      if (jQuery.inArray(year, checked_years) >= 0) {
-        year_qualifies = true;
-        vtypes = vtypes | mainlinelocs_to_years[id][year];
-      }
-    }
+    var marker_image = new google.maps.MarkerImage("{{ STATIC_URL }}small_red.png");
 
-    if (year_qualifies && (vtypes & checked_vtypes)) {
-      mainline_markers[id].marker.setMap(map);
-      mainline_count_num += 1;
-      mainline_count_loc_ids.push(id);
-    } else {
-      mainline_markers[id].marker.setMap(null);
-    }
-  }  
-  $("span#mainline_count_num").html(mainline_count_num);
-  $("input[name=mainline_loc_ids]").val(mainline_count_loc_ids);
-  
-  /*************** movement **************************/
-  var movement_count_num = 0;
-  var movement_count_loc_ids = [];  
-  for (var id in movement_markers) {
-    if (show_movement_locations == false) {
-      movement_markers[id].marker.setMap(null);
-      continue;
-    }
-    
-    var year_qualifies = false;
-    var vtypes = 0; /* vtypes for the qualifying years */
-    for (var year in turnlocs_to_years[id]) {
-      if (jQuery.inArray(year, checked_years) >= 0) {
-        year_qualifies = true;
-        vtypes = vtypes | turnlocs_to_years[id][year];
-      }
-    }
-    if (year_qualifies && (vtypes & checked_vtypes)) {
-      movement_markers[id].marker.setMap(map);
-      movement_count_num += 1;
+    /* Create the movement markers */
+    var movement_count_loc_ids = [];
+    for (var idx = 0; idx < MapsLib.turn_count_locs.length; idx++) {
+      var id = MapsLib.turn_count_locs[idx].pk;
       movement_count_loc_ids.push(id);
-    } else {
-      movement_markers[id].marker.setMap(null);
+      var node_id = MapsLib.turn_count_locs[idx].fields.intersection;
+     
+      MapsLib.movement_markers[id] = new Object();
+      MapsLib.movement_markers[id].marker =  new google.maps.Marker({
+        map:MapsLib.map,
+        icon:marker_image,
+        position:new google.maps.LatLng(MapsLib.nodes[node_id][1], MapsLib.nodes[node_id][0]),
+        title:id.toString()
+      });
+      (function(i){
+        google.maps.event.addListener(MapsLib.movement_markers[id].marker, 'click', function() { MapsLib.getCountsInfo("turn",i); });
+      })(id);
     }
-  }  
-  $("span#movement_count_num").html(movement_count_num);
-  $("input[name=movement_loc_ids]").val(movement_count_loc_ids);  
-}
-
-/* Gets called when the information for a marker or a polyline comes back from the server,
- * and we need to display it in an info window.
- */
-function showInfoWindow(json) {
-  // console.log(json);
+    $("input[name=movement_loc_ids]").val(movement_count_loc_ids);
   
-  var content_str = '<div class="content">';
-  content_str     += json.where_str + '<br />';
-  for (var period_str in json.period_minutes) {
-    content_str   += json.period_minutes[period_str] + ' ' + period_str + '-minute counts<br />';
-  }
-  if (json.date_min == json.date_max) {
-    content_str   += "collected in " + json.date_min;
-  }
-  else {
-    content_str   += "collected between " + json.date_min + " and " + json.date_max;
-  }  
-  content_str     += '</div>';
-  infowindow.setContent(content_str);
-  
-  if (json.count_type == 'turn') {
-    infowindow.open(map, movement_markers[json.loc_id].marker);
-  } else {
-    infowindow.position = google.maps.geometry.spherical.interpolate(mainline_markers[json.loc_id].marker.getPath().getAt(0), 
-                                                                     mainline_markers[json.loc_id].marker.getPath().getAt(1), 0.5);
-    infowindow.open(map);
-  }
-}
+    /* Create mainline markers */
+    var mainline_count_loc_ids = [];
+    for (var idx = 0; idx < MapsLib.mainline_count_locs.length; idx++) {
+      var id = MapsLib.mainline_count_locs[idx].pk;
+      mainline_count_loc_ids.push(id);
+      var node_id_1 = MapsLib.mainline_count_locs[idx].fields.from_int;
+      var node_id_2 = MapsLib.mainline_count_locs[idx].fields.to_int;
+      MapsLib.mainline_markers[id] = new Object();
+      MapsLib.mainline_markers[id].marker = new google.maps.Polyline({
+        map:MapsLib.map,
+        path:[new google.maps.LatLng(MapsLib.nodes[node_id_1][1], MapsLib.nodes[node_id_1][0]),
+              new google.maps.LatLng(MapsLib.nodes[node_id_2][1], MapsLib.nodes[node_id_2][0])
+        ],
+        strokeColor:"#FF0000", strokeOpacity:0.8, strokeWeight:3,
+        // title:"{{mainline_count_loc}}"
+      });
+      (function(i){
+        google.maps.event.addListener(MapsLib.mainline_markers[id].marker, 'click', function() { MapsLib.getCountsInfo("mainline", i); });
+      })(id);  
+    }
+    $("input[name=mainline_loc_ids]").val(mainline_count_loc_ids);
 
-/* Gets called when a polyline or a marker is clicked; initiates a call to the server for
- * more information about that particular count location.
- */
-function getCountsInfo(type, id) {
-  console.log("getCountsInfo(" + type + "," + id + ")");
-  // request information on the counts available here  
-  $.getJSON("/countdracula/counts_for_location/", { count_type:type, loc_id:id }, showInfoWindow );
-}
+    /* Update display on GUI events
+    * Call this on all but the txt search address          
+    */
+    $(':input:not(#txtSearchAddress,#ddlRadius)').change(function(){ MapsLib.updateDisplay(); });
+    /* Enter is required */
+    $("#txtSearchAddress").keypress(function(e){
+      if (e.keyCode == '13') {
+        e.preventDefault();
+        MapsLib.filterByAddress(); }
+    }); 
+  },
+
+  /* Gets called when an UI element changes.*/
+  updateDisplay: function() {
+    console.log("updateDisplay");
+  
+    show_movement_locations = $("#movement").is(":checked");
+    show_mainline_locations = $("#mainline").is(":checked");
+  
+    var checked_years = [];
+    for (var idx = 0; idx < MapsLib.count_years.length; idx++) {
+      if ($("#year"+MapsLib.count_years[idx]).is(":checked")) {
+        checked_years.push(MapsLib.count_years[idx].toString());
+      }
+    }
+    console.log(checked_years);
+    var checked_vtypes = 0;
+    for (var idx = 0; idx < 6; idx++) {
+      if ($("#vtype"+idx).is(":checked")) {
+        checked_vtypes = checked_vtypes | (1<<idx);
+      }
+    }
+    console.log("checked_vtypes = " + checked_vtypes);
+    console.log("address = " + MapsLib.address + " and radius = " + MapsLib.searchRadius);
+    
+    /*************** mainline **************************/
+    var mainline_count_num = 0;
+    var mainline_count_loc_ids = [];  
+    for (var id in MapsLib.mainline_markers) {
+      if (show_mainline_locations == false) {
+        MapsLib.mainline_markers[id].marker.setMap(null);
+        continue;
+      }
+    
+      var year_qualifies = false;
+      var vtypes = 0; /* vtypes for the qualifying years */
+      for (var year in MapsLib.mainlinelocs_to_years[id]) {
+        if (jQuery.inArray(year, checked_years) >= 0) {
+          year_qualifies = true;
+          vtypes = vtypes | MapsLib.mainlinelocs_to_years[id][year];
+        }
+      }
+
+      var int_id = parseInt(id);
+      if (year_qualifies && (vtypes & checked_vtypes) &&
+          ((MapsLib.pinpoint_mainlinelocs.length == 0) || (MapsLib.pinpoint_mainlinelocs.indexOf(int_id) >= 0)) ) {
+        MapsLib.mainline_markers[id].marker.setMap(MapsLib.map);
+        mainline_count_num += 1;
+        mainline_count_loc_ids.push(id);
+      } else {
+        MapsLib.mainline_markers[id].marker.setMap(null);
+      }
+    }  
+    $("span#mainline_count_num").html(mainline_count_num);
+    $("input[name=mainline_loc_ids]").val(mainline_count_loc_ids);
+  
+    /*************** movement **************************/
+    var movement_count_num = 0;
+    var movement_count_loc_ids = [];  
+    for (var id in MapsLib.movement_markers) {
+      if (show_movement_locations == false) {
+        MapsLib.movement_markers[id].marker.setMap(null);
+        continue;
+      }
+    
+      var year_qualifies = false;
+      var vtypes = 0; /* vtypes for the qualifying years */
+      for (var year in MapsLib.turnlocs_to_years[id]) {
+        if (jQuery.inArray(year, checked_years) >= 0) {
+          year_qualifies = true;
+          vtypes = vtypes | MapsLib.turnlocs_to_years[id][year];
+        }
+      }
+      var int_id = parseInt(id);
+      if (year_qualifies && (vtypes & checked_vtypes) && 
+          ((MapsLib.pinpoint_turnlocs.length == 0) || (MapsLib.pinpoint_turnlocs.indexOf(int_id) >= 0)) ) {
+        MapsLib.movement_markers[id].marker.setMap(MapsLib.map);
+        movement_count_num += 1;
+        movement_count_loc_ids.push(id);
+      } else {
+        MapsLib.movement_markers[id].marker.setMap(null);
+      }
+    }  
+    $("span#turn_count_num").html(movement_count_num);
+    $("input[name=movement_loc_ids]").val(movement_count_loc_ids);  
+  },
+
+  /*Gets called when the user enters and address-based filter. */
+  filterByAddress: function() { 
+    // first we have to figure out the location
+    MapsLib.address = $("#txtSearchAddress").val();
+    console.log("filterByAddress with address = " + MapsLib.address);
+    console.log("geocoder = " + MapsLib.geocoder);
+    MapsLib.geocoder.geocode( { 'address':MapsLib.address }, MapsLib.geocodeResults);
+  },
+ 
+  geocodeResults: function(results, status) {
+    console.log("geocodeResults! status="+status);
+    MapsLib.searchRadius = $("#ddlRadius").val();
+    
+    if (status == google.maps.GeocoderStatus.OK) {
+      MapsLib.currentPinpoint = results[0].geometry.location;
+      console.log("location = " + MapsLib.currentPinpoint);
+      // $.address.parameter('address', encodeURIComponent(MapsLib.address));
+      // $.address.parameter('radius', encodeURIComponent(MapsLib.searchRadius));
+      // MapsLib.map.setCenter(MapsLib.currentPinpoint);
+      // MapsLib.map.setZoom(14);
+
+      MapsLib.addrMarker = new google.maps.Marker({
+        position: MapsLib.currentPinpoint, 
+        map: MapsLib.map, 
+        animation: google.maps.Animation.DROP,
+        title:MapsLib.address
+      });
+      MapsLib.drawSearchRadiusCircle(MapsLib.currentPinpoint);
+      
+      // query the server for this
+      $.getJSON("/countdracula/countlocs_for_point/", { lat:MapsLib.currentPinpoint.lat(), lng:MapsLib.currentPinpoint.lng(), 
+        radius:MapsLib.searchRadius }, MapsLib.receiveCountLocationsForPinpoint );      
+    }
+  },
+  
+  resetGeofilter: function() {
+    console.log("resetGeofilter");
+    MapsLib.currentPinpoint         = null;
+    MapsLib.addrMarker.setMap(null);
+    MapsLib.addrMarker              = null;
+    MapsLib.searchRadiusCircle.setMap(null);
+    MapsLib.searchRadiusCircle      = null;
+    
+    MapsLib.pinpoint_turnlocs       = [];
+    MapsLib.pinpoint_mainlinelocs   = [];
+    
+    MapsLib.updateDisplay();    
+  },
+  
+  receiveCountLocationsForPinpoint: function(json) {
+    // console.log(json);
+    MapsLib.pinpoint_turnlocs     = json.movement_locs;
+    MapsLib.pinpoint_mainlinelocs = json.mainline_locs;
+    MapsLib.updateDisplay();
+  },
+
+  drawSearchRadiusCircle: function(point) {
+      var circleOptions = {
+        strokeColor: "#4b58a6",
+        strokeOpacity: 0.3,
+        strokeWeight: 1,
+        fillColor: "#4b58a6",
+        fillOpacity: 0.05,
+        map: MapsLib.map,
+        center: point,
+        clickable: false,
+        zIndex: -1,
+        radius: parseInt(MapsLib.searchRadius)
+      };
+      MapsLib.searchRadiusCircle = new google.maps.Circle(circleOptions);
+  },
+
+ /* Gets called when the information for a marker or a polyline comes back from the server,
+  * and we need to display it in an info window.
+  */
+  showInfoWindow: function(json) {
+    // console.log(json);
+  
+    var content_str = '<div class="content">';
+    content_str     += json.where_str + '<br />';
+    for (var period_str in json.period_minutes) {
+      content_str   += json.period_minutes[period_str] + ' ' + period_str + '-minute counts<br />';
+    }
+    if (json.date_min == json.date_max) {
+      content_str   += "collected in " + json.date_min;
+    }
+    else {
+      content_str   += "collected between " + json.date_min + " and " + json.date_max;
+    }   
+    content_str     += '</div>';
+    MapsLib.infowindow.setContent(content_str);
+  
+    if (json.count_type == 'turn') {
+      MapsLib.infowindow.open(MapsLib.map, MapsLib.movement_markers[json.loc_id].marker);
+    } else {
+      MapsLib.infowindow.position = google.maps.geometry.spherical.interpolate(
+        MapsLib.mainline_markers[json.loc_id].marker.getPath().getAt(0), 
+        MapsLib.mainline_markers[json.loc_id].marker.getPath().getAt(1), 0.5);
+      MapsLib.infowindow.open(MapsLib.map);
+    }
+  },
+
+ /* Gets called when a polyline or a marker is clicked; initiates a call to the server for
+  * more information about that particular count location.
+  */
+  getCountsInfo: function(type, id) {
+    console.log("getCountsInfo(" + type + "," + id + ")");
+    // request information on the counts available here  
+    $.getJSON("/countdracula/counts_for_location/", { count_type:type, loc_id:id }, MapsLib.showInfoWindow );
+  },
+
+} /* end MapsLib */
 
 $(document).ready(function () {});
 </script>
 <link rel="stylesheet" href="{{ STATIC_URL }}gmap.css"/>
 </head>
-<body onload='initialize()'>
+<body onload='MapsLib.initialize()'>
   <div id="header"><h1>Count Dracula</h1></div>
   <div id="nav"><form name="download" action="/countdracula/download/" method="post">{% csrf_token %}
    <table id='filters'>
@@ -237,6 +329,22 @@ $(document).ready(function () {});
        <input type="checkbox" id="year{{year}}" name="count-year" value="year{{year}}" >{{year}}<br />       
        {% endfor %}
        </td>
+   </tr>
+   <tr><th style="border-bottom:none">Within</th>
+        <td style="border-bottom:none" id="within-radius">
+         <select id='ddlRadius'>
+         <option value='400'>2 blocks</option>
+         <option selected value='805'>1/2 mile</option>
+         <option value='1610'>1 mile</option>
+         <option value='3220'>2 miles</option>
+         </select>
+         <a href="#" id="reset" onclick="MapsLib.resetGeofilter(); return false;">reset</a>
+       </td>
+   </tr>
+   <tr><th style="border-top:none">Of</th>
+       <td style="border-top:none">
+       <input class='input-block-level' type="text" placeholder='address' id="txtSearchAddress" />
+        </td>
    </tr>
    </table>
    

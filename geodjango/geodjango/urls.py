@@ -22,6 +22,9 @@ urlpatterns = patterns('',
     # for the map view to fetch count information for a location
     url(r'^counts_for_location/$', 'countdracula.views.counts_for_location'),
     
+    # for the map view to fetch locations near a point
+    url(r'^countlocs_for_point/$', 'countdracula.views.countlocs_for_point'),
+    
     # download button from map
     url(r'^download/', 'countdracula.views.download')
 

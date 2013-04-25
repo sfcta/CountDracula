@@ -1,6 +1,8 @@
 from collections import defaultdict
 import csv, datetime
+from django.contrib.gis.geos import fromstr
 from django.core.context_processors import csrf
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -83,7 +85,7 @@ def mapview(request):
     
 def counts_for_location(request):
     """
-    This enables the mapview to fetch count information for a location.
+    This enables the map view to fetch count information for a location.
     """
     results = {
       'success':False,
@@ -127,6 +129,31 @@ def counts_for_location(request):
     if 'date_max' in results: results['date_max'] = str(results['date_max'])
     return HttpResponse(simplejson.dumps(results), mimetype='application/json')
 
+def countlocs_for_point(request):
+    """
+    This enables the map view to fetch count locations near a point.
+    """
+    results = {}
+    try:
+        lat     = float(request.GET[u'lat'])
+        lng     = float(request.GET[u'lng'])
+        radius  = int(request.GET[u'radius'])
+        
+        pinpoint= fromstr('POINT(%.6f %.6f)' % (lng,lat), srid=4326)
+        
+        node_qs = Node.objects.filter(point__distance_lte=(pinpoint, radius))
+        tcl_qs  = TurnCountLocation.objects.filter(intersection__in=node_qs)
+        results['movement_locs'] = [tcl.id for tcl in tcl_qs]
+        
+        ml_qs   = MainlineCountLocation.objects.filter( Q(from_int__in=node_qs) | Q(to_int__in=node_qs) )
+        results['mainline_locs'] = [ml.id for ml in ml_qs]
+        
+    except Exception as inst:
+        results['error'] = inst
+
+    return HttpResponse(simplejson.dumps(results), mimetype='application/json')
+
+        
 def download(request):
     
     response = HttpResponse(content_type='text/csv')

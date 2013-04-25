@@ -304,9 +304,9 @@ $(document).ready(function () {});
 <link rel="stylesheet" href="{{ STATIC_URL }}gmap.css"/>
 </head>
 <body onload='MapsLib.initialize()'>
-  <div id="header"><h1>Count Dracula</h1></div>
   <div id="nav"><form name="download" action="/countdracula/download/" method="post">{% csrf_token %}
    <table id='filters'>
+   <tr><td colspan="2"><img src="{{ STATIC_URL }}count_db_logo_220w.jpg" alt="Count Dracula Database logo">
    <tr><th>Count Types</th>
        <td id="count-type">
        <input type="checkbox" id="movement" name="count-type" value="movement" />Movement<br />
@@ -348,8 +348,8 @@ $(document).ready(function () {});
    </tr>
    </table>
    
-   <p>Movement locations: <span id="turn_count_num">{{ turn_count_locs|length }}</span></p>
-   <p>Mainline locations: <span id="mainline_count_num">{{ mainline_count_locs|length }}</span></p>
+   <p>Movement locations: <span id="turn_count_num">{{ turn_count_locs|length }}</span><br />
+      Mainline locations: <span id="mainline_count_num">{{ mainline_count_locs|length }}</span></p>
    
    <input type="hidden" id="mainline_loc_ids" name="mainline_loc_ids" value="" />
    <input type="hidden" id="movement_loc_ids" name="movement_loc_ids" value="" />

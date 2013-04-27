@@ -19,14 +19,19 @@ body {
 }
 
 #map {
- height:90%;
+ height:95%;
  margin:5px;
 }
 
 #footer {
  clear:both;
- height:50px;
+ height:20px;
  margin-bottom:10px;
+ text-align:right;
+ color:#999999;
+}
+#footer a {
+ color:#999999;
 }
 
 

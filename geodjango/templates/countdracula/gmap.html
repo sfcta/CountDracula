@@ -187,7 +187,10 @@ var MapsLib = {
   },
 
   /*Gets called when the user enters and address-based filter. */
-  filterByAddress: function() { 
+  filterByAddress: function() {
+    // reset what filter we already have
+    if (MapsLib.currentPinpoint != null) { MapsLib.resetGeofilter(false); }
+    
     // first we have to figure out the location
     MapsLib.address = $("#txtSearchAddress").val();
     console.log("filterByAddress with address = " + MapsLib.address);
@@ -221,7 +224,7 @@ var MapsLib = {
     }
   },
   
-  resetGeofilter: function() {
+  resetGeofilter: function(update_display) {
     console.log("resetGeofilter");
     MapsLib.currentPinpoint         = null;
     MapsLib.addrMarker.setMap(null);
@@ -232,7 +235,7 @@ var MapsLib = {
     MapsLib.pinpoint_turnlocs       = [];
     MapsLib.pinpoint_mainlinelocs   = [];
     
-    MapsLib.updateDisplay();    
+    if (update_display) { MapsLib.updateDisplay(); }    
   },
   
   receiveCountLocationsForPinpoint: function(json) {
@@ -306,7 +309,7 @@ $(document).ready(function () {});
 <body onload='MapsLib.initialize()'>
   <div id="nav"><form name="download" action="/countdracula/download/" method="post">{% csrf_token %}
    <table id='filters'>
-   <tr><td colspan="2"><img src="{{ STATIC_URL }}count_db_logo_220w.jpg" alt="Count Dracula Database logo">
+   <tr><td colspan="2"><img src="{{ STATIC_URL }}count_db_logo_500w.jpg" alt="Count Dracula Database logo" style="width:100%">
    <tr><th>Count Types</th>
        <td id="count-type">
        <input type="checkbox" id="movement" name="count-type" value="movement" />Movement<br />
@@ -338,7 +341,7 @@ $(document).ready(function () {});
          <option value='1610'>1 mile</option>
          <option value='3220'>2 miles</option>
          </select>
-         <a href="#" id="reset" onclick="MapsLib.resetGeofilter(); return false;">reset</a>
+         <a href="#" id="reset" onclick="MapsLib.resetGeofilter(true); return false;">reset</a>
        </td>
    </tr>
    <tr><th style="border-top:none">Of</th>

@@ -5,3 +5,5 @@ doc/_generated/*
 *.DEBUG.log
 *.bak
 static/*
+uploads/*.xls
+uploads/*.xlsx

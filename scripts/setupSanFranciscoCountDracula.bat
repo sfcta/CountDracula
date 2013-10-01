@@ -1,4 +1,5 @@
 
+
 :: RUN THIS IN THE CountDracula directory
 ::
 :: set PATH to have Python, psql, runtpp, geo (for libraries), git
@@ -86,6 +87,6 @@ python insertSanFranciscoMTCCounts.py lisa "Q:\Roadway Observed Data\MTC\all_MTC
 ::
 :: insert other counts
 ::
-python insertSanFranciscoCounts.py -f "Q:\Roadway Observed Data\Counts\Standard\v1.0\CountDraculaFailed" -s "Q:\Roadway Observed Data\Counts\Standard\v1.0\CountDraculaSuccess" lisa "Q:\Roadway Observed Data\Counts\Standard\v1.0\CountDraculaToProcess"
+python insertSanFranciscoCounts.py -f "Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaFailed" -s "Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaSuccess" lisa "Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaToProcess"
 
 :done

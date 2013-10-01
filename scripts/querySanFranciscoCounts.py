@@ -3,6 +3,8 @@ Created on April 3, 2012
 @author: lmz
 
 Quick script to print out a tally of the most popular time slices for counts in the database.
+
+NOTE: this is broken...
 """ 
 
 import countdracula

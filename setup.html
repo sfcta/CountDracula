@@ -172,11 +172,7 @@ respectively.</li>
 58
 59
 60
-61
-62
-63</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">goto</span> <span class="nl">here</span>
-
-<span class="c">:: RUN THIS IN THE CountDracula directory</span>
+61</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">:: RUN THIS IN THE CountDracula directory</span>
 <span class="c">::</span>
 <span class="c">:: set PATH to have Python, psql, runtpp, geo (for libraries), git</span>
 <span class="c">::</span>
@@ -315,9 +311,7 @@ map view.</p>
 23
 24
 25
-26
-27
-28</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">::</span>
+26</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">::</span>
 <span class="c">:: get in place to run scripts</span>
 <span class="c">::</span>
 <span class="k">cd</span> ..\scripts
@@ -327,7 +321,6 @@ map view.</p>
 <span class="c">::</span>
 python insertSanFranciscoIntersectionsFromCube.py Y:\networks\Roads<span class="m">2010</span>\FREEFLOW.net
 
-<span class="nl">:here</span>
 <span class="c">::</span>
 <span class="c">:: insert PeMS counts</span>
 <span class="c">::</span>
@@ -341,8 +334,7 @@ python insertSanFranciscoMTCCounts.py lisa <span class="s2">&quot;Q:\Roadway Obs
 <span class="c">::</span>
 <span class="c">:: insert other counts</span>
 <span class="c">::</span>
-<span class="c">:: python insertSanFranciscoCounts.py -f &quot;Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaFailed&quot; -s &quot;Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaSuccess&quot; lisa &quot;Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaToProcess&quot;</span>
-python insertSanFranciscoCounts.py lisa <span class="s2">&quot;Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaToProcess&quot;</span>
+python insertSanFranciscoCounts.py -f <span class="s2">&quot;Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaFailed&quot;</span> -s <span class="s2">&quot;Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaSuccess&quot;</span> lisa <span class="s2">&quot;Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaToProcess&quot;</span>
 
 <span class="nl">:done</span>
 </pre></div>

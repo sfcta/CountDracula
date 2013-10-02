@@ -86,7 +86,9 @@ python insertSanFranciscoMTCCounts.py lisa "Q:\Roadway Observed Data\MTC\all_MTC
 
 ::
 :: insert other counts
-::
+::   -> process                                 Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaToProcess
+::   -> move successfully processed files into: Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaSuccess
+::   -> move failures into:                     Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaFailed
 python insertSanFranciscoCounts.py -f "Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaFailed" -s "Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaSuccess" lisa "Q:\Roadway Observed Data\Counts\CountDraculaCounts\CountDraculaToProcess"
 
 :done

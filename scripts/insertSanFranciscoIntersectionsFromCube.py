@@ -59,7 +59,7 @@ def readCubeNetwork(cube_network, logger):
     hostname = socket.gethostname().lower()
     if hostname not in ['berry']:
         cmd = r'Y:\champ\util\bin\dispatch-one.bat "%s"' % cmd
-        env['MACHINES'] = 'taraval'
+        env['MACHINES'] = 'vanness'
 
     logger.info("Running %s" % cmd)           
     proc = subprocess.Popen( cmd, 

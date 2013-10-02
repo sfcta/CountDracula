@@ -13,10 +13,10 @@ if geo_path not in sys.path:
 	sys.path.append(geo_path)
 # print sys.path
 # print os.environ['PATH']
-os.environ['PATH']=r"C:\Python27;C:\OSGeo4W\bin;C:\Windows\SysWoW64;C:\Windows\System32"
+os.environ['PATH']=r"C:\Python27;C:\OSGeo4W\bin;C:\Program Files (x86)\PostgreSQL\9.0\bin;C:\Windows\SysWoW64;C:\Windows\System32"
 
 from django.contrib.gis import gdal
-# print gdal.HAS_GDAL
+print "gdal.HAS_GDAL? " + str(gdal.HAS_GDAL)
 # print os.environ
 
 import django.core.handlers.wsgi

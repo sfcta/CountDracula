@@ -58,7 +58,7 @@ def readCubeNetwork(cube_network, logger):
     env = dict(os.environ)
     hostname = socket.gethostname().lower()
     if hostname not in ['berry']:
-        cmd = r'Y:\champ\util\bin\dispatch-one.bat "%s"' % cmd
+        cmd = r'Y:\champ\util\bin\dispatch-one.bat %s' % cmd
         env['MACHINES'] = 'vanness'
 
     logger.info("Running %s" % cmd)           

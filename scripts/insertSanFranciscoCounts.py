@@ -123,8 +123,8 @@ if __name__ == '__main__':
 
         full_file_path = os.path.join(dir, file)
         # optimism: assume success! (ok but also it'll be easier to find)
-        if SUCCESS_DIR:
-            full_file_path = os.path.join(SUCCESS_DIR, file) 
+        if SUCCESS_DIR and not os.path.exists(os.path.join(SUCCESS_DIR, file)):
+            full_file_path = os.path.join(SUCCESS_DIR, file)
             shutil.move(os.path.join(dir,file), full_file_path)
         
         streetlist = CountsWorkbookParser.parseFilename(file)
@@ -137,7 +137,7 @@ if __name__ == '__main__':
             mainline_processed_counts += processed
             mainline_processed_files += (1 if processed >= 0 else 0)
             
-            if processed < 0 and FAIL_DIR: shutil.move(full_file_path, os.path.join(FAIL_DIR, file))
+            if processed < 0 and FAIL_DIR and os.path.exists(os.path.join(FAIL_DIR, file)): shutil.move(full_file_path, os.path.join(FAIL_DIR, file))
                                        
         elif len(streetlist) == 2:
             turns_attempted_files += 1
@@ -147,12 +147,12 @@ if __name__ == '__main__':
             turns_processed_counts += processed
             turns_processed_files += (1 if processed >= 0 else 0)
 
-            if processed < 0 and FAIL_DIR: shutil.move(full_file_path, os.path.join(FAIL_DIR, file))
+            if processed < 0 and FAIL_DIR and os.path.exists(os.path.join(FAIL_DIR, file)): shutil.move(full_file_path, os.path.join(FAIL_DIR, file))
             
         else:
             logger.info("Didn't understand filename %s" % file)
             
-            if FAIL_DIR: shutil.move(full_file_path, os.path.join(FAIL_DIR, file))
+            if FAIL_DIR and not os.path.exists(os.path.join(FAIL_DIR, file)): shutil.move(full_file_path, os.path.join(FAIL_DIR, file))
 
     logger.info("Mainline counts: %4d processed files out of %4d attempts" % (mainline_processed_files, mainline_attempted_files))
     logger.info("Turn     counts: %4d processed files out of %4d attempts" % (   turns_processed_files,    turns_attempted_files))

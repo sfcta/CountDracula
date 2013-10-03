@@ -25,7 +25,7 @@ The following were used to develop and test CountDracula:
   
   * `psycopg <http://www.initd.org/psycopg/>`_, an PostgreSQL adapter for Python.  *Tested with psycopg 2.4.5*
   * `xlrd <http://pypi.python.org/pypi/xlrd>`_, a python library for reading Microsoft Excel files.  
-    *Tested with xlrd 0.7.1*
+    *Tested with xlrd 0.9.2*
   * `python-memcached <http://pypi.python.org/pypi/python-memcached/>`_ This is a memory-based caching
     framework that can help with performance.  Optional. *Tested with python-memcached 1.48*.
   * `django <https://www.djangoproject.com/>`_  *Tested with django-1.5.1*

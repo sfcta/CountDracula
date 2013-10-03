@@ -107,8 +107,8 @@ if __name__ == '__main__':
         
     if STARTFILE: started = False
     for file in files_to_process:
-        if file[-4:] !='.xls':
-            print "File suffix is not .xls: %s -- skipping" % file[-4:]
+        if file[-4:] !='.xls' and file[-5:] != '.xlsx':
+            print "File suffix is not .xls or .xlsx: %s -- skipping" % file
             continue
         
         # given a STARTFILE -- look for it

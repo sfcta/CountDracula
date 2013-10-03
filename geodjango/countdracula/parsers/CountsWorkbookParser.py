@@ -297,7 +297,7 @@ class CountsWorkbookParser():
             
             for sheet_idx in range(len(sheetnames)) :
                
-                if sheetnames[sheet_idx]=="source": continue
+                if sheetnames[sheet_idx].lower()=="source": continue
                 activesheet = book.sheet_by_name(sheetnames[sheet_idx])
                 
                 # Create date from sheetname in date format 

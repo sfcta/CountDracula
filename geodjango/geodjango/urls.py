@@ -14,6 +14,9 @@ urlpatterns = patterns('',
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
+    url(r'^admin_auth/', include(admin.site.urls)),
+
+    # Count Dracula admin - edit count dracula models
     url(r'^admin/', include(countdracula_admin.urls)),
     
     # map view

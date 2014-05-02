@@ -19,6 +19,7 @@ class CountDraculaAdminSite(admin.sites.AdminSite):
         my_urls = patterns('', (r'^upload_counts/$', self.admin_view(self.upload_view)))
         # print "CountDraculaAdminSite"
         # print (my_urls + urls)
+        # todo: can we put the auth (admin.site.get_urls() here?  it'd be nice to have one page)
         return my_urls + urls
     
     def upload_view(self, request):

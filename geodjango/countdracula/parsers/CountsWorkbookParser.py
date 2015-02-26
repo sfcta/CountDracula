@@ -19,11 +19,11 @@ class CountsWorkbookParser():
         """
         Parse the filename into the component streets and returns them as a list.
         
-        Delimiters are `_`, `-`, `.` and ` `.
+        Delimiters are `_` and `.`.
         """
         # strip the suffix
         streets = filename[:filename.rfind(".")]
-        delimiters = "_-."
+        delimiters = "_."
         
         # convert them all to spaces
         for delim in delimiters: streets = streets.replace(delim, " ")

@@ -130,7 +130,7 @@ class CountsWorkbookParser():
                 
         
     
-    def findSectionStarts(self, worksheet):
+    def findSectionStarts(self, worksheet, logger):
         """
         Simple method to iterate through the rows in the workbook and find sections, where a section is defined as a
         set of contiguous non-blank rows.
@@ -145,8 +145,10 @@ class CountsWorkbookParser():
             
             # check if the row is blank
             for colnum in range(worksheet.ncols):
-                if worksheet.cell_type(rownum, colnum) not in [xlrd.XL_CELL_BLANK, xlrd.XL_CELL_EMPTY]:
+                if worksheet.cell_type(rownum, colnum) not in [xlrd.XL_CELL_BLANK, xlrd.XL_CELL_EMPTY] and \
+                   not str(worksheet.cell_value(rownum,colnum)).isspace():
                     blank = False
+                    logger.debug("section start cell value = [%s]" % str(worksheet.cell_value(rownum,colnum)))
                     break
             # blank -- end section
             if blank and current_startrow != -1:
@@ -305,7 +307,7 @@ class CountsWorkbookParser():
                 date_yyyy_mm_dd = date(int(tmp_date[0]),int(tmp_date[1]),int(tmp_date[2]) )
 
                 project  = ""
-                sections = self.findSectionStarts(activesheet)
+                sections = self.findSectionStarts(activesheet, logger)
                 # loop through the different sections in the workbook
                 for section in sections:
                 
@@ -501,8 +503,10 @@ class CountsWorkbookParser():
                 date_yyyy_mm_dd = date(int(tmp_date[0]),int(tmp_date[1]),int(tmp_date[2]) )
 
                 project  = ""
-                sections = self.findSectionStarts(activesheet)
-                
+                sections = self.findSectionStarts(activesheet, logger)
+
+                logger.debug("sheet %s sections = %s" % (sheetnames[sheet_idx], str(sections))) 
+               
                 # loop through the different sections in the workbook
                 for section in sections:
 

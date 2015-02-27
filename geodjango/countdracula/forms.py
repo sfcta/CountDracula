@@ -21,10 +21,7 @@ class UploadCountForm(forms.Form):
         # if not os.path.isabs(sourcefile_name):
         #     raise forms.ValidationError("Sourcefile must be an absolute path to an excel file.  Invalid value: %s" % sourcefile_name)
         
-        # check if the file already exists in uploads
-        if os.path.exists(os.path.join(settings.UPLOAD_DIR, sourcefile_name)):
-            raise forms.ValidationError("Sourcefile %s already exists in uploads area." % sourcefile_name)
-        
+       
         if sourcefile_name[-4:].lower() != ".xls" and sourcefile_name[-5:].lower() != ".xlsx":
             raise forms.ValidationError("Sourcefile must be have a .xls|.xlsx suffix.  Invalid value: %s" % sourcefile_name)
         
@@ -41,9 +38,20 @@ class UploadCountForm(forms.Form):
         Do the work!  Read and insert the turn counts into the database.
         Returns ( num_processed, error_string ), where num_processed will be -1 on error.
         """
+        # Figure out a filename
+        file_suffix_num     = 1
+        new_filename        = file.name
+        # check if the file already exists in uploads
+        while os.path.exists(os.path.join(settings.UPLOAD_DIR, new_filename)):
+            if file.name[-4:].lower() == ".xls":
+                new_filename = "%s_%d%s" % (file.name[:-4],file_suffix_num,file.name[-4:])
+            else:
+                new_filename = "%s_%d%s" % (file.name[:-5],file_suffix_num,file.name[-5:])
+            file_suffix_num += 1
+ 
         
         # for now, save the file to c:\CountDracula\uploads
-        with open(os.path.join(settings.UPLOAD_DIR, file.name), 'wb+') as destination:
+        with open(os.path.join(settings.UPLOAD_DIR, new_filename), 'wb+') as destination:
             for chunk in file.chunks():
                 destination.write(chunk)
         
@@ -53,16 +61,18 @@ class UploadCountForm(forms.Form):
         logHandler.setLevel(logging.INFO)
         logging.getLogger().addHandler(logHandler)
         
+        logging.info("Saving into uploads as [%s]" % new_filename)
+
         if len(self.cleaned_data['streetnames']) == 2:
             # turn counts
-            processed = self.xl_parser.readAndInsertTurnCounts(os.path.join(settings.UPLOAD_DIR, file.name), 
+            processed = self.xl_parser.readAndInsertTurnCounts(os.path.join(settings.UPLOAD_DIR, new_filename), 
                                                                self.cleaned_data['streetnames'][0], 
                                                                self.cleaned_data['streetnames'][1], 
                                                                request.user,
                                                                logging.getLogger())
         else:
             # mainline counts
-            processed = self.xl_parser.readAndInsertMainlineCounts(os.path.join(settings.UPLOAD_DIR, file.name), 
+            processed = self.xl_parser.readAndInsertMainlineCounts(os.path.join(settings.UPLOAD_DIR, new_filename), 
                                                                    self.cleaned_data['streetnames'][0], 
                                                                    self.cleaned_data['streetnames'][1],
                                                                    self.cleaned_data['streetnames'][2],
@@ -77,8 +87,8 @@ class UploadCountForm(forms.Form):
 
         # remove file on failure
         if processed < 0:
-            os.remove(os.path.join(settings.UPLOAD_DIR, file.name))
-            return_str += "Removed %s" % os.path.join(settings.UPLOAD_DIR, file.name)
+            os.remove(os.path.join(settings.UPLOAD_DIR, new_filename))
+            return_str += "Removed %s" % os.path.join(settings.UPLOAD_DIR,new_filename)
 
         return_str = return_str.replace("<","&lt;")
         return_str = return_str.replace(">","&gt;")

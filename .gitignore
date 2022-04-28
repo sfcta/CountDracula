@@ -1,9 +1,0 @@
-*.pyc
-.settings/*
-doc/_build/*
-doc/_generated/*
-*.DEBUG.log
-*.bak
-static/*
-uploads/*.xls
-uploads/*.xlsx
